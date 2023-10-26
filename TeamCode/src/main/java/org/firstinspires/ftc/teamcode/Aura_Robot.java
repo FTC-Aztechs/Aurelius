@@ -29,24 +29,16 @@
 
 package org.firstinspires.ftc.teamcode;
 
-//import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.Pose2d;
-import com.acmerobotics.roadrunner.Pose2dDual;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-
 import org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-//import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
-//import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
-import org.firstinspires.ftc.teamcode.MecanumDrive;
 import org.openftc.easyopencv.OpenCvWebcam;
 
 import java.util.Locale;
@@ -60,6 +52,7 @@ public class Aura_Robot
         LOWER_LEFT,
         UPPER_RIGHT,
         LOWER_RIGHT,
+        INTAKE,
         CAT_MOUSE,
         ALL_DRIVES,
         ALL_ATTACHMENTS,
@@ -70,8 +63,7 @@ public class Aura_Robot
     {
         FLAMETHROWER,
         CARTOON,
-        TEACUP,
-        TILT
+        TEACUP
     }
 
     enum AutoState
@@ -92,21 +84,16 @@ public class Aura_Robot
     public DcMotor lower_left = null;
     public DcMotor lower_right = null;
 
-    public DcMotor Jerry = null;
-    public DcMotor Tom = null;
+    public DcMotor intake = null;
 
-    public Servo FlameThrower = null;
-    public Servo Looney = null;
-    public Servo Teacup = null;
-    public Servo Tilted_Towers = null;
+//    public DcMotor Jerry = null;
+//    public DcMotor Tom = null;
 
-//    public Mvrk_LiftController TomAndJerrySlide;
-//    public Mvrk_TurretController TeacupTurret;
-//    public Mvrk_ClawController LooneyClaw;
-//    public Mvrk_FlameController FlameThrowerSlide;
-//    public Mvrk_TiltedTowers TiltTowers;
 
-    public WebcamName eyeOfSauron = null;
+
+//    public Aura_LiftController TomAndJerrySlide;
+
+    public WebcamName Khimera = null;
     OpenCvWebcam Sauron = null;
 
     // speeds/times
@@ -322,15 +309,14 @@ public class Aura_Robot
         lower_left = hwMap.get(DcMotor.class, "Lower_Left");
         lower_right = hwMap.get(DcMotor.class, "Lower_Right");
 
-        Jerry = hwMap.get(DcMotor.class, "Jerry");
-        Tom = hwMap.get(DcMotor.class, "Tom");
+//        Jerry = hwMap.get(DcMotor.class, "Jerry");
+//        Tom = hwMap.get(DcMotor.class, "Tom");
 
 
         //Servo
-        FlameThrower = hwMap.get(Servo.class, "Flamethrower");
-        Looney = hwMap.get(Servo.class, "Looney_Toons");
-        Teacup = hwMap.get(Servo.class, "Teacup");
-        Tilted_Towers = hwMap.get(Servo.class, "Tilt");
+//        FlameThrower = hwMap.get(Servo.class, "Flamethrower");
+//        Looney = hwMap.get(Servo.class, "Looney_Toons");
+//        Teacup = hwMap.get(Servo.class, "Teacup");
 
 
         // Set all motors to zero power
@@ -339,8 +325,8 @@ public class Aura_Robot
         lower_left.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         lower_right.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        Jerry.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        Tom.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+//        Jerry.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+//        Tom.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         // Most robots need the motor on one side to be reversed to drive forward
         // Reverse the motor that runs backwards when connected directly to the battery
@@ -349,23 +335,21 @@ public class Aura_Robot
         lower_left.setDirection(DcMotor.Direction.REVERSE); //- used to be
         lower_right.setDirection(DcMotor.Direction.FORWARD); //+ used to be
 
-        Jerry.setDirection(DcMotor.Direction.FORWARD); //- used to be
-        Tom.setDirection(DcMotor.Direction.FORWARD); //+ used to be
+//        Jerry.setDirection(DcMotor.Direction.FORWARD); //- used to be
+//        Tom.setDirection(DcMotor.Direction.FORWARD); //+ used to be
 
-        Looney.setDirection(Servo.Direction.FORWARD);
-        Teacup.setDirection(Servo.Direction.FORWARD);
-        FlameThrower.setDirection(Servo.Direction.FORWARD);
-        Tilted_Towers.setDirection(Servo.Direction.FORWARD);
+//        Looney.setDirection(Servo.Direction.FORWARD);
+//        Teacup.setDirection(Servo.Direction.FORWARD);
+
 
         Pose2d initPose2d = new Pose2d(0,0,0);
-        AuraMecanumDrive = new MecanumDrive(hwMap,initPose2d );
-//        eyeOfSauron = hwMap.get(WebcamName.class, "Sauron");
-//
+        AuraMecanumDrive = new MecanumDrive(hwMap, initPose2d);
+        Khimera = hwMap.get(WebcamName.class, "Kemera");
+
 //        TomAndJerrySlide = new Mvrk_LiftController(hwMap);
 //        TeacupTurret = new Mvrk_TurretController(hwMap);
 //        LooneyClaw = new Mvrk_ClawController(hwMap);
-//        FlameThrowerSlide = new Mvrk_FlameController(hwMap);
-//        TiltTowers = new Mvrk_TiltedTowers(hwMap);
+
     }
     String formatAngle( AngleUnit angleUnit, double angle) {
         return formatDegrees(angleUnit.DEGREES.fromUnit(angleUnit, angle));
@@ -402,10 +386,10 @@ public class Aura_Robot
             case LOWER_RIGHT:
                 lower_right.setMode(eMode);
                 break;
-            case CAT_MOUSE:
-                Jerry.setMode(eMode);
-                Tom.setMode(eMode);
-                break;
+//            case CAT_MOUSE:
+//                Jerry.setMode(eMode);
+//                Tom.setMode(eMode);
+//                break;
             case ALL_DRIVES:
                 lower_right.setMode(eMode);
                 lower_left.setMode(eMode);
@@ -415,12 +399,12 @@ public class Aura_Robot
             case ALL_ATTACHMENTS:
                 break;
             case ALL:
-                lower_right.setMode(eMode);
-                lower_left.setMode(eMode);
-                upper_right.setMode(eMode);
-                upper_left.setMode(eMode);
-                Jerry.setMode(eMode);
-                Tom.setMode(eMode);
+//                lower_right.setMode(eMode);
+//                lower_left.setMode(eMode);
+//                upper_right.setMode(eMode);
+//                upper_left.setMode(eMode);
+//                Jerry.setMode(eMode);
+//                Tom.setMode(eMode);
                 break;
         }
     }
@@ -441,10 +425,10 @@ public class Aura_Robot
             case LOWER_RIGHT:
                 lower_right.setPower(dPower);
                 break;
-            case CAT_MOUSE:
-                Jerry.setPower(dPower);
-                Tom.setPower(dPower);
-                break;
+//            case CAT_MOUSE:
+//                Jerry.setPower(dPower);
+//                Tom.setPower(dPower);
+//                break;
             case ALL_DRIVES:
                 lower_right.setPower(dPower);
                 lower_left.setPower(dPower);
@@ -452,12 +436,12 @@ public class Aura_Robot
                 upper_left.setPower(dPower);
                 break;
             case ALL:
-                lower_right.setPower(dPower);
-                lower_left.setPower(dPower);
-                upper_right.setPower(dPower);
-                upper_left.setPower(dPower);
-                Jerry.setPower(dPower);
-                Tom.setPower(dPower);
+//                lower_right.setPower(dPower);
+//                lower_left.setPower(dPower);
+//                upper_right.setPower(dPower);
+//                upper_left.setPower(dPower);
+//                Jerry.setPower(dPower);
+//                Tom.setPower(dPower);
                 break;
         }
     }
@@ -474,8 +458,8 @@ public class Aura_Robot
                 return upper_right.getCurrentPosition();
             case LOWER_RIGHT:
                 return lower_right.getCurrentPosition();
-            case CAT_MOUSE:
-                return Tom.getCurrentPosition();
+//            case CAT_MOUSE:
+//                return Tom.getCurrentPosition();
             default:
                 return 0;
         }
@@ -485,18 +469,15 @@ public class Aura_Robot
     {
         switch( eWhichServo)
         {
-            case FLAMETHROWER:
-                FlameThrower.setPosition(iPos);
-                break;
-            case CARTOON:
-                Looney.setPosition(iPos);
-                break;
-            case TEACUP:
-                Teacup.setPosition(iPos);
-                break;
-            case TILT:
-                Tilted_Towers.setPosition(iPos);
-                break;
+//            case FLAMETHROWER:
+//                FlameThrower.setPosition(iPos);
+//                break;
+//            case CARTOON:
+//                Looney.setPosition(iPos);
+//                break;
+//            case TEACUP:
+//                Teacup.setPosition(iPos);
+//                break;
             default :
                 break;
         }
@@ -516,14 +497,14 @@ public class Aura_Robot
                 return upper_right.isBusy();
             case LOWER_RIGHT: // lower right
                 return lower_right.isBusy();
-            case CAT_MOUSE:
-                return Jerry.isBusy() && Tom.isBusy();
+//            case CAT_MOUSE:
+//                return Jerry.isBusy() && Tom.isBusy();
             case ALL_DRIVES: // All Drives
                 return lower_left.isBusy() && lower_right.isBusy() && upper_left.isBusy() && upper_right.isBusy();
-            case ALL_ATTACHMENTS:
-                //return Linac.isBusy() && duck_wheel.isBusy() && Da_Winch.isBusy();
+//            case ALL_ATTACHMENTS:
+//                //return Linac.isBusy() && duck_wheel.isBusy() && Da_Winch.isBusy();
             case ALL:
-                return lower_left.isBusy() && lower_right.isBusy() && upper_left.isBusy() && upper_right.isBusy();
+//                return lower_left.isBusy() && lower_right.isBusy() && upper_left.isBusy() && upper_right.isBusy();
             default:
                 return false;
         }
@@ -543,10 +524,10 @@ public class Aura_Robot
             case LOWER_RIGHT:
                 lower_right.setTargetPosition(iPos);
                 break;
-            case CAT_MOUSE:
-                Jerry.setTargetPosition(iPos);
-                Tom.setTargetPosition(iPos);
-                break;
+//            case CAT_MOUSE:
+//                Jerry.setTargetPosition(iPos);
+//                Tom.setTargetPosition(iPos);
+//                break;
             case ALL_DRIVES:
                 lower_right.setTargetPosition(iPos);
                 lower_left.setTargetPosition(iPos);
@@ -554,12 +535,12 @@ public class Aura_Robot
                 upper_left.setTargetPosition(iPos);
                 break;
             case ALL:
-                lower_right.setTargetPosition(iPos);
-                lower_left.setTargetPosition(iPos);
-                upper_right.setTargetPosition(iPos);
-                upper_left.setTargetPosition(iPos);
-                Jerry.setTargetPosition(iPos);
-                Tom.setTargetPosition(iPos);
+//                lower_right.setTargetPosition(iPos);
+//                lower_left.setTargetPosition(iPos);
+//                upper_right.setTargetPosition(iPos);
+//                upper_left.setTargetPosition(iPos);
+//                Jerry.setTargetPosition(iPos);
+//                Tom.setTargetPosition(iPos);
             default:
                 break;
         }

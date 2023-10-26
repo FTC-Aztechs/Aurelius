@@ -35,8 +35,6 @@ import static org.firstinspires.ftc.teamcode.Aura_Robot.bumperSpeedAdjust;
 import static org.firstinspires.ftc.teamcode.Aura_Robot.dPadSpeedAdjust;
 import static org.firstinspires.ftc.teamcode.Aura_Robot.speedAdjust;
 
-import static java.lang.Math.max;
-
 import android.os.Environment;
 
 import com.acmerobotics.dashboard.FtcDashboard;
@@ -93,7 +91,6 @@ public class Aura_Sandbox extends LinearOpMode
         Aurelius.init(hardwareMap);
 
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
-
 
         Aurelius.setRunMode(Aura_Robot.AuraMotors.UPPER_LEFT, DcMotor.RunMode.STOP_AND_RESET_ENCODER); //0
         Aurelius.setRunMode(Aura_Robot.AuraMotors.LOWER_RIGHT, DcMotor.RunMode.STOP_AND_RESET_ENCODER);  //3
