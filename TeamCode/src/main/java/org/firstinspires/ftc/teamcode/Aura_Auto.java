@@ -29,13 +29,33 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_WITHOUT_ENCODER;
+import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.STOP_AND_RESET_ENCODER;
+import static com.qualcomm.robotcore.util.ElapsedTime.Resolution.MILLISECONDS;
+
+import static org.firstinspires.ftc.teamcode.Aura_Robot.AuraMotors.CAT_MOUSE;
+import static org.firstinspires.ftc.teamcode.Aura_Robot.AuraServos.CARTOON;
+import static org.firstinspires.ftc.teamcode.Aura_Robot.AuraServos.FLAMETHROWER;
+import static org.firstinspires.ftc.teamcode.Aura_Robot.AuraServos.TEACUP;
+import static org.firstinspires.ftc.teamcode.Aura_Robot.Claw_Close_Pos;
+import static org.firstinspires.ftc.teamcode.Aura_Robot.turret_newPos;
+import static org.firstinspires.ftc.teamcode.Aura_Robot.xSlideInPos;
+
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
-
+import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
+import org.firstinspires.ftc.vision.VisionPortal;
+import org.firstinspires.ftc.vision.tfod.TfodProcessor;
 
 /*
  * This file contains an minimal example of a Linear "OpMode". An OpMode is a 'program' that runs in either
@@ -50,36 +70,17 @@ import com.qualcomm.robotcore.util.Range;
  * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list
  */
 
-@TeleOp(name="Basic: Linear OpMode", group="Linear OpMode")
-@Disabled
+@Autonomous(name="Aura_Auto", group="Linear OpMode")
 public class Aura_Auto extends LinearOpMode {
 
-    // Declare OpMode members.
-    private ElapsedTime runtime = new ElapsedTime();
-    private DcMotor leftDrive = null;
-    private DcMotor rightDrive = null;
+    Aura_Robot Mavryk = new Aura_Robot();
+
+    private static FtcDashboard auraBoard;
+
+    private static int iTeleCt = 1;
 
     @Override
-    public void runOpMode() {
-        telemetry.addData("Status", "Initialized");
-        telemetry.update();
-
-        // Initialize the hardware variables. Note that the strings used here as parameters
-        // to 'get' must correspond to the names assigned during the robot configuration
-        // step (using the FTC Robot Controller app on the phone).
-        leftDrive  = hardwareMap.get(DcMotor.class, "left_drive");
-        rightDrive = hardwareMap.get(DcMotor.class, "right_drive");
-
-        // To drive forward, most robots need the motor on one side to be reversed, because the axles point in opposite directions.
-        // Pushing the left stick forward MUST make robot go forward. So adjust these two lines based on your first test drive.
-        // Note: The settings here assume direct drive on left and right wheels.  Gear Reduction or 90 Deg drives may require direction flips
-        leftDrive.setDirection(DcMotor.Direction.REVERSE);
-        rightDrive.setDirection(DcMotor.Direction.FORWARD);
-
-        // Wait for the game to start (driver presses PLAY)
-        waitForStart();
-        runtime.reset();
-
+    public void runOpMode() throws InterruptedException{
         // TODO: Assume this will be our Auto. The pseudo code below is for camera detection
         //   Option 1: Use TFOD - in this case, we simply use the ConceptTFod detector and extend it with our trained model
         //   Option 2: Develop our own OpenCV based image processor
@@ -92,37 +93,45 @@ public class Aura_Auto extends LinearOpMode {
         //   Option 3: Ditch the VisionProcessor and use EasyOpenCV directly
 
 
+        Mavryk.init(hardwareMap);
 
-        // run until the end of the match (driver presses STOP)
-        while (opModeIsActive()) {
+        ElapsedTime trajectoryTimer = new ElapsedTime(MILLISECONDS);
 
-            // Setup a variable for each drive wheel to save power level for telemetry
-            double leftPower;
-            double rightPower;
+        // init Dashboard
+        auraBoard = FtcDashboard.getInstance();
+        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
+        double volts = getBatteryVoltage();
+        telemetry.addLine(String.format("%d. Battery voltage: %.1f volts", iTeleCt++, volts));
 
-            // Choose to drive using either Tank Mode, or POV Mode
-            // Comment out the method that's not used.  The default below is POV.
-
-            // POV Mode uses left stick to go forward, and right stick to turn.
-            // - This uses basic math to combine motions and is easier to drive straight.
-            double drive = -gamepad1.left_stick_y;
-            double turn  =  gamepad1.right_stick_x;
-            leftPower    = Range.clip(drive + turn, -1.0, 1.0) ;
-            rightPower   = Range.clip(drive - turn, -1.0, 1.0) ;
-
-            // Tank Mode uses one stick to control each wheel.
-            // - This requires no math, but it is hard to drive forward slowly and keep straight.
-            // leftPower  = -gamepad1.left_stick_y ;
-            // rightPower = -gamepad1.right_stick_y ;
-
-            // Send calculated power to wheels
-            leftDrive.setPower(leftPower);
-            rightDrive.setPower(rightPower);
-
-            // Show the elapsed game time and wheel power.
-            telemetry.addData("Status", "Run Time: " + runtime.toString());
-            telemetry.addData("Motors", "left (%.2f), right (%.2f)", leftPower, rightPower);
-            telemetry.update();
+        initMotorsAndServos();
+        telemetry.addData("Status: ", "Motors & Servos initialized");
+        telemetry.update();
         }
+
+    void initMotorsAndServos()
+    {
+        // Reset Slides - current position becomes 0
+        Mavryk.setRunMode(CAT_MOUSE, STOP_AND_RESET_ENCODER);
+        Mavryk.setRunMode(CAT_MOUSE, RUN_WITHOUT_ENCODER);
+        Mavryk.setPosition(CARTOON, Claw_Close_Pos);
+        Mavryk.setPosition(FLAMETHROWER, xSlideInPos);
+        Mavryk.setPosition(TEACUP, turret_newPos);
     }
+
+    private double getBatteryVoltage() {
+        double result = Double.POSITIVE_INFINITY;
+        for (VoltageSensor sensor : hardwareMap.voltageSensor) {
+            double voltage = sensor.getVoltage();
+            if (voltage > 0) {
+                result = Math.min(result, voltage);
+            }
+        }
+        return result;
+    }
+
 }
+
+
+
+
+
