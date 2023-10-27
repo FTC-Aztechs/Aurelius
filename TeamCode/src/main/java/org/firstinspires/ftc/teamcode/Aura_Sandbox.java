@@ -143,7 +143,9 @@ public class Aura_Sandbox extends LinearOpMode
                     telemetry.addData("Time taken to get Vuforia Pose Estimate: %.3f ms",runtime.milliseconds() );
                     break;
                 case SMD_LOG_MECANUMDRIVE:
+                    break;
                 case ENCODER_TESTING:
+                    break;
                 default:
                     telemetry.addData("Left Tracking wheel: ", Aurelius.getCurrentPosition(Aura_Robot.AuraMotors.UPPER_LEFT));
                     telemetry.addData("Right Tracking wheel: ", Aurelius.getCurrentPosition(Aura_Robot.AuraMotors.LOWER_RIGHT));
