@@ -81,7 +81,7 @@ public class Aura_Sandbox extends LinearOpMode
         SEE_IT_OWN_IT,     // Enabled See it, own it claw behavior with flame extension
         SMD_LOG_MECANUMDRIVE   // Dumps motor powers from SampleMecanumDrive to file for a trajectory sequence
     }
-    public static SandboxMode sandboxMode = SandboxMode.ENCODER_TESTING;
+    public static SandboxMode sandboxMode = SandboxMode.SMD_LOG_MECANUMDRIVE;
 
 //    MvrkVuforiaPoseEstimator vuforiaPoseEstimator = new MvrkVuforiaPoseEstimator(hardwareMap);
 
@@ -143,6 +143,7 @@ public class Aura_Sandbox extends LinearOpMode
                     telemetry.addData("Time taken to get Vuforia Pose Estimate: %.3f ms",runtime.milliseconds() );
                     break;
                 case SMD_LOG_MECANUMDRIVE:
+                    SandboxManualDrive();
                     break;
                 case ENCODER_TESTING:
                     break;

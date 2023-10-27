@@ -344,7 +344,7 @@ public class Aura_Robot
 
         Pose2d initPose2d = new Pose2d(0,0,0);
         AuraMecanumDrive = new MecanumDrive(hwMap, initPose2d);
-        Khimera = hwMap.get(WebcamName.class, "Kemera");
+//        Khimera = hwMap.get(WebcamName.class, "Kemera");
 
 //        TomAndJerrySlide = new Mvrk_LiftController(hwMap);
 //        TeacupTurret = new Mvrk_TurretController(hwMap);
