@@ -61,9 +61,10 @@ import java.util.List;
  */
 
 @Autonomous(name="Aura_Auto", group="Linear OpMode")
+
 public class Aura_AutoBlue extends LinearOpMode {
 
-    Aura_Robot Mavryk = new Aura_Robot();
+    Aura_Robot Aurelius = new Aura_Robot();
 
     private static FtcDashboard auraBoard;
 
@@ -84,6 +85,7 @@ public class Aura_AutoBlue extends LinearOpMode {
 
     // UNITS ARE METERS
     double tagsize = 0.04;
+
 
 //TODO: Declare AprilTag IDS below
 //Example: last year's custom sleeve tags
@@ -140,7 +142,7 @@ public class Aura_AutoBlue extends LinearOpMode {
         //   Option 3: Ditch the VisionProcessor and use EasyOpenCV directly
 
 
-        Mavryk.init(hardwareMap);
+        Aurelius.init(hardwareMap);
 
         ElapsedTime trajectoryTimer = new ElapsedTime(MILLISECONDS);
 
@@ -185,9 +187,53 @@ public class Aura_AutoBlue extends LinearOpMode {
         telemetry.update();
 
         //TODO: Add TFOD detection here
+        initTfod();
+
+        // Wait for the DS start button to be touched.
+        telemetry.addData("DS preview on/off", "3 dots, Camera Stream");
+        telemetry.addData(">", "Touch Play to start OpMode");
+        telemetry.update();
 
 
 
+
+        while (!isStarted()){
+            telemetryTfod();
+        }
+
+        if (opModeIsActive()) {
+            while (opModeIsActive()) {
+
+                telemetryTfod();
+
+                // Push telemetry to the Driver Station.
+                telemetry.update();
+
+                // Save CPU resources; can resume streaming when needed.
+                if (gamepad1.dpad_down) {
+                    visionPortal.stopStreaming();
+                } else if (gamepad1.dpad_up) {
+                    visionPortal.resumeStreaming();
+//                    while(!isStarted() && !isStopRequested()) {
+//                        if(x < leftbound){
+//
+//                        }else if(Gamex>leftbound && Gamex<rightbound){
+//
+//                        }else{
+//
+//                        }
+////                    }
+                }
+
+                // Share the CPU.
+                sleep(20);
+            }
+        }
+
+        // Save more CPU resources when camera is no longer needed.
+        visionPortal.close();
+
+    }   // end runOpMode()
 
 
 //example below: AprilTag detection Powerplay
@@ -296,7 +342,7 @@ public class Aura_AutoBlue extends LinearOpMode {
 //        telemetry.update();
 
 //TODO: Init any other Motors and Servos Here
-        initMotorsAndServos(true);
+//        initMotorsAndServos(true);
 
 //TODO: Build any trajectories that depend on detection here
 //example below: building park trajectory based on the TSE position
@@ -360,7 +406,7 @@ public class Aura_AutoBlue extends LinearOpMode {
 //        telemetry.addLine(String.format("%d. Park Trajectory completed in: %.3f ", iTeleCt++, trajectoryTimer.seconds()));
 //
 //        telemetry.update();
-    }
+//    }
 
 
 //TODO: Use April Tags to get current pos
@@ -647,7 +693,7 @@ public class Aura_AutoBlue extends LinearOpMode {
     /**
      * Add telemetry about TensorFlow Object Detection (TFOD) recognitions.
      */
-    private void telemetryTfod() {
+    public void telemetryTfod() {
 
         List<Recognition> currentRecognitions = tfod.getRecognitions();
         telemetry.addData("# Objects Detected", currentRecognitions.size());
