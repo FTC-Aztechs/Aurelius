@@ -88,9 +88,6 @@ public class Aura_Robot
 
 //    public DcMotor Jerry = null;
 //    public DcMotor Tom = null;
-
-
-
 //    public Aura_LiftController TomAndJerrySlide;
 
     public WebcamName Khimera = null;

@@ -35,6 +35,7 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -64,11 +65,16 @@ import java.util.List;
 
 public class Aura_AutoBlue extends LinearOpMode {
 
+    private static final double LEFT_SPIKEMARK_BOUNDARY_X = 0;
+    private static final double RIGHT_SPIKEMARK_BOUNDARY_X = 0;
+
+    public static int PurpleDropOffPos = 0;
+
     Aura_Robot Aurelius = new Aura_Robot();
 
     private static FtcDashboard auraBoard;
 
-//TODO: declare April Tag stuff
+    //TODO: declare April Tag stuff
     OpenCvWebcam Sauron = null;
     AprilTagDetectionPipeline pipeline;
 
@@ -101,6 +107,21 @@ public class Aura_AutoBlue extends LinearOpMode {
     /**
      * The variable to store our instance of the TensorFlow Object Detection processor.
      */
+    // TFOD_MODEL_ASSET points to a model file stored in the project Asset location,
+    // this is only used for Android Studio when using models in Assets.
+    private static final String TFOD_MODEL_ASSET = "MyModelStoredAsAsset.tflite";
+
+    // TFOD_MODEL_FILE points to a model file stored onboard the Robot Controller's storage,
+    // this is used when uploading models directly to the RC using the model upload interface.
+    private static final String TFOD_MODEL_FILE = "/sdcard/FIRST/tflitemodels/myCustomModel.tflite";
+
+    // Define the labels recognized in the model for TFOD (must be in training order!)
+    private static final String[] LABELS = {
+            "Pixel",
+            "Bloopy",
+            "Redpy"
+    };
+
     private TfodProcessor tfod;
 
     /**
@@ -109,24 +130,24 @@ public class Aura_AutoBlue extends LinearOpMode {
     private VisionPortal visionPortal;
 
 //TODO: Declare Trajectories Below
-    //Example below: Powerplay trajectories
 
-//    ElapsedTime timer = new ElapsedTime(MILLISECONDS);
-//
-//    //    public TrajectorySequence Park;
-//    public TrajectorySequence trajPreLoadDropOff;
-//    public TrajectorySequence trajCycleDropOffTopCone;
-//    public TrajectorySequence trajCycleDropOffTopMidCone;
-//    public TrajectorySequence trajCycleDropOffMiddleCone;
-//    public TrajectorySequence trajCycleDropOffBottomMidCone;
-//    public TrajectorySequence trajCycleDropOffBottomCone;
-//    public TrajectorySequence trajParking;
-//    public int currentCyclePickupCone = TopCone;
+    private DcMotor upper_right = null;
+    private DcMotor upper_left = null;
+    private DcMotor lower_right = null;
+    private DcMotor lower_left = null;
+
+    private ElapsedTime runtime = new ElapsedTime();
+
+    static final double COUNTS_PER_MOTOR_REV = 1440;    // eg: TETRIX Motor Encoder
+    static final double DRIVE_GEAR_REDUCTION = 1.0;     // No External Gearing.
+    static final double WHEEL_DIAMETER_INCHES = 4.0;     // For figuring circumference
+    static final double COUNTS_PER_INCH = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) /
+            (WHEEL_DIAMETER_INCHES * 3.1415);
+    static final double DRIVE_SPEED = 0.6;
+    static final double TURN_SPEED = 0.5;
+
 
 //TODO: declare the variable that will store the outcome for detection (already made, just uncomment)
-//public static int pos = 1;
-
-
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -141,7 +162,6 @@ public class Aura_AutoBlue extends LinearOpMode {
         //               4. Implement a method on kemmaProcessor to return detected position based on which of the 3 rectangles returns most positive
         //   Option 3: Ditch the VisionProcessor and use EasyOpenCV directly
 
-
         Aurelius.init(hardwareMap);
 
         ElapsedTime trajectoryTimer = new ElapsedTime(MILLISECONDS);
@@ -155,31 +175,11 @@ public class Aura_AutoBlue extends LinearOpMode {
         telemetry.addLine(String.format("%d. Battery voltage: %.1f volts", iTeleCt++, volts));
 
         //TODO: Initialize any essential starting motor/servo positions here
-//example: powerplay claw, intake, horizontal slide
-//
-//        Aura.setPosition(TWIN_TOWERS, Aura.Claw_Close_Pos);
-//        Aura.setPosition(FUNKY_MONKEY, IntakeInsidePos);
-//        Aura.setPosition(FLAMETHROWER, xSlideInPos);
 
         telemetry.addData("Status: ", "Building Trajectories......");
         telemetry.update();
 
         //TODO: Build trajectories here
-//example below: build cone cycle trajectories for Powerplay
-//
-//        buildPreloadTrajectory();
-//        if(cyclesToRun > 0)
-//            trajCycleDropOffTopCone = buildCycleTrajectory(TopMidCone); // Note: Drop slides to pick up the next cone, in this case Top Mid
-//        if(cyclesToRun > 1)
-//            trajCycleDropOffTopMidCone = buildCycleTrajectory(MiddleCone); // Note: Drop slides to pick up the next cone, in this case Middle
-//        if(cyclesToRun > 2)
-//            trajCycleDropOffMiddleCone = buildCycleTrajectory(BottomMidCone); // Note: Drop slides to pick up the next cone, in this case BottomMid
-//        if(cyclesToRun > 3)
-//            trajCycleDropOffBottomMidCone = buildCycleTrajectory(BottomCone); // Note: Drop slides to pick up the next cone, in this case Bottom
-//        if(cyclesToRun > 4)
-//            trajCycleDropOffBottomCone = buildCycleTrajectory(FloorPosition); // Note: Drop slides to pick up the next cone, in this case Floor
-//
-//        }
 
         telemetry.update();
 
@@ -194,398 +194,79 @@ public class Aura_AutoBlue extends LinearOpMode {
         telemetry.addData(">", "Touch Play to start OpMode");
         telemetry.update();
 
-
-
-
-        while (!isStarted()){
+        while (!isStarted()) {
             telemetryTfod();
         }
 
         if (opModeIsActive()) {
             while (opModeIsActive()) {
-
-                telemetryTfod();
-
-                // Push telemetry to the Driver Station.
-                telemetry.update();
-
-                // Save CPU resources; can resume streaming when needed.
-                if (gamepad1.dpad_down) {
-                    visionPortal.stopStreaming();
-                } else if (gamepad1.dpad_up) {
-                    visionPortal.resumeStreaming();
-//                    while(!isStarted() && !isStopRequested()) {
-//                        if(x < leftbound){
-//
-//                        }else if(Gamex>leftbound && Gamex<rightbound){
-//
-//                        }else{
-//
-//                        }
-////                    }
-                }
-
-                // Share the CPU.
+                DetectPurpleDropoffPos();
                 sleep(20);
             }
         }
 
         // Save more CPU resources when camera is no longer needed.
-        visionPortal.close();
 
-    }   // end runOpMode()
+        // end runOpMode()
 
-
-//example below: AprilTag detection Powerplay
-
-//        WebcamName webcamName = hardwareMap.get(WebcamName.class, "Sauron");
-//        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
-//        Sauron = OpenCvCameraFactory.getInstance().createWebcam(webcamName, cameraMonitorViewId);
-//        telemetry.addData("Status: ", "camera created  ...");
-//        telemetry.update();
-//
-//        pipeline = new AprilTagDetectionPipeline(tagsize, fx, fy, cx, cy);
-//        telemetry.addData("Status: ", "pipeline created  ...");
-//        telemetry.update();
-//
-//        Sauron.setPipeline(pipeline);
-//        telemetry.addData("Status: ", "Pipeline set ...");
-//        telemetry.update();
-//
-//        // We set the viewport policy to optimized view so the preview doesn't appear 90 deg
-//        // out when the RC activity is in portrait. We do our actual image processing assuming
-//        // landscape orientation, though.
-//        Sauron.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
-//            public void onOpened() {
-//                Sauron.startStreaming(800, 448, OpenCvCameraRotation.UPRIGHT);
-////                telemetry.addData("Status: ", "Sauron Streaming ...");
-//                auraRobot.startCameraStream(Sauron, 0);
-//            }
-//
-//            public void onError(int errorCode) {
-//                return;
-//            }
-//        });
-//
-//        telemetry.addData("Status: ", "Starting April Tag detection");
-//        telemetry.update();
-//
-//        // while waiting for the game to start, search for april tags
-//        while (!isStarted() && !isStopRequested()) {
-//            ArrayList<AprilTagDetection> currentDetections = pipeline.getLatestDetections();
-//
-//            if (currentDetections.size() != 0) {
-//                boolean tagFound = false;
-//
-//                for (AprilTagDetection tag : currentDetections) {
-//                    if (tag.id == LEFT || tag.id == MIDDLE || tag.id == RIGHT) {
-//                        tagOfInterest = tag;
-//                        tagFound = true;
-//                        break;
-//                    }
-//                }
-//
-////                if (tagFound) {
-////                    //telemetry.addLine("Tag of interest is in sight!\n\nLocation data:");
-////                    //tagToTelemetry(tagOfInterest);
-////                } else {
-////                    telemetry.addLine("Don't see tag of interest :(");
-////
-////                    if (tagOfInterest == null) {
-////                        //telemetry.addLine("(The tag has never been seen)");
-////                    } else {
-////                        //telemetry.addLine("\nBut we HAVE seen the tag before; last seen at:");
-////                        //tagToTelemetry(tagOfInterest);
-////                    }
-////                }
-//
-//            } else {
-////                telemetry.addLine("Don't see tag of interest :(");
-////
-////                if (tagOfInterest == null) {
-////                    telemetry.addLine("(The tag has never been seen)");
-////                } else {
-////                    telemetry.addLine("\nBut we HAVE seen the tag before; last seen at:");
-////                    tagToTelemetry(tagOfInterest);
-////                }
-//
-//            }
-//
-////            telemetry.update();
-//            sleep(20);
-//        }
-//
-////        //once program starts
-////        if (tagOfInterest != null) {
-////            telemetry.addLine("Tag snapshot:\n");
-////            tagToTelemetry(tagOfInterest);
-////            telemetry.update();
-////        } else {
-////            telemetry.addLine("No tag snapshot available, it was never sighted during the init loop :(");
-////            telemetry.update();
-////        }
 
         //TODO: Add if/else case that sets trajectory based on which position the pixel/TSE is at
-//example below: April Tag switch case from Powerplay
-//
-//        if (tagOfInterest == null || tagOfInterest.id == LEFT) {
-//            telemetry.addLine("Going to Position 1");
-//            pos = 1;
-//        } else if (tagOfInterest.id == MIDDLE) {
-//            telemetry.addLine("Going to Position 2");
-//            pos = 2;
-//        } else {
-//            telemetry.addLine("Going to Position 3");
-//            pos = 3;
-//        }
-//
-//        telemetry.update();
 
-//TODO: Init any other Motors and Servos Here
-//        initMotorsAndServos(true);
+        //TODO: Init any other Motors and Servos Here
 
-//TODO: Build any trajectories that depend on detection here
-//example below: building park trajectory based on the TSE position
-//        buildParkTrajectory(pos);
-//        telemetry.update();
+        //TODO: Build any trajectories that depend on detection here
+
+
+        upper_right = hardwareMap.get(DcMotor.class, "upper_right");
+        upper_left = hardwareMap.get(DcMotor.class, "upper_right");
+        lower_right = hardwareMap.get(DcMotor.class, "upper_right");
+        lower_left = hardwareMap.get(DcMotor.class, "upper_right");
 
 //TODO: Run Trajectories
-//Example below: powerplay preload, cycle, and park
 
-//        // Drop off preload
-//        trajectoryTimer.reset();
-//        Aura.mecanumDrive.setPoseEstimate(Blue_Start.pose2d());
-//        Aura.mecanumDrive.followTrajectorySequence(trajPreLoadDropOff);
-//        telemetry.addLine(String.format("%d. Preload Trajectory completed in: %.3f ", iTeleCt++, trajectoryTimer.seconds()));
-//
-//        // Cycle 1
-//        if (cyclesToRun > 0) {
-//            trajectoryTimer.reset();
-//            Aura.mecanumDrive.followTrajectorySequence(trajCycleDropOffTopCone);
-//            telemetry.addLine(String.format("%d. Cycle 1 Trajectory completed in: %.3f ", iTeleCt++, trajectoryTimer.seconds()));
-//        }
-//
-//        // Cycle 2
-//        if (cyclesToRun > 1) {
-//            trajectoryTimer.reset();
-//            Aura.mecanumDrive.followTrajectorySequence(trajCycleDropOffTopMidCone);
-//            telemetry.addLine(String.format("%d. Cycle 2 Trajectory completed in: %.3f ", iTeleCt++, trajectoryTimer.seconds()));
-//        }
-//
-//        // Cycle 3
-//        if (cyclesToRun > 2) {
-//            trajectoryTimer.reset();
-//            Aura.mecanumDrive.followTrajectorySequence(trajCycleDropOffMiddleCone);
-//            telemetry.addLine(String.format("%d. Cycle 3 Trajectory completed in: %.3f ", iTeleCt++, trajectoryTimer.seconds()));
-//        }
-//
-//        // Cycle 4
-//        if (cyclesToRun > 3) {
-//            trajectoryTimer.reset();
-//            Aura.mecanumDrive.followTrajectorySequence(trajCycleDropOffBottomMidCone);
-//            telemetry.addLine(String.format("%d. Cycle 4 Trajectory completed in: %.3f ", iTeleCt++, trajectoryTimer.seconds()));
-//        }
-//
-//        // Cycle 5
-//        if (cyclesToRun > 4) {
-//            trajectoryTimer.reset();
-//            Aura.mecanumDrive.followTrajectorySequence(trajCycleDropOffBottomCone);
-//            telemetry.addLine(String.format("%d. Cycle 5 Trajectory completed in: %.3f ", iTeleCt++, trajectoryTimer.seconds()));
-//        }
-//
-//        // Park
-////        EstimateCurrentPose();
-////        if (!currentPose.epsilonEquals(Blue_Pickup)) {
-////            Trajectory trajAdjustPos = Aura.mecanumDrive.trajectoryBuilder(currentPose)
-////                    .lineToLinearHeading(Blue_Pickup)
-////                    .build();
-////            Aura.mecanumDrive.followTrajectory(trajAdjustPos);
-////        }
-//        trajectoryTimer.reset();
-//        Aura.mecanumDrive.followTrajectorySequence(trajParking);
-//        telemetry.addLine(String.format("%d. Park Trajectory completed in: %.3f ", iTeleCt++, trajectoryTimer.seconds()));
-//
-//        telemetry.update();
-//    }
+        switch (PurpleDropOffPos) {
+            case 1:
+                encoderStraightDrive(DRIVE_SPEED, 24, 24, 5.0);  // forward 24, for 5s?
+                encoderStraightDrive(TURN_SPEED, -3, 3, 4.0);  // turn left 45 degrees, for 4s?
+                //spit out purple pixel
+                encoderStraightDrive(TURN_SPEED, 3, -3, 4.0);  // turn right 45 degrees, for 4s?
+                encoderStraightDrive(DRIVE_SPEED, -20, -20, 5.0);  // backward 20, for 5s?
+                encoderStraightDrive(TURN_SPEED, -6, 6, 4.0);  // turn left 90 degrees, for 4s?
+                encoderStraightDrive(DRIVE_SPEED, 48, 48, 5.0);  // forward 48, for 5s?
+                break;
+            case 2:
+                encoderStraightDrive(DRIVE_SPEED, 30, 30, 5.0);  // forward 30, for 5s?
+                //spit out purple pixel
+                encoderStraightDrive(DRIVE_SPEED, -26, -26, 5.0);  // forward 30, for 5s?
+                encoderStraightDrive(TURN_SPEED, -6, 6, 4.0);  // turn left 90 degrees, for 4s?
+                encoderStraightDrive(DRIVE_SPEED, 48, 48, 5.0);  // forward 48, for 5s?
+                break;
+            case 3:
+                encoderStraightDrive(DRIVE_SPEED, 24, 24, 5.0);  // forward 24, for 5s?
+                encoderStraightDrive(TURN_SPEED, 3, -3, 4.0);  // S2: turn right 45 degrees, for 4s?
+                //spit out purple pixel
+                encoderStraightDrive(TURN_SPEED, -3, 3, 4.0);  // turn left 45 degrees, for 4s?
+                encoderStraightDrive(DRIVE_SPEED, -20, -20, 5.0);  // backward 20, for 5s?
+                encoderStraightDrive(TURN_SPEED, -6, 6, 4.0);  // turn left 90 degrees, for 4s?
+                encoderStraightDrive(DRIVE_SPEED, 48, 48, 5.0);  // forward 48, for 5s?
+                break;
+            default:
+                encoderStraightDrive(DRIVE_SPEED, 30, 30, 5.0);  // forward 30, for 5s?
+                //spit out purple pixel
+                encoderStraightDrive(DRIVE_SPEED, -26, -26, 5.0);  // forward 30, for 5s?
+                break;
+
+        }
+
+
+
+        encoderStraightDrive(TURN_SPEED, -3, 3, 4.0);  // S2: Turn Right 12 Inches with 4 Sec timeout
+    }
 
 
 //TODO: Use April Tags to get current pos
-//example below: pseudocode for Powerplay's vuforia
-
-//    private void EstimateCurrentPose() {
-//        //use vumarks to update current pose
-//        currentPose = Blue_Pickup.pose2d();
-//    }
 
 //TODO: write trajectories as different functions
-//examples below: trajectories from Powerplay
-
-//    void buildPreloadTrajectory() {
-//        telemetry.addLine(String.format("%d. buildPreloadTrajectory", iTeleCt++));
-//
-//        trajPreLoadDropOff = Aura.mecanumDrive.trajectorySequenceBuilder(Blue_Start.pose2d())
-//                //preload
-//                .lineToLinearHeading(Blue_Push_Signal.pose2d())
-//                .lineToLinearHeading(Blue_Dropoff.pose2d())
-//                .UNSTABLE_addTemporalMarkerOffset(PlSlideUpOffset, () -> {
-//                    // Raise Tom&Jerry
-//                    Aura.setTargetPosition(CAT_MOUSE, HighJunction);
-//                    Aura.setRunMode(CAT_MOUSE, RUN_TO_POSITION);
-//                    Aura.setPower(CAT_MOUSE, SlidePower_Up);
-//                })
-//                .waitSeconds(auto_raise_wait)
-//                .UNSTABLE_addTemporalMarkerOffset(DropoffExtendFlamethrowerOffset, () -> { // Start after 1.5s of raise
-//                    // Extend FlameThrower
-//                    Aura.setPosition(FLAMETHROWER, xSlideOutPos);
-//                })
-//
-//                .waitSeconds(auto_extend_half_wait)
-//                .UNSTABLE_addTemporalMarkerOffset(PlSlideDownOffset, () -> {
-//                    // Lower Tom&Jerry to Top Cone
-//                    Aura.setTargetPosition(CAT_MOUSE, DropoffPos);
-//                    Aura.setRunMode(CAT_MOUSE, RUN_TO_POSITION);
-//                    Aura.setPower(CAT_MOUSE, SlidePower_Down);
-//                    Aura.setPosition(TWIN_TOWERS, Claw_Open_Pos);
-//                })
-//                .waitSeconds(auto_drop_wait)
-//                .addTemporalMarker(() -> {
-//                    // Retract FlameThrower
-//                    Aura.setPosition(FLAMETHROWER, xSlideDropPos);
-//                })
-//                .waitSeconds(auto_retract_wait) // Eliminate
-//                .UNSTABLE_addTemporalMarkerOffset(PlSlideDownOffset, () -> {
-//                    // Lower Tom&Jerry to Top Cone
-//                    Aura.setTargetPosition(CAT_MOUSE, TopCone);
-//                    Aura.setRunMode(CAT_MOUSE, RUN_TO_POSITION);
-//                    Aura.setPower(CAT_MOUSE, SlidePower_Down);
-//                })
-//                .waitSeconds(auto_drop_wait)
-//                .build();
-//
-//
-//        int iNumSegments = trajPreLoadDropOff.size();
-//        telemetry.addLine(String.format("%d. Preload Trajectory numTrajectory Segments: %d", iTeleCt++, iNumSegments));
-//        for(int iSeg=0; iSeg<iNumSegments; iSeg++ ) {
-//            telemetry.addLine(String.format("%d. Preload Trajectory Segment %d Duration: %.3f", iTeleCt++, iSeg,trajPreLoadDropOff.get(iSeg).getDuration()));
-//        }
-//        telemetry.addLine(String.format("%d. Park Preload calculated Duration: %.3f", iTeleCt++, trajPreLoadDropOff.duration()));
-//
-//        return;
-//    }
-//
-//    void buildParkTrajectory(int iPos)
-//    {
-//        telemetry.addLine(String.format("%d. buildParkTrajectory", iTeleCt++));
-//
-//        switch (iPos) {
-//            case 1:
-//            default:
-//                trajParking = Aura.mecanumDrive.trajectorySequenceBuilder(Blue_Dropoff.pose2d())
-//                        .addTemporalMarker(()->{
-//                            Aura.setPosition(FLAMETHROWER, xSlideInPos);
-//                        })
-//                        .lineToLinearHeading(Blue_Park_Pos1.pose2d())
-//                        .build();
-//                break;
-//            case 2:
-//                trajParking = Aura.mecanumDrive.trajectorySequenceBuilder(Blue_Dropoff.pose2d())
-//                        .addTemporalMarker(()->{
-//                            Aura.setPosition(FLAMETHROWER, xSlideInPos);
-//                        })
-//                        .lineToLinearHeading(Blue_Park_Pos2.pose2d())
-//                        .build();
-//                break;
-//            case 3:
-//                trajParking = Aura.mecanumDrive.trajectorySequenceBuilder(Blue_Dropoff.pose2d())
-//                        .addTemporalMarker(()->{
-//                            Aura.setPosition(FLAMETHROWER, xSlideInPos);
-//                        })
-//                        .lineToLinearHeading(Blue_Park_Pos3.pose2d())
-//                        .build();
-//                break;
-//        }
-//
-//        int iNumSegments = trajParking.size();
-//        telemetry.addLine(String.format("%d. Park Trajectory numTrajectory Segments: %d", iTeleCt++, iNumSegments));
-//        for(int iSeg=0; iSeg<iNumSegments; iSeg++ ) {
-//            telemetry.addLine(String.format("%d. Park Trajectory Segment %d Duration: %.3f", iTeleCt++, iSeg,trajParking.get(iSeg).getDuration()));
-//        }
-//        telemetry.addLine(String.format("%d. Park Trajectory calculated Duration: %.3f", iTeleCt++, trajParking.duration()));
-//
-//        return;
-//    }
-//
-//    TrajectorySequence buildCycleTrajectory(int iCycleConePickup)
-//    {
-//        telemetry.addLine(String.format("%d. buildCycleTrajectory %d", iTeleCt++, iCycleConePickup));
-//        TrajectorySequence trajSeq = Aura.mecanumDrive.trajectorySequenceBuilder(Blue_Dropoff.pose2d())
-//                .lineToLinearHeading(Blue_Inter_Pos.pose2d())
-//                .lineToLinearHeading(Blue_Pickup.pose2d())
-//                .waitSeconds(auto_move_wait)  // Eliminate
-//                .UNSTABLE_addTemporalMarkerOffset(CycleExtendFlamethrowerOffset, () -> {
-//                    // Extend Flamethrower & Grab Cone
-//                    Aura.setPosition(FLAMETHROWER, xSlideOutPos);
-//                })
-//                .waitSeconds(auto_extend_half_wait)
-//                .addTemporalMarker(() -> {
-//                    Aura.setPosition(TWIN_TOWERS, Claw_Close_Pos);
-//                })
-//                .waitSeconds(auto_pickup_wait)
-//                .addTemporalMarker(() -> {
-//                    // Raise to Low Junction
-//                    Aura.setTargetPosition(CAT_MOUSE, LowJunction);
-//                    Aura.setRunMode(CAT_MOUSE, RUN_TO_POSITION);
-//                    Aura.setPower(CAT_MOUSE, SlidePower_Up);
-//                })
-//                .waitSeconds(auto_half_raise_wait)
-//                .UNSTABLE_addTemporalMarkerOffset(CycleRetractFlamethrowerOffset, () -> {
-//                    // Retract Flamethrower
-//                    Aura.setPosition(FLAMETHROWER, xSlideDropPos);
-//                })
-//                .waitSeconds(auto_retract_wait) // Eliminate
-//                .lineToLinearHeading(Blue_Dropoff.pose2d())
-//                .UNSTABLE_addTemporalMarkerOffset(PlSlideUpOffset, () -> {
-//                    // Raise Tom&Jerry
-//                    Aura.setTargetPosition(CAT_MOUSE, HighJunction);
-//                    Aura.setRunMode(CAT_MOUSE, RUN_TO_POSITION);
-//                    Aura.setPower(CAT_MOUSE, SlidePower_Up);
-//                })
-//                .waitSeconds(auto_raise_wait)
-//                .UNSTABLE_addTemporalMarkerOffset(DropoffExtendFlamethrowerOffset, () -> {
-//                    // Extend FlameThrower
-//                    Aura.setPosition(FLAMETHROWER, xSlideOutPos);
-//                })
-//                .waitSeconds(auto_extend_half_wait)
-//                .UNSTABLE_addTemporalMarkerOffset(PlSlideDownOffset, () -> {
-//                    // Lower Tom&Jerry to Top Cone
-//                    Aura.setTargetPosition(CAT_MOUSE, DropoffPos);
-//                    Aura.setRunMode(CAT_MOUSE, RUN_TO_POSITION);
-//                    Aura.setPower(CAT_MOUSE, SlidePower_Down);
-//                    Aura.setPosition(TWIN_TOWERS, Claw_Open_Pos);
-//                })
-//                .waitSeconds(auto_drop_wait)
-//                .addTemporalMarker(() -> {
-//                    // Retract FlameThrower
-//                    Aura.setPosition(FLAMETHROWER, xSlideDropPos);
-//                })
-//                .waitSeconds(auto_retract_wait) // Eliminate
-//                .addTemporalMarker(() -> {
-//                    // Lower Tom&Jerry to Top Cone
-//                    Aura.setTargetPosition(CAT_MOUSE, iCycleConePickup);
-//                    Aura.setRunMode(CAT_MOUSE, RUN_TO_POSITION);
-//                    Aura.setPower(CAT_MOUSE, SlidePower_Down);
-//                })
-//                .build();
-//
-//        int iNumSegments = trajSeq.size();
-//        telemetry.addLine(String.format("%d. Cycle %d numTrajectory Segments: %d", iTeleCt++, iCycleConePickup, iNumSegments));
-//        for(int iSeg=0; iSeg<iNumSegments; iSeg++ ) {
-//            telemetry.addLine(String.format("%d. Cycle %d Trajectory Segment %d Duration: %.3f", iTeleCt++, iCycleConePickup, iSeg,trajSeq.get(iSeg).getDuration()));
-//        }
-//        telemetry.addLine(String.format("%d. Cycle %d Trajectory calculated Duration: %.3f", iTeleCt++, iCycleConePickup, trajSeq.duration()));
-//
-//        return trajSeq;
-//    }
 
     //TODO: add any motors/servos that initialized later
     void initMotorsAndServos(boolean run_to_position)
@@ -608,77 +289,7 @@ public class Aura_AutoBlue extends LinearOpMode {
     }
 
 //TODO: April Tag detection function - might need updating
-//example: powerplay's initial april tag detection
-
-//    public void getTag(AprilTagDetectionPipeline pipeline)
-//    {
-//        ArrayList<AprilTagDetection> currentDetections = pipeline.getLatestDetections();
-//        if(currentDetections.size() != 0)
-//        {
-//            boolean tagFound = false;
-//
-//            for(AprilTagDetection tag : currentDetections)
-//            {
-//                if(tag.id == LEFT ||  tag.id == MIDDLE || tag.id == RIGHT)
-//                {
-//                    tagOfInterest = tag;
-//                    tagFound = true;
-//                    break;
-//                }
-//            }
-//
-//            if(tagFound)
-//            {
-//                telemetry.addLine("Tag of interest is in sight!\n\nLocation data:");
-//                tagToTelemetry(tagOfInterest);
-//            }
-//            else
-//            {
-//                telemetry.addLine("Don't see tag of interest :(");
-//
-//                if(tagOfInterest == null)
-//                {
-//                    telemetry.addLine("(The tag has never been seen)");
-//                }
-//                else
-//                {
-//                    telemetry.addLine("\nBut we HAVE seen the tag before; last seen at:");
-//                    tagToTelemetry(tagOfInterest);
-//                }
-//            }
-//
-//        }
-//        else
-//        {
-//            telemetry.addLine("Don't see tag of interest :(");
-//
-//            if(tagOfInterest == null)
-//            {
-//                telemetry.addLine("(The tag has never been seen)");
-//            }
-//            else
-//            {
-//                telemetry.addLine("\nBut we HAVE seen the tag before; last seen at:");
-//                tagToTelemetry(tagOfInterest);
-//            }
-//
-//        }
-//
-//        telemetry.update();
-//        sleep(20);
-//    }
-//
-//    void tagToTelemetry(AprilTagDetection detection)
-//    {
-//        telemetry.addLine(String.format("\nDetected tag ID=%d", detection.id));
-//        telemetry.addLine(String.format("Translation X: %.2f feet", detection.pose.x*FEET_PER_METER));
-//        telemetry.addLine(String.format("Translation Y: %.2f feet", detection.pose.y*FEET_PER_METER));
-//        telemetry.addLine(String.format("Translation Z: %.2f feet", detection.pose.z*FEET_PER_METER));
-//        telemetry.addLine(String.format("Rotation Yaw: %.2f degrees", Math.toDegrees(detection.pose.yaw)));
-//        telemetry.addLine(String.format("Rotation Pitch: %.2f degrees", Math.toDegrees(detection.pose.pitch)));
-//        telemetry.addLine(String.format("Rotation Roll: %.2f degrees", Math.toDegrees(detection.pose.roll)));
-//    }
-
+//TODO: TFOD functions here
     //TFOD ConceptTensorFlowObjectDetectionEasy functions
     private void initTfod() {
 
@@ -710,6 +321,176 @@ public class Aura_AutoBlue extends LinearOpMode {
         }   // end for() loop
 
     }   // end method telemetryTfod()
+
+    void DetectPurpleDropoffPos()
+    {
+        double x = 0, y = 0;
+        List<Recognition> currentRecognitions = tfod.getRecognitions();
+        for(Recognition recognition : currentRecognitions ) {
+            if (recognition.getLabel() == "Bloopy") {
+                x = (recognition.getLeft() + recognition.getRight()) / 2;
+                y = (recognition.getTop() + recognition.getBottom()) / 2;
+            }
+            break;
+        }
+        visionPortal.close();
+
+        if( x < LEFT_SPIKEMARK_BOUNDARY_X )
+            PurpleDropOffPos = 1;
+        else if (x > RIGHT_SPIKEMARK_BOUNDARY_X)
+            PurpleDropOffPos = 3;
+        else
+            PurpleDropOffPos = 2;
+
+        telemetry.addData("Detected Drop off Position = ", PurpleDropOffPos);
+
+        // Push telemetry to the Driver Station.
+        telemetry.update();
+
+    }
+
+    public void encoderStraightDrive(double speed,
+                                     double leftInches, double rightInches,
+                                     double timeoutS) {
+        int newUpperLeftTarget;
+        int newUpperRightTarget;
+        int newLowerLeftTarget;
+        int newLowerRightTarget;
+
+        // Ensure that the OpMode is still active
+        if (opModeIsActive()) {
+
+            // Determine new target position, and pass to motor controller
+            newUpperLeftTarget = upper_left.getCurrentPosition() + (int)(leftInches * COUNTS_PER_INCH);
+            newUpperRightTarget = upper_right.getCurrentPosition() + (int)(rightInches * COUNTS_PER_INCH);
+            newLowerLeftTarget = lower_left.getCurrentPosition() + (int)(leftInches * COUNTS_PER_INCH);
+            newLowerRightTarget = lower_right.getCurrentPosition() + (int)(rightInches * COUNTS_PER_INCH);
+            upper_left.setTargetPosition(newUpperLeftTarget);
+            upper_right.setTargetPosition(newUpperRightTarget);
+            lower_left.setTargetPosition(newLowerLeftTarget);
+            lower_right.setTargetPosition(newLowerRightTarget);
+
+            // Turn On RUN_TO_POSITION
+            upper_left.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            upper_right.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            lower_left.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            lower_right.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+            // reset the timeout time and start motion.
+            runtime.reset();
+            upper_left.setPower(Math.abs(speed));
+            upper_right.setPower(Math.abs(speed));
+            lower_left.setPower(Math.abs(speed));
+            lower_right.setPower(Math.abs(speed));
+
+            // keep looping while we are still active, and there is time left, and both motors are running.
+            // Note: We use (isBusy() && isBusy()) in the loop test, which means that when EITHER motor hits
+            // its target position, the motion will stop.  This is "safer" in the event that the robot will
+            // always end the motion as soon as possible.
+            // However, if you require that BOTH motors have finished their moves before the robot continues
+            // onto the next step, use (isBusy() || isBusy()) in the loop test.
+            while (opModeIsActive() &&
+                    (runtime.seconds() < timeoutS) &&
+                    (upper_left.isBusy() && upper_right.isBusy() && lower_left.isBusy() && lower_right.isBusy())) {
+
+                // Display it for the driver.
+                telemetry.addData("Running to",  " %7d :%7d", newUpperLeftTarget,  newUpperRightTarget, newLowerLeftTarget, newLowerRightTarget);
+                telemetry.addData("Currently at",  " at %7d :%7d",
+                        upper_left.getCurrentPosition(), upper_right.getCurrentPosition(), lower_left.getCurrentPosition(), lower_right.getCurrentPosition());
+                telemetry.update();
+            }
+
+            // Stop all motion;
+            upper_left.setPower(0);
+            upper_right.setPower(0);
+            lower_left.setPower(0);
+            lower_right.setPower(0);
+
+            // Turn off RUN_TO_POSITION
+            upper_left.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            upper_right.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            lower_left.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            lower_right.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+
+            sleep(250);   // optional pause after each move.
+        }
+    }
+
+    public void encoderStrafeDrive(double speed,
+                                     double leftDiagonalInches, double rightDiagonalInches,
+                                     double timeoutS) {
+//        guide for strafe
+//                _________
+//             L-| Forward |-R
+//               |         |
+//               |         |
+//             R-|_________|-L
+
+        int newUpperLeftTarget;
+        int newUpperRightTarget;
+        int newLowerLeftTarget;
+        int newLowerRightTarget;
+
+        // Ensure that the OpMode is still active
+        if (opModeIsActive()) {
+
+            // Determine new target position, and pass to motor controller
+            newUpperLeftTarget = upper_left.getCurrentPosition() + (int)(leftDiagonalInches * COUNTS_PER_INCH);
+            newUpperRightTarget = upper_right.getCurrentPosition() + (int)(rightDiagonalInches * COUNTS_PER_INCH);
+            newLowerLeftTarget = lower_left.getCurrentPosition() + (int)(rightDiagonalInches * COUNTS_PER_INCH);
+            newLowerRightTarget = lower_right.getCurrentPosition() + (int)(leftDiagonalInches * COUNTS_PER_INCH);
+            upper_left.setTargetPosition(newUpperLeftTarget);
+            upper_right.setTargetPosition(newUpperRightTarget);
+            lower_left.setTargetPosition(newLowerLeftTarget);
+            lower_right.setTargetPosition(newLowerRightTarget);
+
+            // Turn On RUN_TO_POSITION
+            upper_left.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            upper_right.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            lower_left.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            lower_right.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+            // reset the timeout time and start motion.
+            runtime.reset();
+            upper_left.setPower(Math.abs(speed));
+            upper_right.setPower(Math.abs(speed));
+            lower_left.setPower(Math.abs(speed));
+            lower_right.setPower(Math.abs(speed));
+
+            // keep looping while we are still active, and there is time left, and both motors are running.
+            // Note: We use (isBusy() && isBusy()) in the loop test, which means that when EITHER motor hits
+            // its target position, the motion will stop.  This is "safer" in the event that the robot will
+            // always end the motion as soon as possible.
+            // However, if you require that BOTH motors have finished their moves before the robot continues
+            // onto the next step, use (isBusy() || isBusy()) in the loop test.
+            while (opModeIsActive() &&
+                    (runtime.seconds() < timeoutS) &&
+                    (upper_left.isBusy() && upper_right.isBusy() && lower_left.isBusy() && lower_right.isBusy())) {
+
+                // Display it for the driver.
+                telemetry.addData("Running to",  " %7d :%7d", newUpperLeftTarget,  newUpperRightTarget, newLowerLeftTarget, newLowerRightTarget);
+                telemetry.addData("Currently at",  " at %7d :%7d",
+                        upper_left.getCurrentPosition(), upper_right.getCurrentPosition(), lower_left.getCurrentPosition(), lower_right.getCurrentPosition());
+                telemetry.update();
+            }
+
+            // Stop all motion;
+            upper_left.setPower(0);
+            upper_right.setPower(0);
+            lower_left.setPower(0);
+            lower_right.setPower(0);
+
+            // Turn off RUN_TO_POSITION
+            upper_left.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            upper_right.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            lower_left.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            lower_right.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+
+            sleep(250);   // optional pause after each move.
+        }
+    }
 
 }
 
