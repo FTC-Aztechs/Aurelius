@@ -79,7 +79,8 @@ public class Aura_Sandbox extends LinearOpMode
         ENCODER_TESTING,   // Default - prints encoder ticks.
         VUFORIA_ESTIMATOR, // Displays current Pose from Vuforia estimate
         SEE_IT_OWN_IT,     // Enabled See it, own it claw behavior with flame extension
-        SMD_LOG_MECANUMDRIVE   // Dumps motor powers from SampleMecanumDrive to file for a trajectory sequence
+        SMD_LOG_MECANUMDRIVE,   // Dumps motor powers from SampleMecanumDrive to file for a trajectory sequence
+        SMD_INTAKE_OUTTAKE
     }
     public static SandboxMode sandboxMode = SandboxMode.SMD_LOG_MECANUMDRIVE;
 
@@ -148,6 +149,9 @@ public class Aura_Sandbox extends LinearOpMode
                     break;
                 case ENCODER_TESTING:
                     break;
+                case SMD_INTAKE_OUTTAKE:
+                    SandboxIntakeOuttake();
+                    break;
                 default:
                     telemetry.addData("Left Tracking wheel: ", Aurelius.getCurrentPosition(Aura_Robot.AuraMotors.UPPER_LEFT));
                     telemetry.addData("Right Tracking wheel: ", Aurelius.getCurrentPosition(Aura_Robot.AuraMotors.LOWER_RIGHT));
@@ -175,6 +179,44 @@ public class Aura_Sandbox extends LinearOpMode
 
     }
 
+    void SandboxIntakeOuttake()
+    {
+        if (gamepad2.dpad_left) {
+            if (!changingWheelSpeed) {
+                timer_gp1_dpad_left.reset();
+                changingWheelSpeed = true;
+            } else if (timer_gp1_dpad_left.time(TimeUnit.MILLISECONDS) > BUTTON_TRIGGER_TIMER_MS) {
+                if (dPadSpeedAdjust <= 1) {
+                    dPadSpeedAdjust = 1;
+                } else {
+                    dPadSpeedAdjust -= 1;
+                }
+                telemetry.addLine("Current speed: " + dPadSpeedAdjust);
+                telemetry.update();
+                changingWheelSpeed = false;
+            }
+        }
+
+        //gamepad right -> increase wheel speed
+        if (gamepad2.dpad_right) {
+            if (!changingWheelSpeed) {
+                timer_gp1_dpad_right.reset();
+                changingWheelSpeed = true;
+            } else if (timer_gp1_dpad_right.time(TimeUnit.MILLISECONDS) > BUTTON_TRIGGER_TIMER_MS) {
+                if (dPadSpeedAdjust >= 10) {
+                    dPadSpeedAdjust = 10;
+                } else {
+                    dPadSpeedAdjust += 1;
+                }
+                telemetry.addLine("Current speed: " + dPadSpeedAdjust);
+                telemetry.update();
+                changingWheelSpeed = false;
+            }
+        }
+
+        Aurelius.setPower(Aura_Robot.AuraMotors.INTAKE, (dPadSpeedAdjust/10)*gamepad2.right_stick_y);
+    }
+
     public boolean waitingForCommand()
     {
         if(gamepad1.dpad_up) {
@@ -186,13 +228,14 @@ public class Aura_Sandbox extends LinearOpMode
             return false;
         }
         else if(gamepad1.dpad_right) {
-            sandboxMode = SandboxMode.SEE_IT_OWN_IT;
+            sandboxMode = SandboxMode.SMD_INTAKE_OUTTAKE;
             return false;
         }
         else if(gamepad1.dpad_left) {
             sandboxMode = SandboxMode.SMD_LOG_MECANUMDRIVE;
             return false;
         }
+
         else
             return true;
     }

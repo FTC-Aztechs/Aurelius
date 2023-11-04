@@ -34,7 +34,9 @@ package org.firstinspires.ftc.teamcode;
 
 import static com.qualcomm.robotcore.util.ElapsedTime.Resolution.MILLISECONDS;
 import static org.firstinspires.ftc.teamcode.Aura_Robot.BUTTON_TRIGGER_TIMER_MS;
+import static org.firstinspires.ftc.teamcode.Aura_Robot.Launcher_Set_Pos;
 import static org.firstinspires.ftc.teamcode.Aura_Robot.bumperSpeedAdjust;
+import static org.firstinspires.ftc.teamcode.Aura_Robot.dPadIntakeAdjust;
 import static org.firstinspires.ftc.teamcode.Aura_Robot.dPadSpeedAdjust;
 import static org.firstinspires.ftc.teamcode.Aura_Robot.speedAdjust;
 
@@ -50,13 +52,16 @@ import java.util.concurrent.TimeUnit;
 
 @Config
 @TeleOp(name="Aura_Manual", group="Manual mode")
-//@Disabled
+
 public class Aura_Manual extends LinearOpMode {
 
     // Declare OpMode members.
     Aura_Robot Aurelius = new Aura_Robot();
 
     private boolean changingWheelSpeed = false; //truer than false;
+    private boolean changingIntakeSpeed = false;
+    private boolean changingLauncherSpeed = false;
+
 
     private int slide_currentPos = 0;
     private int slide_newPos = slide_currentPos;
@@ -65,7 +70,7 @@ public class Aura_Manual extends LinearOpMode {
     public static int Mode = 1;
 //    public static int BUTTON_TRIGGER_TIMER_MS = 500;
 
-    boolean ServoTurn = false;
+    boolean PlaneLaunched = false;
 
     //    private static ElapsedTime timer_gp1_buttonA;
 //    private static ElapsedTime timer_gp1_buttonX;
@@ -92,6 +97,7 @@ public class Aura_Manual extends LinearOpMode {
     private static ElapsedTime timer_gp2_dpad_right = new ElapsedTime(MILLISECONDS);
 
     private static ElapsedTime timer_gp1_left_bumper = new ElapsedTime(MILLISECONDS);
+    private static ElapsedTime timer_gp1_left_trigger = new ElapsedTime(MILLISECONDS);
 
     //slide button booleans
     private boolean assumingHighPosition = false;
@@ -121,19 +127,11 @@ public class Aura_Manual extends LinearOpMode {
 
 
         while (opModeIsActive()) {
-//            AuraClaw();
-//            AuraXSlide();
-//            AuraUpSlide_Pid();
-//            MrvkTurret();
-
-//            if(gamepad1.left_bumper) {
-//                if (!changing_drive_mode) {
-//                    timer_gp1_left_bumper.reset();
-//                    changing_drive_mode = true;
-//                } else if (timer_gp1_left_bumper.time(TimeUnit.MILLISECONDS) > BUTTON_TRIGGER_TIMER_MS) {
-//                    fieldCentric = !fieldCentric;
-//                    changing_drive_mode = false;
-//                }
+            AuraIntake();
+            AuraLauncher();
+            AuraManualDrive();
+            telemetry.addLine("Drive Mode: Forward Facing");
+            telemetry.update();
         }
 
 //            if(fieldCentric){
@@ -141,9 +139,6 @@ public class Aura_Manual extends LinearOpMode {
 //                telemetry.addLine("Drive Mode: Field Centric");
 //                telemetry.update();
 //            }else{
-        AuraManualDrive();
-        telemetry.addLine("Drive Mode: Forward Facing");
-        telemetry.update();
 //            }
     }
 //    }
@@ -155,8 +150,7 @@ public class Aura_Manual extends LinearOpMode {
 //        Aurelius.setRunMode(Aura_Robot.AuraMotors.CAT_MOUSE, STOP_AND_RESET_ENCODER);
 //        Aurelius.setRunMode(Aura_Robot.AuraMotors.CAT_MOUSE, RUN_WITHOUT_ENCODER);
 
-//        Claw_Position = Claw_Close_Pos;
-//        Aurelius.Looney.setPosition(Claw_Position);
+        Aurelius.boeing747.launcher.setPosition(Launcher_Set_Pos);
 
 //        xSlide_Position = xSlideInPos;
 //        Aurelius.FlameThrower.setPosition(xSlide_Position);
@@ -190,80 +184,113 @@ public class Aura_Manual extends LinearOpMode {
                 }
                 telemetry.addLine("Current speed: " + dPadSpeedAdjust);
                 telemetry.update();
+                changingWheelSpeed = false;
             }
-
-            //gamepad right -> increase wheel speed
-            if (gamepad1.dpad_right) {
-                if (!changingWheelSpeed) {
-                    timer_gp1_dpad_right.reset();
-                    changingWheelSpeed = true;
-                } else if (timer_gp1_dpad_right.time(TimeUnit.MILLISECONDS) > BUTTON_TRIGGER_TIMER_MS) {
-                    if (dPadSpeedAdjust >= 10) {
-                        dPadSpeedAdjust = 10;
-                    } else {
-                        dPadSpeedAdjust += 1;
-                    }
-                    telemetry.addLine("Current speed: " + dPadSpeedAdjust);
-                    telemetry.update();
-                    changingWheelSpeed = false;
-                }
-            }
-
-            //bumper speed boost mode
-            if (gamepad1.right_bumper) {
-                speedAdjust = bumperSpeedAdjust;
-            } else {
-                speedAdjust = dPadSpeedAdjust;
-            }
-
-            // actually making the robot move
-            float turnDir = gamepad1.right_stick_x;
-            float moveDir = gamepad1.left_stick_y;
-            float strafeDir = gamepad1.left_stick_x;
-
-            if (turnDir > 1) {
-                turnDir = 1;
-            } else if (turnDir < -1) {
-                turnDir = -1;
-            }
-            Aurelius.lower_left.setPower((moveDir + strafeDir - turnDir) * (-speedAdjust / 10)); // 1.0
-            Aurelius.lower_right.setPower((moveDir - strafeDir + turnDir) * (-speedAdjust / 10)); // 1.0
-            Aurelius.upper_left.setPower((moveDir - strafeDir - turnDir) * (-speedAdjust / 10)); // 0
-            Aurelius.upper_right.setPower((moveDir + strafeDir + turnDir) * (-speedAdjust / 10)); // 0
-
-            return;
         }
 
+        //gamepad right -> increase wheel speed
+        if (gamepad1.dpad_right) {
+            if (!changingWheelSpeed) {
+                timer_gp1_dpad_right.reset();
+                changingWheelSpeed = true;
+            } else if (timer_gp1_dpad_right.time(TimeUnit.MILLISECONDS) > BUTTON_TRIGGER_TIMER_MS) {
+                if (dPadSpeedAdjust >= 10) {
+                    dPadSpeedAdjust = 10;
+                } else {
+                    dPadSpeedAdjust += 1;
+                }
+                telemetry.addLine("Current speed: " + dPadSpeedAdjust);
+                telemetry.update();
+                changingWheelSpeed = false;
+            }
+        }
+
+        //bumper speed boost mode
+        if (gamepad1.right_bumper) {
+            speedAdjust = bumperSpeedAdjust;
+        } else {
+            speedAdjust = dPadSpeedAdjust;
+        }
+
+        // actually making the robot move
+        float turnDir = gamepad1.right_stick_x;
+        float moveDir = gamepad1.left_stick_y;
+        float strafeDir = gamepad1.left_stick_x;
+
+        if (turnDir > 1) {
+            turnDir = 1;
+        } else if (turnDir < -1) {
+            turnDir = -1;
+        }
+        Aurelius.lower_left.setPower((moveDir + strafeDir - turnDir) * (-speedAdjust / 10)); // 1.0
+        Aurelius.lower_right.setPower((moveDir - strafeDir + turnDir) * (-speedAdjust / 10)); // 1.0
+        Aurelius.upper_left.setPower((moveDir - strafeDir - turnDir) * (-speedAdjust / 10)); // 0
+        Aurelius.upper_right.setPower((moveDir + strafeDir + turnDir) * (-speedAdjust / 10)); // 0
+
+        return;
+    }
 
 
-//    public void AuraManualDrive_FieldCentric()
-//    {
-//
-//        Localizer myLocaliizer = Aurelius.MecanumDrive.getLocalizer();
-//        myLocaliizer.getPoseVelocity();
-//        Vector2d input = new Vector2d( -gamepad1.left_stick_y,
-//                -gamepad1.left_stick_x).rotated(-imu.getAngularOrientation().firstAngle);
-//
-//        Aurelius.MecanumDrive.setWeightedDrivePower(new Pose2d(input.getX(), input.getY(), -gamepad1.right_stick_x));
-//        Aurelius.MecanumDrive.update();
-//
-//        return;
-//    }
 
+    public void AuraIntake() {
+        if (gamepad2.dpad_left) {
+            if (!changingIntakeSpeed) {
+                timer_gp2_dpad_left.reset();
+                changingIntakeSpeed = true;
+            } else if (timer_gp2_dpad_left.time(TimeUnit.MILLISECONDS) > BUTTON_TRIGGER_TIMER_MS) {
+                if (dPadIntakeAdjust <= 1) {
+                    dPadIntakeAdjust = 1;
+                } else {
+                    dPadIntakeAdjust -= 1;
+                }
+                telemetry.addLine("Current intake speed: " + dPadIntakeAdjust);
+                telemetry.update();
+                changingIntakeSpeed = false;
+            }
+        }
 
-//    public void AuraClaw() {
-//        ServoTurn = gamepad2.right_trigger == 1f;
-//
-//
-//        if (ServoTurn) {
-//            Claw_Position = Claw_Open_Pos;
-//        } else {
-//            Claw_Position = Claw_Close_Pos;
-//        }
-//
-//        Aurelius.setPosition(Aura_Robot.AuraServos.CARTOON, Claw_Position);
-//
-//    }
+        //gamepad right -> increase wheel speed
+        if (gamepad2.dpad_right) {
+            if (!changingIntakeSpeed) {
+                timer_gp2_dpad_right.reset();
+                changingIntakeSpeed = true;
+            } else if (timer_gp2_dpad_right.time(TimeUnit.MILLISECONDS) > BUTTON_TRIGGER_TIMER_MS) {
+                if (dPadIntakeAdjust >= 10) {
+                    dPadIntakeAdjust = 10;
+                } else {
+                    dPadIntakeAdjust += 1;
+                }
+                telemetry.addLine("Current speed: " + dPadIntakeAdjust);
+                telemetry.update();
+                changingIntakeSpeed = false;
+            }
+        }
+
+        Aurelius.setPower(Aura_Robot.AuraMotors.INTAKE,(dPadIntakeAdjust/10)* gamepad2.right_stick_y);
+    }
+
+    public void AuraLauncher(){
+        if (gamepad1.left_trigger == 1f) {
+            if (!changingLauncherSpeed) {
+                timer_gp1_left_trigger.reset();
+                changingLauncherSpeed = true;
+            } else if (timer_gp1_left_trigger.time(TimeUnit.MILLISECONDS) > BUTTON_TRIGGER_TIMER_MS) {
+                if (PlaneLaunched == false) {
+                    Aurelius.boeing747.setTargetState(Aura_LaunchController.launchState.Launch);
+                    Aurelius.boeing747.update();
+                    PlaneLaunched = true;
+                } else {
+                    Aurelius.boeing747.setTargetState(Aura_LaunchController.launchState.Set);
+                    Aurelius.boeing747.update();
+                    PlaneLaunched = false;
+                }
+                telemetry.addLine("Current State:" + Aurelius.boeing747.currState);
+                telemetry.update();
+                changingLauncherSpeed = false;
+            }
+        }
+
+    }
 
 //    public void AuraUpSlide_Pid() {
 //        //restrict range and provide warnings
@@ -445,5 +472,5 @@ public class Aura_Manual extends LinearOpMode {
 //            telemetry.update();
 //            turret_currentPos = Aurelius.Teacup.getPosition();
 //        }
-    }
+
 }

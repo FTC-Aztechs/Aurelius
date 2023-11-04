@@ -10,7 +10,6 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 @Config
 public class Aura_IntakeController {
     private DcMotor intakeMotor;
-    public static double speed = 0.5f;
 
     enum intakeState
     {
@@ -35,7 +34,7 @@ public class Aura_IntakeController {
         targetState = state;
     }
 
-    public void update() {
+    public void update(float speed) {
         //  Open -> Open: No-op
         //  Open -> Close: Close, update curr
 

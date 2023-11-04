@@ -258,8 +258,6 @@ public class Aura_AutoBlue extends LinearOpMode {
 
         }
 
-
-
         encoderStraightDrive(TURN_SPEED, -3, 3, 4.0);  // S2: Turn Right 12 Inches with 4 Sec timeout
     }
 

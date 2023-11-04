@@ -84,11 +84,12 @@ public class Aura_Robot
     public DcMotor lower_left = null;
     public DcMotor lower_right = null;
 
-    public DcMotor intake = null;
+    public DcMotor intakeMotor = null;
 
 //    public DcMotor Jerry = null;
 //    public DcMotor Tom = null;
-//    public Aura_LiftController TomAndJerrySlide;
+    public Aura_IntakeController noodleWash;
+    public Aura_LaunchController boeing747;
 
     public WebcamName Khimera = null;
     OpenCvWebcam Sauron = null;
@@ -99,6 +100,7 @@ public class Aura_Robot
     public static double bumperSpeedAdjust = 10;
     public static double dPadSpeedAdjust = 7;
 
+    public static double dPadIntakeAdjust = 6;
     public static double SlidePower_Up= 1;
     public static double SlidePower_Down = -0.01;
     public static double SlidePower_Zero = 0.0;
@@ -209,8 +211,8 @@ public class Aura_Robot
 //    public static Waits CycleWaits;
 
     //claw variables
-    public static double Claw_Open_Pos = 0.56;
-    public static double Claw_Close_Pos = 0.75;
+    public static double Launcher_Set_Pos = 0;
+    public static double Launcher_Fire_Pos = 1;
 
     //Tilt Positions
     public static double Tilted_Towers_Tilted_Pos = 0.8; //  Needs to change
@@ -287,7 +289,7 @@ public class Aura_Robot
     /* local OpMode members. */
     HardwareMap hwMap           =  null;
     private ElapsedTime period  = new ElapsedTime();
-    MecanumDrive AuraMecanumDrive;
+//    MecanumDrive AuraMecanumDrive;
     //public static MvrkPIDController control = new MvrkPIDController(11, 0, 0.25, 3600);
 
     /* Constructor */
@@ -305,7 +307,7 @@ public class Aura_Robot
         upper_left = hwMap.get(DcMotor.class, "Upper_Left");
         lower_left = hwMap.get(DcMotor.class, "Lower_Left");
         lower_right = hwMap.get(DcMotor.class, "Lower_Right");
-
+        intakeMotor = hwMap.get(DcMotor.class, "intakeMotor");
 //        Jerry = hwMap.get(DcMotor.class, "Jerry");
 //        Tom = hwMap.get(DcMotor.class, "Tom");
 
@@ -322,7 +324,7 @@ public class Aura_Robot
         lower_left.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         lower_right.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-//        Jerry.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        intakeMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 //        Tom.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         // Most robots need the motor on one side to be reversed to drive forward
@@ -332,7 +334,7 @@ public class Aura_Robot
         lower_left.setDirection(DcMotor.Direction.REVERSE); //- used to be
         lower_right.setDirection(DcMotor.Direction.FORWARD); //+ used to be
 
-//        Jerry.setDirection(DcMotor.Direction.FORWARD); //- used to be
+        intakeMotor.setDirection(DcMotor.Direction.FORWARD); //- used to be
 //        Tom.setDirection(DcMotor.Direction.FORWARD); //+ used to be
 
 //        Looney.setDirection(Servo.Direction.FORWARD);
@@ -340,10 +342,11 @@ public class Aura_Robot
 
 
         Pose2d initPose2d = new Pose2d(0,0,0);
-        AuraMecanumDrive = new MecanumDrive(hwMap, initPose2d);
+        //AuraMecanumDrive = new MecanumDrive(hwMap, initPose2d);
         Khimera = hwMap.get(WebcamName.class, "Kemera");
 
-//        TomAndJerrySlide = new Mvrk_LiftController(hwMap);
+        noodleWash = new Aura_IntakeController(hwMap);
+        boeing747 = new Aura_LaunchController(hwMap);
 //        TeacupTurret = new Mvrk_TurretController(hwMap);
 //        LooneyClaw = new Mvrk_ClawController(hwMap);
 
@@ -421,6 +424,9 @@ public class Aura_Robot
                 break;
             case LOWER_RIGHT:
                 lower_right.setPower(dPower);
+                break;
+            case INTAKE:
+                intakeMotor.setPower(dPower);
                 break;
 //            case CAT_MOUSE:
 //                Jerry.setPower(dPower);
