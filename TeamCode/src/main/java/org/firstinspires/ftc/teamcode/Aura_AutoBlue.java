@@ -109,11 +109,11 @@ public class Aura_AutoBlue extends LinearOpMode {
      */
     // TFOD_MODEL_ASSET points to a model file stored in the project Asset location,
     // this is only used for Android Studio when using models in Assets.
-    private static final String TFOD_MODEL_ASSET = "MyModelStoredAsAsset.tflite";
+    private static final String TFOD_MODEL_ASSET = "myBloopy.tflite";
 
     // TFOD_MODEL_FILE points to a model file stored onboard the Robot Controller's storage,
     // this is used when uploading models directly to the RC using the model upload interface.
-    private static final String TFOD_MODEL_FILE = "C:\\Sashank\\FTC CenterStage\\Aurelius\\Aurelius\\TeamCode\\src\\main\\java\\org\\firstinspires\\ftc\\teamcode\\myBloopy.tflite";
+//    private static final String TFOD_MODEL_FILE = "C:\\Sashank\\FTC CenterStage\\Aurelius\\Aurelius\\TeamCode\\src\\main\\java\\org\\firstinspires\\ftc\\teamcode\\myBloopy.tflite";
 
     // Define the labels recognized in the model for TFOD (must be in training order!)
     private static final String[] LABELS = {
@@ -131,14 +131,15 @@ public class Aura_AutoBlue extends LinearOpMode {
 
 //TODO: Declare Trajectories Below
 
-    private DcMotor upper_right = null;
-    private DcMotor upper_left = null;
-    private DcMotor lower_right = null;
-    private DcMotor lower_left = null;
+    private DcMotor Upper_Right = null;
+    private DcMotor Upper_Left = null;
+    private DcMotor Lower_Right = null;
+    private DcMotor Lower_Left = null;
+    //private DcMotor intakeMotor = null;
 
     private ElapsedTime runtime = new ElapsedTime();
 
-    static final double COUNTS_PER_MOTOR_REV = 1440;    // eg: TETRIX Motor Encoder
+    static final double COUNTS_PER_MOTOR_REV = 537.7;    // eg: TETRIX Motor Encoder
     static final double DRIVE_GEAR_REDUCTION = 1.0;     // No External Gearing.
     static final double WHEEL_DIAMETER_INCHES = 4.0;     // For figuring circumference
     static final double COUNTS_PER_INCH = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) /
@@ -189,6 +190,23 @@ public class Aura_AutoBlue extends LinearOpMode {
         //TODO: Add TFOD detection here
         initTfod();
 
+        Upper_Right = hardwareMap.get(DcMotor.class, "Upper_Right");
+        Upper_Left = hardwareMap.get(DcMotor.class, "Upper_Left");
+        Lower_Right = hardwareMap.get(DcMotor.class, "Lower_Right");
+        Lower_Left = hardwareMap.get(DcMotor.class, "Lower_Left");
+
+        Upper_Right.setDirection(DcMotor.Direction.FORWARD);
+        Lower_Right.setDirection(DcMotor.Direction.FORWARD);
+        Upper_Left.setDirection(DcMotor.Direction.REVERSE);
+        Lower_Left.setDirection(DcMotor.Direction.REVERSE);
+
+        Upper_Right.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        Lower_Right.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        Upper_Left.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        Lower_Left.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        //intakeMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+
         // Wait for the DS start button to be touched.
         telemetry.addData("DS preview on/off", "3 dots, Camera Stream");
         telemetry.addData(">", "Touch Play to start OpMode");
@@ -199,66 +217,56 @@ public class Aura_AutoBlue extends LinearOpMode {
         }
 
         if (opModeIsActive()) {
-            while (opModeIsActive()) {
-                DetectPurpleDropoffPos();
-                sleep(20);
+            DetectPurpleDropoffPos();
+            visionPortal.close();
+            //TODO: Run Trajectories
+
+            switch (PurpleDropOffPos) {
+                case 1:
+                    encoderStraightDrive(DRIVE_SPEED, -36, -36, 5);
+                    encoderStraightDrive(DRIVE_SPEED, 4, 4, 5);
+                    //intakeMotor.setPower(0.4);
+//                    encoderStraightDrive(DRIVE_SPEED, -24, -24, 5.0);  // forward 24, for 5s?
+//                    encoderStraightDrive(TURN_SPEED, 3, -3, 4.0);  // turn left 45 degrees, for 4s?
+//                    //spit out purple pixel
+//                    encoderStraightDrive(TURN_SPEED, -3, 3, 4.0);  // turn right 45 degrees, for 4s?
+//                    encoderStraightDrive(DRIVE_SPEED, 20, 20, 5.0);  // backward 20, for 5s?
+//                    encoderStraightDrive(TURN_SPEED, 6, -6, 4.0);  // turn left 90 degrees, for 4s?
+//                    encoderStraightDrive(DRIVE_SPEED, -48, -48, 5.0);  // forward 48, for 5s?
+                    break;
+                case 2:
+                    encoderStraightDrive(DRIVE_SPEED, -36, -36, 5);
+                    encoderStraightDrive(DRIVE_SPEED, 4, 4, 5);
+                    //intakeMotor.setPower(0.4);
+//                    encoderStraightDrive(DRIVE_SPEED, -30, -30, 5.0);  // forward 30, for 5s?
+//                    //spit out purple pixel
+//                    encoderStraightDrive(DRIVE_SPEED, 26, 26, 5.0);  // forward 30, for 5s?
+//                    encoderStraightDrive(TURN_SPEED, 6, -6, 4.0);  // turn left 90 degrees, for 4s?
+//                    encoderStraightDrive(DRIVE_SPEED, -48, -48, 5.0);  // forward 48, for 5s?
+                    break;
+                case 3:
+                    encoderStraightDrive(DRIVE_SPEED, -36, -36, 5);
+                    encoderStraightDrive(DRIVE_SPEED, 4, 4, 5);
+                    //.setPower(0.4);
+//                    encoderStraightDrive(DRIVE_SPEED, -24, -24, 5.0);  // forward 24, for 5s?
+//                    encoderStraightDrive(TURN_SPEED, -3, 3, 4.0);  // S2: turn right 45 degrees, for 4s?
+//                    //spit out purple pixel
+//                    encoderStraightDrive(TURN_SPEED, 3, -3, 4.0);  // turn left 45 degrees, for 4s?
+//                    encoderStraightDrive(DRIVE_SPEED, 20, 20, 5.0);  // backward 20, for 5s?
+//                    encoderStraightDrive(TURN_SPEED, 6, -6, 4.0);  // turn left 90 degrees, for 4s?
+//                    encoderStraightDrive(DRIVE_SPEED, -48, -48, 5.0);  // forward 48, for 5s?
+                    break;
+                default:
+                    encoderStraightDrive(DRIVE_SPEED, -36, -36, 5);
+                    encoderStraightDrive(DRIVE_SPEED, 4, 4, 5);
+                    //intakeMotor.setPower(0.4);
+//                    encoderStraightDrive(DRIVE_SPEED, -30, -30, 5.0);  // forward 30, for 5s?
+//                    //spit out purple pixel
+//                    encoderStraightDrive(DRIVE_SPEED, 26, 26, 5.0);  // forward 30, for 5s?
+                    break;
             }
+//            encoderStraightDrive(TURN_SPEED, 3, -3, 4.0);  // S2: Turn Right 12 Inches with 4 Sec timeout
         }
-
-        // Save more CPU resources when camera is no longer needed.
-
-        // end runOpMode()
-
-
-        //TODO: Add if/else case that sets trajectory based on which position the pixel/TSE is at
-
-        //TODO: Init any other Motors and Servos Here
-
-        //TODO: Build any trajectories that depend on detection here
-
-
-        upper_right = hardwareMap.get(DcMotor.class, "upper_right");
-        upper_left = hardwareMap.get(DcMotor.class, "upper_right");
-        lower_right = hardwareMap.get(DcMotor.class, "upper_right");
-        lower_left = hardwareMap.get(DcMotor.class, "upper_right");
-
-//TODO: Run Trajectories
-
-        switch (PurpleDropOffPos) {
-            case 1:
-                encoderStraightDrive(DRIVE_SPEED, 24, 24, 5.0);  // forward 24, for 5s?
-                encoderStraightDrive(TURN_SPEED, -3, 3, 4.0);  // turn left 45 degrees, for 4s?
-                //spit out purple pixel
-                encoderStraightDrive(TURN_SPEED, 3, -3, 4.0);  // turn right 45 degrees, for 4s?
-                encoderStraightDrive(DRIVE_SPEED, -20, -20, 5.0);  // backward 20, for 5s?
-                encoderStraightDrive(TURN_SPEED, -6, 6, 4.0);  // turn left 90 degrees, for 4s?
-                encoderStraightDrive(DRIVE_SPEED, 48, 48, 5.0);  // forward 48, for 5s?
-                break;
-            case 2:
-                encoderStraightDrive(DRIVE_SPEED, 30, 30, 5.0);  // forward 30, for 5s?
-                //spit out purple pixel
-                encoderStraightDrive(DRIVE_SPEED, -26, -26, 5.0);  // forward 30, for 5s?
-                encoderStraightDrive(TURN_SPEED, -6, 6, 4.0);  // turn left 90 degrees, for 4s?
-                encoderStraightDrive(DRIVE_SPEED, 48, 48, 5.0);  // forward 48, for 5s?
-                break;
-            case 3:
-                encoderStraightDrive(DRIVE_SPEED, 24, 24, 5.0);  // forward 24, for 5s?
-                encoderStraightDrive(TURN_SPEED, 3, -3, 4.0);  // S2: turn right 45 degrees, for 4s?
-                //spit out purple pixel
-                encoderStraightDrive(TURN_SPEED, -3, 3, 4.0);  // turn left 45 degrees, for 4s?
-                encoderStraightDrive(DRIVE_SPEED, -20, -20, 5.0);  // backward 20, for 5s?
-                encoderStraightDrive(TURN_SPEED, -6, 6, 4.0);  // turn left 90 degrees, for 4s?
-                encoderStraightDrive(DRIVE_SPEED, 48, 48, 5.0);  // forward 48, for 5s?
-                break;
-            default:
-                encoderStraightDrive(DRIVE_SPEED, 30, 30, 5.0);  // forward 30, for 5s?
-                //spit out purple pixel
-                encoderStraightDrive(DRIVE_SPEED, -26, -26, 5.0);  // forward 30, for 5s?
-                break;
-
-        }
-
-        encoderStraightDrive(TURN_SPEED, -3, 3, 4.0);  // S2: Turn Right 12 Inches with 4 Sec timeout
     }
 
 
@@ -292,11 +300,29 @@ public class Aura_AutoBlue extends LinearOpMode {
     private void initTfod() {
 
         // Create the TensorFlow processor the easy way.
-        tfod = TfodProcessor.easyCreateWithDefaults();
+        tfod = new TfodProcessor.Builder()
+        .setModelAssetName(TFOD_MODEL_ASSET)
+//        .setModelFileName(TFOD_MODEL_FILE)
+        .setModelLabels(LABELS)
+        .setIsModelTensorFlow2(true)
+        .setIsModelQuantized(true)
+        .setModelInputSize(300)
+        .setModelAspectRatio(16.0 / 9.0)
+        .build();
 
         // Create the vision portal the easy way.
-        visionPortal = VisionPortal.easyCreateWithDefaults(
-                hardwareMap.get(WebcamName.class, "Kemera"), tfod);
+        VisionPortal.Builder builder = new VisionPortal.Builder();
+
+        // Set the camera (webcam vs. built-in RC phone camera).
+        builder.setCamera(hardwareMap.get(WebcamName.class, "Kemera"));
+
+        
+        // Set and enable the processor.
+        builder.addProcessor(tfod);
+
+        // Build the Vision Portal, using the above settings.
+        visionPortal = builder.build();
+
     } // end method initTfod()
 
     /**
@@ -359,27 +385,27 @@ public class Aura_AutoBlue extends LinearOpMode {
         if (opModeIsActive()) {
 
             // Determine new target position, and pass to motor controller
-            newUpperLeftTarget = upper_left.getCurrentPosition() + (int)(leftInches * COUNTS_PER_INCH);
-            newUpperRightTarget = upper_right.getCurrentPosition() + (int)(rightInches * COUNTS_PER_INCH);
-            newLowerLeftTarget = lower_left.getCurrentPosition() + (int)(leftInches * COUNTS_PER_INCH);
-            newLowerRightTarget = lower_right.getCurrentPosition() + (int)(rightInches * COUNTS_PER_INCH);
-            upper_left.setTargetPosition(newUpperLeftTarget);
-            upper_right.setTargetPosition(newUpperRightTarget);
-            lower_left.setTargetPosition(newLowerLeftTarget);
-            lower_right.setTargetPosition(newLowerRightTarget);
+            newUpperLeftTarget = Upper_Left.getCurrentPosition() + (int)(leftInches * COUNTS_PER_INCH);
+            newUpperRightTarget = Upper_Right.getCurrentPosition() + (int)(rightInches * COUNTS_PER_INCH);
+            newLowerLeftTarget = Lower_Left.getCurrentPosition() + (int)(leftInches * COUNTS_PER_INCH);
+            newLowerRightTarget = Lower_Right.getCurrentPosition() + (int)(rightInches * COUNTS_PER_INCH);
+            Upper_Left.setTargetPosition(newUpperLeftTarget);
+            Upper_Right.setTargetPosition(newUpperRightTarget);
+            Lower_Left.setTargetPosition(newLowerLeftTarget);
+            Lower_Right.setTargetPosition(newLowerRightTarget);
 
             // Turn On RUN_TO_POSITION
-            upper_left.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            upper_right.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            lower_left.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            lower_right.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            Upper_Left.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            Upper_Right.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            Lower_Left.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            Lower_Right.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
             // reset the timeout time and start motion.
             runtime.reset();
-            upper_left.setPower(Math.abs(speed));
-            upper_right.setPower(Math.abs(speed));
-            lower_left.setPower(Math.abs(speed));
-            lower_right.setPower(Math.abs(speed));
+            Upper_Left.setPower(Math.abs(speed));
+            Upper_Right.setPower(Math.abs(speed));
+            Lower_Left.setPower(Math.abs(speed));
+            Lower_Right.setPower(Math.abs(speed));
 
             // keep looping while we are still active, and there is time left, and both motors are running.
             // Note: We use (isBusy() && isBusy()) in the loop test, which means that when EITHER motor hits
@@ -389,26 +415,26 @@ public class Aura_AutoBlue extends LinearOpMode {
             // onto the next step, use (isBusy() || isBusy()) in the loop test.
             while (opModeIsActive() &&
                     (runtime.seconds() < timeoutS) &&
-                    (upper_left.isBusy() && upper_right.isBusy() && lower_left.isBusy() && lower_right.isBusy())) {
+                    (Upper_Left.isBusy() && Upper_Right.isBusy() && Lower_Left.isBusy() && Lower_Right.isBusy())) {
 
                 // Display it for the driver.
                 telemetry.addData("Running to",  " %7d :%7d", newUpperLeftTarget,  newUpperRightTarget, newLowerLeftTarget, newLowerRightTarget);
                 telemetry.addData("Currently at",  " at %7d :%7d",
-                        upper_left.getCurrentPosition(), upper_right.getCurrentPosition(), lower_left.getCurrentPosition(), lower_right.getCurrentPosition());
+                        Upper_Left.getCurrentPosition(), Upper_Right.getCurrentPosition(), Lower_Left.getCurrentPosition(), Lower_Right.getCurrentPosition());
                 telemetry.update();
             }
 
             // Stop all motion;
-            upper_left.setPower(0);
-            upper_right.setPower(0);
-            lower_left.setPower(0);
-            lower_right.setPower(0);
+            Upper_Left.setPower(0);
+            Upper_Right.setPower(0);
+            Lower_Left.setPower(0);
+            Lower_Right.setPower(0);
 
             // Turn off RUN_TO_POSITION
-            upper_left.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            upper_right.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            lower_left.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            lower_right.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            Upper_Left.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            Upper_Right.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            Lower_Left.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            Lower_Right.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
 
             sleep(250);   // optional pause after each move.
@@ -434,27 +460,27 @@ public class Aura_AutoBlue extends LinearOpMode {
         if (opModeIsActive()) {
 
             // Determine new target position, and pass to motor controller
-            newUpperLeftTarget = upper_left.getCurrentPosition() + (int)(leftDiagonalInches * COUNTS_PER_INCH);
-            newUpperRightTarget = upper_right.getCurrentPosition() + (int)(rightDiagonalInches * COUNTS_PER_INCH);
-            newLowerLeftTarget = lower_left.getCurrentPosition() + (int)(rightDiagonalInches * COUNTS_PER_INCH);
-            newLowerRightTarget = lower_right.getCurrentPosition() + (int)(leftDiagonalInches * COUNTS_PER_INCH);
-            upper_left.setTargetPosition(newUpperLeftTarget);
-            upper_right.setTargetPosition(newUpperRightTarget);
-            lower_left.setTargetPosition(newLowerLeftTarget);
-            lower_right.setTargetPosition(newLowerRightTarget);
+            newUpperLeftTarget = Upper_Left.getCurrentPosition() + (int)(leftDiagonalInches * COUNTS_PER_INCH);
+            newUpperRightTarget = Upper_Right.getCurrentPosition() + (int)(rightDiagonalInches * COUNTS_PER_INCH);
+            newLowerLeftTarget = Lower_Left.getCurrentPosition() + (int)(rightDiagonalInches * COUNTS_PER_INCH);
+            newLowerRightTarget = Lower_Right.getCurrentPosition() + (int)(leftDiagonalInches * COUNTS_PER_INCH);
+            Upper_Left.setTargetPosition(newUpperLeftTarget);
+            Upper_Right.setTargetPosition(newUpperRightTarget);
+            Lower_Left.setTargetPosition(newLowerLeftTarget);
+            Lower_Right.setTargetPosition(newLowerRightTarget);
 
             // Turn On RUN_TO_POSITION
-            upper_left.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            upper_right.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            lower_left.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            lower_right.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            Upper_Left.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            Upper_Right.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            Lower_Left.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            Lower_Right.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
             // reset the timeout time and start motion.
             runtime.reset();
-            upper_left.setPower(Math.abs(speed));
-            upper_right.setPower(Math.abs(speed));
-            lower_left.setPower(Math.abs(speed));
-            lower_right.setPower(Math.abs(speed));
+            Upper_Left.setPower(Math.abs(speed));
+            Upper_Right.setPower(Math.abs(speed));
+            Lower_Left.setPower(Math.abs(speed));
+            Lower_Right.setPower(Math.abs(speed));
 
             // keep looping while we are still active, and there is time left, and both motors are running.
             // Note: We use (isBusy() && isBusy()) in the loop test, which means that when EITHER motor hits
@@ -464,26 +490,26 @@ public class Aura_AutoBlue extends LinearOpMode {
             // onto the next step, use (isBusy() || isBusy()) in the loop test.
             while (opModeIsActive() &&
                     (runtime.seconds() < timeoutS) &&
-                    (upper_left.isBusy() && upper_right.isBusy() && lower_left.isBusy() && lower_right.isBusy())) {
+                    (Upper_Left.isBusy() && Upper_Right.isBusy() && Lower_Left.isBusy() && Lower_Right.isBusy())) {
 
                 // Display it for the driver.
                 telemetry.addData("Running to",  " %7d :%7d", newUpperLeftTarget,  newUpperRightTarget, newLowerLeftTarget, newLowerRightTarget);
                 telemetry.addData("Currently at",  " at %7d :%7d",
-                        upper_left.getCurrentPosition(), upper_right.getCurrentPosition(), lower_left.getCurrentPosition(), lower_right.getCurrentPosition());
+                        Upper_Left.getCurrentPosition(), Upper_Right.getCurrentPosition(), Lower_Left.getCurrentPosition(), Lower_Right.getCurrentPosition());
                 telemetry.update();
             }
 
             // Stop all motion;
-            upper_left.setPower(0);
-            upper_right.setPower(0);
-            lower_left.setPower(0);
-            lower_right.setPower(0);
+            Upper_Left.setPower(0);
+            Upper_Right.setPower(0);
+            Lower_Left.setPower(0);
+            Lower_Right.setPower(0);
 
             // Turn off RUN_TO_POSITION
-            upper_left.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            upper_right.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            lower_left.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            lower_right.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            Upper_Left.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            Upper_Right.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            Lower_Left.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            Lower_Right.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
 
             sleep(250);   // optional pause after each move.

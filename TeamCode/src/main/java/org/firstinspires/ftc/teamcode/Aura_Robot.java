@@ -48,10 +48,10 @@ public class Aura_Robot
 {
     enum AuraMotors
     {
-        UPPER_LEFT,
-        LOWER_LEFT,
-        UPPER_RIGHT,
-        LOWER_RIGHT,
+        Upper_Left,
+        Lower_Left,
+        Upper_Right,
+        Lower_Right,
         INTAKE,
         CAT_MOUSE,
         ALL_DRIVES,
@@ -79,10 +79,10 @@ public class Aura_Robot
     }
 
     /* Public OpMode members. */
-    public DcMotor upper_right = null;
-    public DcMotor upper_left = null;
-    public DcMotor lower_left = null;
-    public DcMotor lower_right = null;
+    public DcMotor Upper_Right = null;
+    public DcMotor Upper_Left = null;
+    public DcMotor Lower_Left = null;
+    public DcMotor Lower_Right = null;
 
     public DcMotor intakeMotor = null;
 
@@ -303,10 +303,10 @@ public class Aura_Robot
         hwMap = ahwMap;
 
         // Define and Initialize Motors
-        upper_right  = hwMap.get(DcMotor.class, "Upper_Right");
-        upper_left = hwMap.get(DcMotor.class, "Upper_Left");
-        lower_left = hwMap.get(DcMotor.class, "Lower_Left");
-        lower_right = hwMap.get(DcMotor.class, "Lower_Right");
+        Upper_Right  = hwMap.get(DcMotor.class, "Upper_Right");
+        Upper_Left = hwMap.get(DcMotor.class, "Upper_Left");
+        Lower_Left = hwMap.get(DcMotor.class, "Lower_Left");
+        Lower_Right = hwMap.get(DcMotor.class, "Lower_Right");
         intakeMotor = hwMap.get(DcMotor.class, "intakeMotor");
 //        Jerry = hwMap.get(DcMotor.class, "Jerry");
 //        Tom = hwMap.get(DcMotor.class, "Tom");
@@ -319,20 +319,20 @@ public class Aura_Robot
 
 
         // Set all motors to zero power
-        upper_left.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        upper_right.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        lower_left.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        lower_right.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        Upper_Left.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        Upper_Right.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        Lower_Left.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        Lower_Right.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         intakeMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 //        Tom.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         // Most robots need the motor on one side to be reversed to drive forward
         // Reverse the motor that runs backwards when connected directly to the battery
-        upper_left.setDirection(DcMotor.Direction.REVERSE);  //-
-        upper_right.setDirection(DcMotor.Direction.FORWARD); //+
-        lower_left.setDirection(DcMotor.Direction.REVERSE); //- used to be
-        lower_right.setDirection(DcMotor.Direction.FORWARD); //+ used to be
+        Upper_Left.setDirection(DcMotor.Direction.REVERSE);  //-
+        Upper_Right.setDirection(DcMotor.Direction.FORWARD); //+
+        Lower_Left.setDirection(DcMotor.Direction.REVERSE); //- used to be
+        Lower_Right.setDirection(DcMotor.Direction.FORWARD); //+ used to be
 
         intakeMotor.setDirection(DcMotor.Direction.FORWARD); //- used to be
 //        Tom.setDirection(DcMotor.Direction.FORWARD); //+ used to be
@@ -374,35 +374,35 @@ public class Aura_Robot
     {
 
         switch (eWhichMotor){
-            case UPPER_LEFT:
-                upper_left.setMode(eMode);
+            case Upper_Left:
+                Upper_Left.setMode(eMode);
                 break;
-            case UPPER_RIGHT:
-                upper_right.setMode(eMode);
+            case Upper_Right:
+                Upper_Right.setMode(eMode);
                 break;
-            case LOWER_LEFT:
-                lower_left.setMode(eMode);
+            case Lower_Left:
+                Lower_Left.setMode(eMode);
                 break;
-            case LOWER_RIGHT:
-                lower_right.setMode(eMode);
+            case Lower_Right:
+                Lower_Right.setMode(eMode);
                 break;
 //            case CAT_MOUSE:
 //                Jerry.setMode(eMode);
 //                Tom.setMode(eMode);
 //                break;
             case ALL_DRIVES:
-                lower_right.setMode(eMode);
-                lower_left.setMode(eMode);
-                upper_right.setMode(eMode);
-                upper_left.setMode(eMode);
+                Lower_Right.setMode(eMode);
+                Lower_Left.setMode(eMode);
+                Upper_Right.setMode(eMode);
+                Upper_Left.setMode(eMode);
                 break;
             case ALL_ATTACHMENTS:
                 break;
             case ALL:
-//                lower_right.setMode(eMode);
-//                lower_left.setMode(eMode);
-//                upper_right.setMode(eMode);
-//                upper_left.setMode(eMode);
+//                Lower_Right.setMode(eMode);
+//                Lower_Left.setMode(eMode);
+//                Upper_Right.setMode(eMode);
+//                Upper_Left.setMode(eMode);
 //                Jerry.setMode(eMode);
 //                Tom.setMode(eMode);
                 break;
@@ -413,17 +413,17 @@ public class Aura_Robot
     {
 
         switch (eWhichMotor){
-            case UPPER_LEFT:
-                upper_left.setPower(dPower);
+            case Upper_Left:
+                Upper_Left.setPower(dPower);
                 break;
-            case UPPER_RIGHT:
-                upper_right.setPower(dPower);
+            case Upper_Right:
+                Upper_Right.setPower(dPower);
                 break;
-            case LOWER_LEFT:
-                lower_left.setPower(dPower);
+            case Lower_Left:
+                Lower_Left.setPower(dPower);
                 break;
-            case LOWER_RIGHT:
-                lower_right.setPower(dPower);
+            case Lower_Right:
+                Lower_Right.setPower(dPower);
                 break;
             case INTAKE:
                 intakeMotor.setPower(dPower);
@@ -433,16 +433,16 @@ public class Aura_Robot
 //                Tom.setPower(dPower);
 //                break;
             case ALL_DRIVES:
-                lower_right.setPower(dPower);
-                lower_left.setPower(dPower);
-                upper_right.setPower(dPower);
-                upper_left.setPower(dPower);
+                Lower_Right.setPower(dPower);
+                Lower_Left.setPower(dPower);
+                Upper_Right.setPower(dPower);
+                Upper_Left.setPower(dPower);
                 break;
             case ALL:
-//                lower_right.setPower(dPower);
-//                lower_left.setPower(dPower);
-//                upper_right.setPower(dPower);
-//                upper_left.setPower(dPower);
+//                Lower_Right.setPower(dPower);
+//                Lower_Left.setPower(dPower);
+//                Upper_Right.setPower(dPower);
+//                Upper_Left.setPower(dPower);
 //                Jerry.setPower(dPower);
 //                Tom.setPower(dPower);
                 break;
@@ -453,14 +453,14 @@ public class Aura_Robot
     {
         switch(eWhichMotor)
         {
-            case UPPER_LEFT:
-                return upper_left.getCurrentPosition();
-            case LOWER_LEFT:
-                return lower_left.getCurrentPosition();
-            case UPPER_RIGHT:
-                return upper_right.getCurrentPosition();
-            case LOWER_RIGHT:
-                return lower_right.getCurrentPosition();
+            case Upper_Left:
+                return Upper_Left.getCurrentPosition();
+            case Lower_Left:
+                return Lower_Left.getCurrentPosition();
+            case Upper_Right:
+                return Upper_Right.getCurrentPosition();
+            case Lower_Right:
+                return Lower_Right.getCurrentPosition();
 //            case CAT_MOUSE:
 //                return Tom.getCurrentPosition();
             default:
@@ -492,22 +492,22 @@ public class Aura_Robot
 
         switch(eWhichMotor)
         {
-            case UPPER_LEFT: // upper left
-                return upper_left.isBusy();
-            case LOWER_LEFT: // lower left
-                return lower_left.isBusy();
-            case UPPER_RIGHT: // upper right
-                return upper_right.isBusy();
-            case LOWER_RIGHT: // lower right
-                return lower_right.isBusy();
+            case Upper_Left: // upper left
+                return Upper_Left.isBusy();
+            case Lower_Left: // lower left
+                return Lower_Left.isBusy();
+            case Upper_Right: // upper right
+                return Upper_Right.isBusy();
+            case Lower_Right: // lower right
+                return Lower_Right.isBusy();
 //            case CAT_MOUSE:
 //                return Jerry.isBusy() && Tom.isBusy();
             case ALL_DRIVES: // All Drives
-                return lower_left.isBusy() && lower_right.isBusy() && upper_left.isBusy() && upper_right.isBusy();
+                return Lower_Left.isBusy() && Lower_Right.isBusy() && Upper_Left.isBusy() && Upper_Right.isBusy();
 //            case ALL_ATTACHMENTS:
 //                //return Linac.isBusy() && duck_wheel.isBusy() && Da_Winch.isBusy();
             case ALL:
-//                return lower_left.isBusy() && lower_right.isBusy() && upper_left.isBusy() && upper_right.isBusy();
+//                return Lower_Left.isBusy() && Lower_Right.isBusy() && Upper_Left.isBusy() && Upper_Right.isBusy();
             default:
                 return false;
         }
@@ -515,33 +515,33 @@ public class Aura_Robot
 
     public void setTargetPosition(AuraMotors eWhichMotor, int iPos ) {
         switch (eWhichMotor) {
-            case UPPER_LEFT:
-                upper_left.setTargetPosition(iPos);
+            case Upper_Left:
+                Upper_Left.setTargetPosition(iPos);
                 break;
-            case LOWER_LEFT:
-                lower_left.setTargetPosition(iPos);
+            case Lower_Left:
+                Lower_Left.setTargetPosition(iPos);
                 break;
-            case UPPER_RIGHT:
-                upper_right.setTargetPosition(iPos);
+            case Upper_Right:
+                Upper_Right.setTargetPosition(iPos);
                 break;
-            case LOWER_RIGHT:
-                lower_right.setTargetPosition(iPos);
+            case Lower_Right:
+                Lower_Right.setTargetPosition(iPos);
                 break;
 //            case CAT_MOUSE:
 //                Jerry.setTargetPosition(iPos);
 //                Tom.setTargetPosition(iPos);
 //                break;
             case ALL_DRIVES:
-                lower_right.setTargetPosition(iPos);
-                lower_left.setTargetPosition(iPos);
-                upper_right.setTargetPosition(iPos);
-                upper_left.setTargetPosition(iPos);
+                Lower_Right.setTargetPosition(iPos);
+                Lower_Left.setTargetPosition(iPos);
+                Upper_Right.setTargetPosition(iPos);
+                Upper_Left.setTargetPosition(iPos);
                 break;
             case ALL:
-//                lower_right.setTargetPosition(iPos);
-//                lower_left.setTargetPosition(iPos);
-//                upper_right.setTargetPosition(iPos);
-//                upper_left.setTargetPosition(iPos);
+//                Lower_Right.setTargetPosition(iPos);
+//                Lower_Left.setTargetPosition(iPos);
+//                Upper_Right.setTargetPosition(iPos);
+//                Upper_Left.setTargetPosition(iPos);
 //                Jerry.setTargetPosition(iPos);
 //                Tom.setTargetPosition(iPos);
             default:

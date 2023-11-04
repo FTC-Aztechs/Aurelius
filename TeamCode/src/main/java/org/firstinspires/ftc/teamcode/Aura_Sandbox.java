@@ -93,17 +93,17 @@ public class Aura_Sandbox extends LinearOpMode
 
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
-        Aurelius.setRunMode(Aura_Robot.AuraMotors.UPPER_LEFT, DcMotor.RunMode.STOP_AND_RESET_ENCODER); //0
-        Aurelius.setRunMode(Aura_Robot.AuraMotors.LOWER_RIGHT, DcMotor.RunMode.STOP_AND_RESET_ENCODER);  //3
-        Aurelius.setRunMode(Aura_Robot.AuraMotors.UPPER_RIGHT, DcMotor.RunMode.STOP_AND_RESET_ENCODER); //1
+        Aurelius.setRunMode(Aura_Robot.AuraMotors.Upper_Left, DcMotor.RunMode.STOP_AND_RESET_ENCODER); //0
+        Aurelius.setRunMode(Aura_Robot.AuraMotors.Lower_Right, DcMotor.RunMode.STOP_AND_RESET_ENCODER);  //3
+        Aurelius.setRunMode(Aura_Robot.AuraMotors.Upper_Right, DcMotor.RunMode.STOP_AND_RESET_ENCODER); //1
 
-        Aurelius.setRunMode(Aura_Robot.AuraMotors.UPPER_LEFT, DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        Aurelius.setRunMode(Aura_Robot.AuraMotors.LOWER_RIGHT, DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        Aurelius.setRunMode(Aura_Robot.AuraMotors.UPPER_RIGHT, DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        Aurelius.setRunMode(Aura_Robot.AuraMotors.Upper_Left, DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        Aurelius.setRunMode(Aura_Robot.AuraMotors.Lower_Right, DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        Aurelius.setRunMode(Aura_Robot.AuraMotors.Upper_Right, DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-        telemetry.addData("Left Tracking wheel: ", Aurelius.getCurrentPosition(Aura_Robot.AuraMotors.UPPER_LEFT));
-        telemetry.addData("Right Tracking wheel: ", Aurelius.getCurrentPosition(Aura_Robot.AuraMotors.LOWER_RIGHT));
-        telemetry.addData("Strafe Tracking wheel: ", Aurelius.getCurrentPosition(Aura_Robot.AuraMotors.UPPER_RIGHT));
+        telemetry.addData("Left Tracking wheel: ", Aurelius.getCurrentPosition(Aura_Robot.AuraMotors.Upper_Left));
+        telemetry.addData("Right Tracking wheel: ", Aurelius.getCurrentPosition(Aura_Robot.AuraMotors.Lower_Right));
+        telemetry.addData("Strafe Tracking wheel: ", Aurelius.getCurrentPosition(Aura_Robot.AuraMotors.Upper_Right));
         // Wait for the game to start (driver presses PLAY)
 
 //        MvrkVuforiaPoseEstimator poseEstimator = new MvrkVuforiaPoseEstimator(hardwareMap);
@@ -153,9 +153,9 @@ public class Aura_Sandbox extends LinearOpMode
                     SandboxIntakeOuttake();
                     break;
                 default:
-                    telemetry.addData("Left Tracking wheel: ", Aurelius.getCurrentPosition(Aura_Robot.AuraMotors.UPPER_LEFT));
-                    telemetry.addData("Right Tracking wheel: ", Aurelius.getCurrentPosition(Aura_Robot.AuraMotors.LOWER_RIGHT));
-                    telemetry.addData("Strafe Tracking wheel: ", Aurelius.getCurrentPosition(Aura_Robot.AuraMotors.UPPER_RIGHT));
+                    telemetry.addData("Left Tracking wheel: ", Aurelius.getCurrentPosition(Aura_Robot.AuraMotors.Upper_Left));
+                    telemetry.addData("Right Tracking wheel: ", Aurelius.getCurrentPosition(Aura_Robot.AuraMotors.Lower_Right));
+                    telemetry.addData("Strafe Tracking wheel: ", Aurelius.getCurrentPosition(Aura_Robot.AuraMotors.Upper_Right));
 
                     SandboxManualDrive();
                     break;
@@ -281,13 +281,13 @@ public class Aura_Sandbox extends LinearOpMode
                 changingWheelSpeed = true;
             } else if (timer_gp1_dpad_right.time(TimeUnit.MILLISECONDS) > BUTTON_TRIGGER_TIMER_MS) {
 
-                Aurelius.setRunMode(Aura_Robot.AuraMotors.UPPER_LEFT, DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                Aurelius.setRunMode(Aura_Robot.AuraMotors.LOWER_RIGHT, DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                Aurelius.setRunMode(Aura_Robot.AuraMotors.UPPER_RIGHT, DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                Aurelius.setRunMode(Aura_Robot.AuraMotors.Upper_Left, DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                Aurelius.setRunMode(Aura_Robot.AuraMotors.Lower_Right, DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                Aurelius.setRunMode(Aura_Robot.AuraMotors.Upper_Right, DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-                Aurelius.setRunMode(Aura_Robot.AuraMotors.UPPER_LEFT, DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-                Aurelius.setRunMode(Aura_Robot.AuraMotors.LOWER_RIGHT, DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-                Aurelius.setRunMode(Aura_Robot.AuraMotors.UPPER_RIGHT, DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                Aurelius.setRunMode(Aura_Robot.AuraMotors.Upper_Left, DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                Aurelius.setRunMode(Aura_Robot.AuraMotors.Lower_Right, DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                Aurelius.setRunMode(Aura_Robot.AuraMotors.Upper_Right, DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
 
                 telemetry.addLine("Reset Encoders");
@@ -313,10 +313,10 @@ public class Aura_Sandbox extends LinearOpMode
         } else if (turnDir < -1) {
             turnDir = -1;
         }
-        Aurelius.lower_left.setPower((moveDir + strafeDir - turnDir) * (-speedAdjust / 10)); // 1.0
-        Aurelius.lower_right.setPower((moveDir - strafeDir + turnDir) * (-speedAdjust / 10)); // 1.0
-        Aurelius.upper_left.setPower((moveDir - strafeDir - turnDir) * (-speedAdjust / 10)); // 0
-        Aurelius.upper_right.setPower((moveDir + strafeDir + turnDir) * (-speedAdjust / 10)); // 0
+        Aurelius.Lower_Left.setPower((moveDir + strafeDir - turnDir) * (-speedAdjust / 10)); // 1.0
+        Aurelius.Lower_Right.setPower((moveDir - strafeDir + turnDir) * (-speedAdjust / 10)); // 1.0
+        Aurelius.Upper_Left.setPower((moveDir - strafeDir - turnDir) * (-speedAdjust / 10)); // 0
+        Aurelius.Upper_Right.setPower((moveDir + strafeDir + turnDir) * (-speedAdjust / 10)); // 0
 
         return;
     }
