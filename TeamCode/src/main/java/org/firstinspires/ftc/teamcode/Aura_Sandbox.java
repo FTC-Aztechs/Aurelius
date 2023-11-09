@@ -82,7 +82,7 @@ public class Aura_Sandbox extends LinearOpMode
         SMD_LOG_MECANUMDRIVE,   // Dumps motor powers from SampleMecanumDrive to file for a trajectory sequence
         SMD_INTAKE_OUTTAKE
     }
-    public static SandboxMode sandboxMode = SandboxMode.SMD_LOG_MECANUMDRIVE;
+    public static SandboxMode sandboxMode = SandboxMode.ENCODER_TESTING;
 
 //    MvrkVuforiaPoseEstimator vuforiaPoseEstimator = new MvrkVuforiaPoseEstimator(hardwareMap);
 
@@ -147,15 +147,14 @@ public class Aura_Sandbox extends LinearOpMode
                 case SMD_LOG_MECANUMDRIVE:
                     SandboxManualDrive();
                     break;
-                case ENCODER_TESTING:
-                    break;
                 case SMD_INTAKE_OUTTAKE:
                     SandboxIntakeOuttake();
                     break;
+                case ENCODER_TESTING:
                 default:
-                    telemetry.addData("Left Tracking wheel: ", Aurelius.getCurrentPosition(Aura_Robot.AuraMotors.Upper_Left));
-                    telemetry.addData("Right Tracking wheel: ", Aurelius.getCurrentPosition(Aura_Robot.AuraMotors.Lower_Right));
-                    telemetry.addData("Strafe Tracking wheel: ", Aurelius.getCurrentPosition(Aura_Robot.AuraMotors.Upper_Right));
+                    telemetry.addData("Left Tracking wheel: ", Aurelius.getCurrentPosition(Aura_Robot.AuraMotors.Lower_Left));
+                    telemetry.addData("Right Tracking wheel: ", Aurelius.getCurrentPosition(Aura_Robot.AuraMotors.Upper_Right));
+                    telemetry.addData("Strafe Tracking wheel: ", Aurelius.getCurrentPosition(Aura_Robot.AuraMotors.Lower_Right));
 
                     SandboxManualDrive();
                     break;

@@ -31,12 +31,12 @@ public final class ThreeDeadWheelLocalizer implements Localizer {
     private int lastPar0Pos, lastPar1Pos, lastPerpPos;
 
     public ThreeDeadWheelLocalizer(HardwareMap hardwareMap, double inPerTick) {
-        par0 = new OverflowEncoder(new RawEncoder(hardwareMap.get(DcMotorEx.class, "Upper_Right")));
-        par1 = new OverflowEncoder(new RawEncoder(hardwareMap.get(DcMotorEx.class, "Lower_Left")));
-        perp = new OverflowEncoder(new RawEncoder(hardwareMap.get(DcMotorEx.class, "Upper_Left")));
+        par0 = new OverflowEncoder(new RawEncoder(hardwareMap.get(DcMotorEx.class, "Lower_Left")));
+        par1 = new OverflowEncoder(new RawEncoder(hardwareMap.get(DcMotorEx.class, "Upper_Right")));
+        perp = new OverflowEncoder(new RawEncoder(hardwareMap.get(DcMotorEx.class, "Lower_Right")));
 
-        par0.setDirection(DcMotor.Direction.REVERSE);
-        par1.setDirection(DcMotor.Direction.REVERSE);
+        par0.setDirection(DcMotor.Direction.FORWARD);
+        par1.setDirection(DcMotor.Direction.FORWARD);
         perp.setDirection(DcMotor.Direction.FORWARD);
 
         lastPar0Pos = par0.getPositionAndVelocity().position;
@@ -80,4 +80,7 @@ public final class ThreeDeadWheelLocalizer implements Localizer {
 
         return twist;
     }
+
+
+
 }
