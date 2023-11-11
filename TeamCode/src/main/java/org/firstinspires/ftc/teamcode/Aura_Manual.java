@@ -34,6 +34,8 @@ package org.firstinspires.ftc.teamcode;
 
 import static com.qualcomm.robotcore.util.ElapsedTime.Resolution.MILLISECONDS;
 import static org.firstinspires.ftc.teamcode.Aura_Robot.BUTTON_TRIGGER_TIMER_MS;
+import static org.firstinspires.ftc.teamcode.Aura_Robot.DropOffDepositPos;
+import static org.firstinspires.ftc.teamcode.Aura_Robot.DropoffRestPos;
 import static org.firstinspires.ftc.teamcode.Aura_Robot.Launcher_Set_Pos;
 import static org.firstinspires.ftc.teamcode.Aura_Robot.bumperSpeedAdjust;
 import static org.firstinspires.ftc.teamcode.Aura_Robot.dPadIntakeAdjust;
@@ -118,50 +120,25 @@ public class Aura_Manual extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-//        PhotonCore.enable();
         // Initialize the drive system vriables
         Aurelius.init(hardwareMap);
-
         initAurelius();
         waitForStart();
-
 
         while (opModeIsActive()) {
             AuraIntake();
             AuraLauncher();
             AuraManualDrive();
+            AuraDeposit();
             telemetry.addLine("Drive Mode: Forward Facing");
             telemetry.update();
         }
-
-//            if(fieldCentric){
-//                AuraManualDrive_FieldCentric();
-//                telemetry.addLine("Drive Mode: Field Centric");
-//                telemetry.update();
-//            }else{
-//            }
     }
-//    }
 
     public void initAurelius() {
-        msStuckDetectStop = 2500;
         FtcDashboard Dash = auraDashboard;
-
-//        Aurelius.setRunMode(Aura_Robot.AuraMotors.CAT_MOUSE, STOP_AND_RESET_ENCODER);
-//        Aurelius.setRunMode(Aura_Robot.AuraMotors.CAT_MOUSE, RUN_WITHOUT_ENCODER);
-
         Aurelius.boeing747.launcher.setPosition(Launcher_Set_Pos);
-
-//        xSlide_Position = xSlideInPos;
-//        Aurelius.FlameThrower.setPosition(xSlide_Position);
-
-//        Aurelius.Teacup.setPosition(turretUp);
-//        telemetry.addData("angle", Aurelius.Teacup.getPosition());
-
-//        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
-//        parameters.angleUnit = BNO055IMU.AngleUnit.RADIANS;
-//        BNO055IMUUtil.remapZAxis(imu, AxisDirection.NEG_Y);
-//        imu.initialize(parameters);
+        Aurelius.flipper.controlledServo.setPosition(DropoffRestPos);
 
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         telemetry.addLine("Status: Robot is ready to roll!");
@@ -230,8 +207,6 @@ public class Aura_Manual extends LinearOpMode {
         return;
     }
 
-
-
     public void AuraIntake() {
         if (gamepad2.dpad_left) {
             if (!changingIntakeSpeed) {
@@ -269,6 +244,20 @@ public class Aura_Manual extends LinearOpMode {
         Aurelius.setPower(Aura_Robot.AuraMotors.INTAKE,(dPadIntakeAdjust/10)* gamepad2.right_stick_y);
     }
 
+    public void AuraDeposit()
+    {
+        if(gamepad2.y) {
+            Aurelius.flipper.setTargetPosition(DropOffDepositPos);
+            while (!Aurelius.flipper.update())
+                idle();
+        }
+        if(gamepad2.x) {
+            Aurelius.flipper.setTargetPosition(DropoffRestPos);
+            while (!Aurelius.flipper.update())
+                idle();
+        }
+    }
+
     public void AuraLauncher(){
         if (gamepad1.left_trigger == 1f) {
             if (!changingLauncherSpeed) {
@@ -291,186 +280,4 @@ public class Aura_Manual extends LinearOpMode {
         }
 
     }
-
-//    public void AuraUpSlide_Pid() {
-//        //restrict range and provide warnings
-//        slideHeightMinExtension = LowerLimit;
-//        slideHeightMaxExtension = HighJunction;
-//
-//        //joystick control
-//        slide_newPos += (int) (-gamepad2.left_stick_y * slideTicks_stepSize);
-//
-//        //button control
-//        if (gamepad2.y) {
-//            if (!assumingHighPosition) {
-//                timer_gp2_buttonY.reset();
-//                assumingHighPosition = true;
-//            } else if (timer_gp2_buttonY.time(TimeUnit.MILLISECONDS) > BUTTON_TRIGGER_TIMER_MS) {
-//                telemetry.addLine("GP2_Y triggered. Set Tom&Jerry to High position");
-//                telemetry.update();
-//                slide_newPos = HighJunction;
-//                assumingHighPosition = false;
-//                if(HighJunction >= slideHeightMinExtension) {
-//                } else {
-//                    telemetry.addData("Vertical Slides", "Move to High Junction locked. Turn the turret forward to unlock full range!");
-//                    telemetry.update();
-//                    assumingHighPosition = false;
-//                }
-//            }
-//        }
-//
-//        if (gamepad2.x) {
-//            if (!assumingMidPosition) {
-//                timer_gp2_buttonX.reset();
-//                assumingMidPosition = true;
-//            } else if (timer_gp2_buttonX.time(TimeUnit.MILLISECONDS) > BUTTON_TRIGGER_TIMER_MS) {
-//
-//                if( MidJunction >= slideHeightMinExtension) {
-//                    telemetry.addLine("GP2_X triggered. Set Tom&Jerry to Mid position");
-//                    telemetry.update();
-//                    slide_newPos = MidJunction;
-//                    assumingHighPosition = false;
-//                } else {
-//                    telemetry.addData("Vertical Slides", "Move to MidJunction is locked. Turn the turret forward to unlock full range!");
-//                    telemetry.update();
-//                    assumingMidPosition = false;
-//                }
-//            }
-//        }
-//
-//        if(gamepad2.a) {
-//            if (!assumingLowPosition) {
-//                timer_gp2_buttonY.reset();
-//                assumingLowPosition = true;
-//            } else if (timer_gp2_buttonA.time(TimeUnit.MILLISECONDS) > BUTTON_TRIGGER_TIMER_MS) {
-//
-//                if(LowJunction >= slideHeightMinExtension) {
-//                    telemetry.addLine("GP2_A triggered. Set Tom&Jerry to Low position");
-//                    telemetry.update();
-//                    slide_newPos = LowJunction;
-//                    assumingLowPosition = false;
-//                } else {
-//                    telemetry.addData("Vertical Slides", "Move to Low Junction is locked. Turn the turret forward to unlock full range!");
-//                    telemetry.update();
-//                    assumingLowPosition = false;
-//                }
-//
-//
-//            }
-//        }
-//
-//        if (gamepad2.b) {
-//            if (!assumingFloorPosition) {
-//                timer_gp2_buttonB.reset();
-//                assumingFloorPosition = true;
-//            } else if (timer_gp2_buttonB.time(TimeUnit.MILLISECONDS) > BUTTON_TRIGGER_TIMER_MS) {
-//
-//                if( LowerLimit >= slideHeightMinExtension) {
-//                    telemetry.addLine("GP2_B triggered. Set Tom&Jerry to Floor position");
-//                    telemetry.update();
-//                    slide_newPos = FloorPosition;
-//                    assumingFloorPosition = false;
-//                } else {
-//                    telemetry.addData("Vertical Slides", "Move to Floor Position is locked. Turn the turret forward to unlock full range!");
-//                    telemetry.update();
-//                    assumingFloorPosition = false;
-//                }
-//            }
-//        }
-//
-//        telemetry.addData("newPos", slide_newPos);
-//        telemetry.update();
-//
-//        //capping control
-//        if(slide_newPos >= slideHeightMaxExtension)
-//            slide_newPos = slideHeightMaxExtension;
-//        else if (slide_newPos <= slideHeightMinExtension)
-//            slide_newPos = slideHeightMinExtension;
-//        telemetry.addData("newPos", slide_newPos);
-//        telemetry.update();
-//
-//        //actually using the pid to move the slides
-//        if( slide_newPos != slide_currentPos && slide_newPos >= slideHeightMinExtension && slide_newPos <= slideHeightMaxExtension ) {
-//            double command = manualSlidePID.output(slide_newPos, Aurelius.getCurrentPosition(Aura_Robot.AuraMotors.CAT_MOUSE));
-//            if(slide_newPos < slide_currentPos)
-//                SlidePower = Math.max(command/HighJunction, SlidePower_Down);
-//            else
-//                SlidePower = Math.min(command/HighJunction, SlidePower_Up);
-//
-//            Aurelius.setPower(Aura_Robot.AuraMotors.CAT_MOUSE, SlidePower);
-//            slide_currentPos = Aurelius.getCurrentPosition(Aura_Robot.AuraMotors.CAT_MOUSE);
-//        }
-//
-//        telemetry.addData("rykUpSlide_pid: Current Slide Position: ", Aurelius.getCurrentPosition(Aura_Robot.AuraMotors.CAT_MOUSE));
-//        telemetry.update();
-//    }
-
-//    public void MrvkTurret() {
-//        if (Aurelius.getCurrentPosition(Aura_Robot.AuraMotors.CAT_MOUSE) > slideHeightSafetyBarrier || Aurelius.FlameThrower.getPosition() <= xSlideSafetyBarrier){
-//            turret_Range[0] = turretRight;
-//            turret_Range[1] = turretLeft;
-//            telemetry.addData("Turret", "Full range is ready to go!");
-//        }
-//        else{
-//            if (Claw_Position == Claw_Open_Pos){
-//                turret_Range[0] = turret_restrictedRange[0];
-//                turret_Range[1] = turret_restrictedRange[1];
-//            }else{
-//                turret_Range[0] = turretUp;
-//                turret_Range[1] = turretUp;
-//            }
-//            telemetry.addData("Turret", "Full rotation is locked. Turn the turret forward/extend horizontal to unlock full range!");
-//        }
-//        telemetry.update();
-//
-//        //joystick control
-//        turret_newPos += turretIncrement * -gamepad2.right_stick_x;
-//        if (turret_newPos >= turret_Range[1]) {
-//            turret_newPos = turret_Range[1];a
-//        } else if (turret_newPos <= turret_Range[0]) {
-//            turret_newPos = turret_Range[0];
-//        }
-//
-//        //dPad control
-//        if (gamepad2.dpad_left) {
-//            if(turretLeft >= turret_Range[0] && turretLeft <= turret_Range[1]) {
-//                turret_newPos = turretLeft;
-//                telemetry.addLine("dPad left triggered. Set turret to left");
-//                telemetry.update();
-//            }
-//        }
-//
-//        if (gamepad2.dpad_right) {
-//            if(turretRight >= turret_Range[0] && turretRight <= turret_Range[1]) {
-//                turret_newPos = turretRight;
-//                telemetry.addLine("dPad right triggered. Set turret to right");
-//                telemetry.update();
-//            }
-//        }
-//
-//        if (gamepad2.dpad_up) {
-//            if(turretUp >= turret_Range[0] && turretUp <= turret_Range[1]) {
-//                turret_newPos = turretUp;
-//                telemetry.addLine("dPad up triggered. Set turret to forward");
-//                telemetry.update();
-//            }
-//        }
-//
-//        if (gamepad2.dpad_down) {
-//            if(turretDown >= turret_Range[0] && turretDown <= turret_Range[1]) {
-//                turret_newPos = turretDown;
-//                telemetry.addLine("dPad down triggered. Set turret to down");
-//                telemetry.update();
-//            }
-//        }
-//
-//        //actually setting the position
-//        if( turret_newPos != turret_currentPos  && turret_newPos >= turret_Range[0] && turret_newPos <= turret_Range[1] ) {
-//            turret_Move = (turret_newPos - turret_currentPos) * turretSpeed;
-//            Aurelius.Teacup.setPosition(turret_currentPos + turret_Move);
-//            telemetry.addData("", turret_currentPos + turret_Move);
-//            telemetry.update();
-//            turret_currentPos = Aurelius.Teacup.getPosition();
-//        }
-
 }

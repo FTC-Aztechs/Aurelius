@@ -30,22 +30,30 @@
 package org.firstinspires.ftc.teamcode;
 
 
+import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_WITHOUT_ENCODER;
+import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.STOP_AND_RESET_ENCODER;
+import static org.firstinspires.ftc.teamcode.Aura_Robot.AuraMotors.ALL_DRIVES;
+import static org.firstinspires.ftc.teamcode.Aura_Robot.AuraMotors.Lower_Left;
+import static org.firstinspires.ftc.teamcode.Aura_Robot.AuraMotors.Lower_Right;
+import static org.firstinspires.ftc.teamcode.Aura_Robot.AuraMotors.Upper_Left;
+import static org.firstinspires.ftc.teamcode.Aura_Robot.AuraMotors.Upper_Right;
 import static org.firstinspires.ftc.teamcode.Aura_Robot.BUTTON_TRIGGER_TIMER_MS;
 import static org.firstinspires.ftc.teamcode.Aura_Robot.bumperSpeedAdjust;
 import static org.firstinspires.ftc.teamcode.Aura_Robot.dPadSpeedAdjust;
 import static org.firstinspires.ftc.teamcode.Aura_Robot.speedAdjust;
-
-import android.os.Environment;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
 
@@ -72,14 +80,17 @@ public class Aura_Sandbox extends LinearOpMode
     private static ElapsedTime timer_gp1_dpad_right = new ElapsedTime();
     boolean changingWheelSpeed = false;
     public static int SANDBOX_MODE = 0;
-//    public TrajectorySequence trajPreLoadDropOff;
+
+    // HTML Logging
+    private File logFile;
+    private PrintWriter printWriter;
+
+    ArrayList<String> htmlLog = new ArrayList<>();
 
     enum SandboxMode
     {
         ENCODER_TESTING,   // Default - prints encoder ticks.
-        VUFORIA_ESTIMATOR, // Displays current Pose from Vuforia estimate
-        SEE_IT_OWN_IT,     // Enabled See it, own it claw behavior with flame extension
-        SMD_LOG_MECANUMDRIVE,   // Dumps motor powers from SampleMecanumDrive to file for a trajectory sequence
+        SMD_WHEEL_MOTOR_PROFILER,
         SMD_INTAKE_OUTTAKE
     }
     public static SandboxMode sandboxMode = SandboxMode.ENCODER_TESTING;
@@ -91,91 +102,131 @@ public class Aura_Sandbox extends LinearOpMode
 
         Aurelius.init(hardwareMap);
 
+        // Telemetry and HTML Log file
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
-        Aurelius.setRunMode(Aura_Robot.AuraMotors.Upper_Left, DcMotor.RunMode.STOP_AND_RESET_ENCODER); //0
-        Aurelius.setRunMode(Aura_Robot.AuraMotors.Lower_Right, DcMotor.RunMode.STOP_AND_RESET_ENCODER);  //3
-        Aurelius.setRunMode(Aura_Robot.AuraMotors.Upper_Right, DcMotor.RunMode.STOP_AND_RESET_ENCODER); //1
+        Aurelius.setRunMode(Upper_Left, STOP_AND_RESET_ENCODER); //0
+        Aurelius.setRunMode(Aura_Robot.AuraMotors.Lower_Right, STOP_AND_RESET_ENCODER);  //3
+        Aurelius.setRunMode(Upper_Right, STOP_AND_RESET_ENCODER); //1
 
-        Aurelius.setRunMode(Aura_Robot.AuraMotors.Upper_Left, DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        Aurelius.setRunMode(Aura_Robot.AuraMotors.Lower_Right, DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        Aurelius.setRunMode(Aura_Robot.AuraMotors.Upper_Right, DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        Aurelius.setRunMode(Upper_Left, RUN_WITHOUT_ENCODER);
+        Aurelius.setRunMode(Aura_Robot.AuraMotors.Lower_Right, RUN_WITHOUT_ENCODER);
+        Aurelius.setRunMode(Upper_Right, RUN_WITHOUT_ENCODER);
 
-        telemetry.addData("Left Tracking wheel: ", Aurelius.getCurrentPosition(Aura_Robot.AuraMotors.Upper_Left));
+        telemetry.addData("Left Tracking wheel: ", Aurelius.getCurrentPosition(Upper_Left));
         telemetry.addData("Right Tracking wheel: ", Aurelius.getCurrentPosition(Aura_Robot.AuraMotors.Lower_Right));
-        telemetry.addData("Strafe Tracking wheel: ", Aurelius.getCurrentPosition(Aura_Robot.AuraMotors.Upper_Right));
-        // Wait for the game to start (driver presses PLAY)
+        telemetry.addData("Strafe Tracking wheel: ", Aurelius.getCurrentPosition(Upper_Right));
 
-//        MvrkVuforiaPoseEstimator poseEstimator = new MvrkVuforiaPoseEstimator(hardwareMap);
-//        poseEstimator.setTelemetry(telemetry);
-
-        runtime.reset();
-        while(waitingForCommand() && runtime.seconds() < 4 )
-        {
-            telemetry.addData("Initialized, Waiting for command (4 Seconds): \n dPad ^-Encoder v-Vuforia >-SeeItOwnIt <-DriveLog ", runtime.milliseconds());
-            telemetry.update();
-        }
+        waitForStart();
+        getUserInput();
 
         telemetry.addData("Running in Mode: ", sandboxMode);
         telemetry.update();
-
-
-        waitForStart();
-
         runtime.reset();
-
-        if(sandboxMode == SandboxMode.SMD_LOG_MECANUMDRIVE ) {
-
-//            Mavryk.MecanumDrive.enableLogging(true);
-//            Mavryk.MecanumDrive.setPoseEstimate(Red_Start.pose2d());
-//            Mavryk.MecanumDrive.followTrajectorySequenceAsync(trajPreLoadDropOff);
-        }
 
         // run until the end of the match (driver presses STOP)
         while (!isStopRequested()) {
             switch(sandboxMode) {
-                case SEE_IT_OWN_IT:
-                   // SandboxSeeItOwnItClaw();
-                    break;
-                case VUFORIA_ESTIMATOR:
-                    runtime.reset();
-//                    poseEstimator.activateTargets(true);
-                  //  SandboxVuforiaPoseEstimate();
-//                    poseEstimator.activateTargets(false);
-                    telemetry.addData("Time taken to get Vuforia Pose Estimate: %.3f ms",runtime.milliseconds() );
-                    break;
-                case SMD_LOG_MECANUMDRIVE:
-                    SandboxManualDrive();
-                    break;
                 case SMD_INTAKE_OUTTAKE:
                     SandboxIntakeOuttake();
                     break;
+                case SMD_WHEEL_MOTOR_PROFILER:
+                    logFile = new File("/sdcard/FIRST/www/SandboxTelemetry.html");
+                    try {
+                        // create the www folder if it doesn't exist
+                        new File("/sdcard/FIRST/www/").mkdirs();
+                        printWriter = new PrintWriter(new FileWriter(logFile, false));
+                    }catch (IOException e) {
+                        telemetry.addData("Error", "Failed to create log file");
+                        telemetry.update();
+                        sleep(2000);
+                        requestOpModeStop();
+                    }
+                    SandboxMotorProfile(Upper_Left);
+                    logTelemetryToHTML();
+                    if(printWriter != null)
+                        printWriter.close();
+                break;
                 case ENCODER_TESTING:
                 default:
                     telemetry.addData("Left Tracking wheel: ", Aurelius.getCurrentPosition(Aura_Robot.AuraMotors.Lower_Left));
-                    telemetry.addData("Right Tracking wheel: ", Aurelius.getCurrentPosition(Aura_Robot.AuraMotors.Upper_Right));
+                    telemetry.addData("Right Tracking wheel: ", Aurelius.getCurrentPosition(Upper_Right));
                     telemetry.addData("Strafe Tracking wheel: ", Aurelius.getCurrentPosition(Aura_Robot.AuraMotors.Lower_Right));
-
                     SandboxManualDrive();
                     break;
             }
             telemetry.update();
         }
+    }
 
-        if(sandboxMode == SandboxMode.SMD_LOG_MECANUMDRIVE) {
-            String SMDLogFilePath = String.format("%s/FIRST/data/AztechsSMDLog.txt", Environment.getExternalStorageDirectory().getAbsolutePath());
-            FileWriter SMDFileWriter;
-            {
-                try {
-                    SMDFileWriter = new FileWriter(SMDLogFilePath, false);
-//                    SMDFileWriter.write(Mavryk.MecanumDrive.getSMDLogString());
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-            telemetry.addLine("Updated SMDLogFile");
+    public void SandboxMotorProfile(Aura_Robot.AuraMotors eWhichMotor) {
+
+        // Connect motor and encoder cable to port 1 of Robot Controller
+        // Reset encoder.
+        // Run motor at 0.1 speed for 1 second - write out encoder ticks
+        // Run motor at 0.5 speed for 1 second - write out encoder ticks
+        // Run motor at 1.0 speed for 1 second - write out encoder ticks
+        // Run motor at speeds accelerating along a sine curve for 3 seconds - write out encoder ticks
+        ElapsedTime timer = new ElapsedTime();
+        Aurelius.setRunMode(ALL_DRIVES, RUN_WITHOUT_ENCODER);
+        Aurelius.setRunMode(ALL_DRIVES, STOP_AND_RESET_ENCODER);
+        timer.reset();
+        while(timer.time(MILLISECONDS) < 1000)
+        {
+            if(timer.time(MILLISECONDS) < 500)
+                Aurelius.setPower(eWhichMotor,.1);
+            else
+                Aurelius.setPower(eWhichMotor, -0.1);
         }
+        htmlLog.add(telemetry.addData("0.1 speed test: # Encoder Ticks Upper_Left  = ", Aurelius.getCurrentPosition(Upper_Left)).toString());
+        htmlLog.add(telemetry.addData("0.1 speed test: # Encoder Ticks Upper_Right = ", Aurelius.getCurrentPosition(Upper_Right)).toString());
+        htmlLog.add( telemetry.addData("0.1 speed test: # Encoder Ticks Lower_Left  = ", Aurelius.getCurrentPosition(Lower_Left)).toString());
+        htmlLog.add(telemetry.addData("0.1 speed test: # Encoder Ticks Lower_Right = ", Aurelius.getCurrentPosition(Lower_Right)).toString());
+        telemetry.update();
 
+        Aurelius.setRunMode(ALL_DRIVES, STOP_AND_RESET_ENCODER);
+        timer.reset();
+        while(timer.time(MILLISECONDS) < 1000)
+        {
+            if(timer.time(MILLISECONDS) < 500)
+                Aurelius.setPower(eWhichMotor,.5);
+            else
+                Aurelius.setPower(eWhichMotor, -0.5);
+        }
+        htmlLog.add(telemetry.addData("0.1 speed test: # Encoder Ticks Upper_Left  = ", Aurelius.getCurrentPosition(Upper_Left)).toString());
+        htmlLog.add(telemetry.addData("0.1 speed test: # Encoder Ticks Upper_Right = ", Aurelius.getCurrentPosition(Upper_Right)).toString());
+        htmlLog.add(telemetry.addData("0.1 speed test: # Encoder Ticks Lower_Left  = ", Aurelius.getCurrentPosition(Lower_Left)).toString());
+        htmlLog.add(telemetry.addData("0.1 speed test: # Encoder Ticks Lower_Right = ", Aurelius.getCurrentPosition(Lower_Right)).toString());
+        telemetry.update();
+
+        Aurelius.setRunMode(ALL_DRIVES, STOP_AND_RESET_ENCODER);
+        timer.reset();
+        while(timer.time(MILLISECONDS) < 1000)
+        {
+            if(timer.time(MILLISECONDS) < 500)
+                Aurelius.setPower(eWhichMotor,1);
+            else
+                Aurelius.setPower(eWhichMotor, 1);
+        }
+        htmlLog.add(telemetry.addData("0.1 speed test: # Encoder Ticks Upper_Left  = ", Aurelius.getCurrentPosition(Upper_Left)).toString());
+        htmlLog.add(telemetry.addData("0.1 speed test: # Encoder Ticks Upper_Right = ", Aurelius.getCurrentPosition(Upper_Right)).toString());
+        htmlLog.add(telemetry.addData("0.1 speed test: # Encoder Ticks Lower_Left  = ", Aurelius.getCurrentPosition(Lower_Left)).toString());
+        htmlLog.add(telemetry.addData("0.1 speed test: # Encoder Ticks Lower_Right = ", Aurelius.getCurrentPosition(Lower_Right)).toString());
+        telemetry.update();
+
+        Aurelius.setRunMode(ALL_DRIVES, STOP_AND_RESET_ENCODER);
+        timer.reset();
+        while(timer.time(MILLISECONDS) < 3000)
+        {
+            double angle = 2*Math.PI * timer.time(TimeUnit.SECONDS) / 3;
+            double sinePower = Math.sin(angle);
+            Aurelius.setPower(eWhichMotor,sinePower);
+        }
+        htmlLog.add(telemetry.addData("0.1 speed test: # Encoder Ticks Upper_Left  = ", Aurelius.getCurrentPosition(Upper_Left)).toString());
+        htmlLog.add(telemetry.addData("0.1 speed test: # Encoder Ticks Upper_Right = ", Aurelius.getCurrentPosition(Upper_Right)).toString());
+        htmlLog.add(telemetry.addData("0.1 speed test: # Encoder Ticks Lower_Left  = ", Aurelius.getCurrentPosition(Lower_Left)).toString());
+        htmlLog.add(telemetry.addData("0.1 speed test: # Encoder Ticks Lower_Right = ", Aurelius.getCurrentPosition(Lower_Right)).toString());
+        telemetry.update();
     }
 
     void SandboxIntakeOuttake()
@@ -184,7 +235,7 @@ public class Aura_Sandbox extends LinearOpMode
             if (!changingWheelSpeed) {
                 timer_gp1_dpad_left.reset();
                 changingWheelSpeed = true;
-            } else if (timer_gp1_dpad_left.time(TimeUnit.MILLISECONDS) > BUTTON_TRIGGER_TIMER_MS) {
+            } else if (timer_gp1_dpad_left.time(MILLISECONDS) > BUTTON_TRIGGER_TIMER_MS) {
                 if (dPadSpeedAdjust <= 1) {
                     dPadSpeedAdjust = 1;
                 } else {
@@ -201,7 +252,7 @@ public class Aura_Sandbox extends LinearOpMode
             if (!changingWheelSpeed) {
                 timer_gp1_dpad_right.reset();
                 changingWheelSpeed = true;
-            } else if (timer_gp1_dpad_right.time(TimeUnit.MILLISECONDS) > BUTTON_TRIGGER_TIMER_MS) {
+            } else if (timer_gp1_dpad_right.time(MILLISECONDS) > BUTTON_TRIGGER_TIMER_MS) {
                 if (dPadSpeedAdjust >= 10) {
                     dPadSpeedAdjust = 10;
                 } else {
@@ -216,27 +267,19 @@ public class Aura_Sandbox extends LinearOpMode
         Aurelius.setPower(Aura_Robot.AuraMotors.INTAKE, (dPadSpeedAdjust/10)*gamepad2.right_stick_y);
     }
 
-    public boolean waitingForCommand()
+    public void getUserInput()
     {
-        if(gamepad1.dpad_up) {
+        telemetry.addData("Please select command (GP1): ", "a for Encoder Testing, b for Wheel Profiles, x for IntakeOutTake");
+        if(gamepad1.a) {
             sandboxMode = SandboxMode.ENCODER_TESTING;
-            return false;
         }
-        else if(gamepad1.dpad_down) {
-            sandboxMode = SandboxMode.VUFORIA_ESTIMATOR;
-            return false;
+        else if(gamepad1.b) {
+            sandboxMode = SandboxMode.SMD_WHEEL_MOTOR_PROFILER;
         }
-        else if(gamepad1.dpad_right) {
+        else if(gamepad1.x) {
             sandboxMode = SandboxMode.SMD_INTAKE_OUTTAKE;
-            return false;
         }
-        else if(gamepad1.dpad_left) {
-            sandboxMode = SandboxMode.SMD_LOG_MECANUMDRIVE;
-            return false;
-        }
-
-        else
-            return true;
+        idle();
     }
 
     public void SandboxManualDrive() {
@@ -245,7 +288,7 @@ public class Aura_Sandbox extends LinearOpMode
             if (!changingWheelSpeed) {
                 timer_gp1_dpad_left.reset();
                 changingWheelSpeed = true;
-            } else if (timer_gp1_dpad_left.time(TimeUnit.MILLISECONDS) > BUTTON_TRIGGER_TIMER_MS) {
+            } else if (timer_gp1_dpad_left.time(MILLISECONDS) > BUTTON_TRIGGER_TIMER_MS) {
                 if (dPadSpeedAdjust <= 1) {
                     dPadSpeedAdjust = 1;
                 } else {
@@ -262,7 +305,7 @@ public class Aura_Sandbox extends LinearOpMode
             if (!changingWheelSpeed) {
                 timer_gp1_dpad_right.reset();
                 changingWheelSpeed = true;
-            } else if (timer_gp1_dpad_right.time(TimeUnit.MILLISECONDS) > BUTTON_TRIGGER_TIMER_MS) {
+            } else if (timer_gp1_dpad_right.time(MILLISECONDS) > BUTTON_TRIGGER_TIMER_MS) {
                 if (dPadSpeedAdjust >= 10) {
                     dPadSpeedAdjust = 10;
                 } else {
@@ -278,15 +321,15 @@ public class Aura_Sandbox extends LinearOpMode
             if (!changingWheelSpeed) {
                 timer_gp1_dpad_right.reset();
                 changingWheelSpeed = true;
-            } else if (timer_gp1_dpad_right.time(TimeUnit.MILLISECONDS) > BUTTON_TRIGGER_TIMER_MS) {
+            } else if (timer_gp1_dpad_right.time(MILLISECONDS) > BUTTON_TRIGGER_TIMER_MS) {
 
-                Aurelius.setRunMode(Aura_Robot.AuraMotors.Upper_Left, DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                Aurelius.setRunMode(Aura_Robot.AuraMotors.Lower_Right, DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                Aurelius.setRunMode(Aura_Robot.AuraMotors.Upper_Right, DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                Aurelius.setRunMode(Upper_Left, STOP_AND_RESET_ENCODER);
+                Aurelius.setRunMode(Aura_Robot.AuraMotors.Lower_Right, STOP_AND_RESET_ENCODER);
+                Aurelius.setRunMode(Upper_Right, STOP_AND_RESET_ENCODER);
 
-                Aurelius.setRunMode(Aura_Robot.AuraMotors.Upper_Left, DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-                Aurelius.setRunMode(Aura_Robot.AuraMotors.Lower_Right, DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-                Aurelius.setRunMode(Aura_Robot.AuraMotors.Upper_Right, DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                Aurelius.setRunMode(Upper_Left, RUN_WITHOUT_ENCODER);
+                Aurelius.setRunMode(Aura_Robot.AuraMotors.Lower_Right, RUN_WITHOUT_ENCODER);
+                Aurelius.setRunMode(Upper_Right, RUN_WITHOUT_ENCODER);
 
 
                 telemetry.addLine("Reset Encoders");
@@ -318,6 +361,22 @@ public class Aura_Sandbox extends LinearOpMode
         Aurelius.Upper_Right.setPower((moveDir + strafeDir + turnDir) * (-speedAdjust / 10)); // 0
 
         return;
+    }
+
+    private void logTelemetryToHTML() {
+        if(printWriter != null) {
+            // Write HTML header
+            printWriter.println("<html><head><title>Telemetry Log</title></head><body>");
+
+            // Write telemetry data
+            printWriter.println("<h2>Sandbox Telemetry Data</h2>");
+            printWriter.println("<pre>");
+            for (String line : htmlLog) {
+                printWriter.println("<p>" + line + "</p>");
+            }
+            printWriter.println("</body></html>");
+            printWriter.flush();
+        }
     }
 
 }
