@@ -53,13 +53,13 @@ public final class MecanumDrive {
     public static class Params {
         // drive model parameters
         public double inPerTick = 0.00052050391;
-        public double lateralInPerTick = 1;
-        public double trackWidthTicks = 0;
+        public double lateralInPerTick =  0.00038448562615907343;
+        public double trackWidthTicks = 25444.217781875817;
 
         // feedforward parameters (in tick units)
-        public double kS = 1.061620083910337;
-        public double kV = -0.0001010463826471908;
-        public double kA = 0;
+        public double kS = 1.2440120045558212;
+        public double kV = 0.00009965415143116228;
+        public double kA = 0.00001  ;
 
         // path profile parameters (in inches)
         public double maxWheelVel = 50;
@@ -118,10 +118,10 @@ public final class MecanumDrive {
             rightBack = new OverflowEncoder(new RawEncoder(MecanumDrive.this.Lower_Right));
             rightFront = new OverflowEncoder(new RawEncoder(MecanumDrive.this.Upper_Right));
 
-            leftFront.setDirection(DcMotor.Direction.REVERSE);
-            rightFront.setDirection(DcMotor.Direction.FORWARD);
-            leftBack.setDirection(DcMotor.Direction.REVERSE);
-            rightBack.setDirection(DcMotor.Direction.FORWARD);
+            leftFront.setDirection(DcMotor.Direction.REVERSE);   // Upper left
+            rightFront.setDirection(DcMotor.Direction.FORWARD); // Upper right
+            leftBack.setDirection(DcMotor.Direction.REVERSE);  //  Lower Left
+            rightBack.setDirection(DcMotor.Direction.FORWARD); // Lower right
 
             lastLeftFrontPos = leftFront.getPositionAndVelocity().position;
             lastLeftBackPos = leftBack.getPositionAndVelocity().position;

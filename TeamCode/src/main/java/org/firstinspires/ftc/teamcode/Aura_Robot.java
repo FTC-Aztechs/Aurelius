@@ -38,6 +38,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.teamcode.roadrunnerbasics.MecanumDrive;
 import org.openftc.easyopencv.OpenCvWebcam;
 
 import java.util.Locale;
@@ -104,7 +105,11 @@ public class Aura_Robot
     public static double Launcher_Set_Pos = 0;
     public static double Launcher_Fire_Pos = 1;
 
+    public static double Lid_Close_Pos = 0;
+    public  static double Lid_Open_Pos = .25;
 
+    public static double Deposit_Down_Pos = 0;
+    public static double Deposit_Up_Pos = 0;
     //Slide variables
     public static int LowerLimit     = 0;
     public static int FloorPosition  = 600;
@@ -116,7 +121,7 @@ public class Aura_Robot
 /* local OpMode members. */
     HardwareMap hwMap           =  null;
     private ElapsedTime period  = new ElapsedTime();
-//    MecanumDrive AuraMecanumDrive;
+    MecanumDrive AuraMecanumDrive;
     //public static MvrkPIDController control = new MvrkPIDController(11, 0, 0.25, 3600);
 
     /* Constructor */

@@ -35,6 +35,8 @@ import static org.firstinspires.ftc.teamcode.Aura_Robot.AuraMotors.INTAKE;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.acmerobotics.roadrunner.Action;
+import com.acmerobotics.roadrunner.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
@@ -130,7 +132,22 @@ public class Aura_AutoBlue_Meet2 extends LinearOpMode {
      */
     private VisionPortal visionPortal;
 
-//TODO: Declare Trajectories Below
+    // TODO: define trajectory variables here
+    // Purple Trajectories
+    private Action trajPos1Purple;
+    private Action trajPos2Purple;
+    private Action trajPos3Purple;
+
+    // Yellow Trajectories
+    private Action trajPos1Yellow;
+    private Action trajPos2Yellow;
+    private Action trajPos3Yellow;
+
+    // Park Trajectories
+    private Action trajPos1ToPark;
+    private Action trajPos2ToPark;
+    private Action trajPos3ToPark;
+
     private ElapsedTime runtime = new ElapsedTime();
 
     @Override
@@ -174,6 +191,10 @@ public class Aura_AutoBlue_Meet2 extends LinearOpMode {
         telemetry.addData(">", "Touch Play to start OpMode");
         telemetry.update();
 
+        buildPurpleTrajectories();
+        buildYellowTrajectories();
+        buildParkTrajectories();
+
         while (!isStarted()) {
             telemetryTfod();
         }
@@ -189,18 +210,21 @@ public class Aura_AutoBlue_Meet2 extends LinearOpMode {
                     dropOffPurplePixel();
                     // Go to Position 1 on Backdrop
                     // dropOffYellowPixel();
+                    // Go to Park
                     break;
                 case 2:
                     // Go to position 2
                     dropOffPurplePixel();
                     // Go to Position 2 on Backdrop
                     // dropOffYellowPixel();
+                    // Go to Park
                     break;
                 case 3:
                     // Go to position 3
                     dropOffPurplePixel();
                     // Go to Position 3 on Backdrop
                     // dropOffYellowPixel();
+                    // Go to Park
                     break;
                 default:
                     // Go to position 3
@@ -210,6 +234,25 @@ public class Aura_AutoBlue_Meet2 extends LinearOpMode {
                     break;
             }
         }
+    }
+
+
+    void buildPurpleTrajectories()
+    {
+        Pose2d beginPose = new Pose2d(0,0,0);
+
+        Action trajAct = Aurelius.AuraMecanumDrive.actionBuilder(beginPose)
+                        .build();
+    }
+
+    void buildYellowTrajectories()
+    {
+
+    }
+
+    void buildParkTrajectories()
+    {
+
     }
 
     void dropOffPurplePixel()

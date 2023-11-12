@@ -105,17 +105,18 @@ public class Aura_Sandbox extends LinearOpMode
         // Telemetry and HTML Log file
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
-        Aurelius.setRunMode(Upper_Left, STOP_AND_RESET_ENCODER); //0
-        Aurelius.setRunMode(Aura_Robot.AuraMotors.Lower_Right, STOP_AND_RESET_ENCODER);  //3
-        Aurelius.setRunMode(Upper_Right, STOP_AND_RESET_ENCODER); //1
+        Aurelius.setRunMode(Lower_Left, STOP_AND_RESET_ENCODER); //3
+        Aurelius.setRunMode(Upper_Right, STOP_AND_RESET_ENCODER);  //0
+        Aurelius.setRunMode(Lower_Right, STOP_AND_RESET_ENCODER); //1
 
-        Aurelius.setRunMode(Upper_Left, RUN_WITHOUT_ENCODER);
-        Aurelius.setRunMode(Aura_Robot.AuraMotors.Lower_Right, RUN_WITHOUT_ENCODER);
+        Aurelius.setRunMode(Lower_Left, RUN_WITHOUT_ENCODER);
         Aurelius.setRunMode(Upper_Right, RUN_WITHOUT_ENCODER);
+        Aurelius.setRunMode(Lower_Right, RUN_WITHOUT_ENCODER);
 
-        telemetry.addData("Left Tracking wheel: ", Aurelius.getCurrentPosition(Upper_Left));
-        telemetry.addData("Right Tracking wheel: ", Aurelius.getCurrentPosition(Aura_Robot.AuraMotors.Lower_Right));
-        telemetry.addData("Strafe Tracking wheel: ", Aurelius.getCurrentPosition(Upper_Right));
+
+        telemetry.addData("Right Tracking wheel: ", Aurelius.getCurrentPosition(Lower_Left));
+        telemetry.addData("Left Tracking wheel: ", Aurelius.getCurrentPosition(Upper_Right));
+        telemetry.addData("Strafe Tracking wheel: ", Aurelius.getCurrentPosition(Lower_Right));
 
         waitForStart();
         getUserInput();
@@ -149,9 +150,9 @@ public class Aura_Sandbox extends LinearOpMode
                 break;
                 case ENCODER_TESTING:
                 default:
-                    telemetry.addData("Left Tracking wheel: ", Aurelius.getCurrentPosition(Aura_Robot.AuraMotors.Lower_Left));
-                    telemetry.addData("Right Tracking wheel: ", Aurelius.getCurrentPosition(Upper_Right));
-                    telemetry.addData("Strafe Tracking wheel: ", Aurelius.getCurrentPosition(Aura_Robot.AuraMotors.Lower_Right));
+                    telemetry.addData("Right Tracking wheel: ", Aurelius.getCurrentPosition(Lower_Left));
+                    telemetry.addData("Left Tracking wheel: ", Aurelius.getCurrentPosition(Upper_Right));
+                    telemetry.addData("Strafe Tracking wheel: ", Aurelius.getCurrentPosition(Lower_Right));
                     SandboxManualDrive();
                     break;
             }
