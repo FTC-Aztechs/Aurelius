@@ -30,8 +30,8 @@
 package org.firstinspires.ftc.teamcode;
 
 import static com.qualcomm.robotcore.util.ElapsedTime.Resolution.MILLISECONDS;
-
 import static org.firstinspires.ftc.teamcode.Aura_Robot.AuraMotors.INTAKE;
+import static org.firstinspires.ftc.teamcode.Aura_Robot.Blue1Start;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
@@ -241,7 +241,9 @@ public class Aura_AutoBlue_Meet2 extends LinearOpMode {
     {
         Pose2d beginPose = new Pose2d(0,0,0);
 
-        Action trajAct = Aurelius.AuraMecanumDrive.actionBuilder(beginPose)
+        Action Blue1PurplePixel = Aurelius.AuraMecanumDrive.actionBuilder(Blue1Start)
+                //.lineToXLinearHeading(new Pose2d(12, 36, Math.toRadians(270)))
+
                         .build();
     }
 

@@ -85,8 +85,8 @@ public class Aura_Robot
     public static double SlidePower_Down = -0.01;
     public static int BUTTON_TRIGGER_TIMER_MS = 500;
 
-    public static double DropoffRestPos = 0.5;
-    public static double DropOffDepositPos = 0.5;
+    public static double DropoffRestPos = 0.16;
+    public static double DropOffDepositPos = 0.675;
 
     public static WebcamName webcamName       = null;
     public static final String VUFORIA_KEY =
@@ -117,6 +117,10 @@ public class Aura_Robot
     public static int HighJunction_Auto = 15250;
     public static int UpperLimit     = 18000;
 
+    public static Pose2d Blue1Start = new Pose2d(12,62,Math.toRadians(270));
+    public static Pose2d Blue1CenterPos = new Pose2d(12,36, Math.toRadians(270));
+
+    public
 
 /* local OpMode members. */
     HardwareMap hwMap           =  null;
