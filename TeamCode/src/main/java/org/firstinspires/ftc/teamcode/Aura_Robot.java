@@ -48,10 +48,10 @@ public class Aura_Robot
 {
     enum AuraMotors
     {
-        Upper_Left,
-        Lower_Left,
-        Upper_Right,
-        Lower_Right,
+        UPPER_LEFT,
+        LOWER_LEFT,
+        UPPER_RIGHT,
+        LOWER_RIGHT,
         INTAKE,
         CAT_MOUSE,
         ALL_DRIVES,
@@ -69,7 +69,8 @@ public class Aura_Robot
 
     public Aura_IntakeController noodleWash;
     public Aura_LaunchController boeing747;
-    public Aura_ServoPIDController flipper;
+
+    public Aura_DepositController depositFlipper;
 
     public WebcamName Khimera = null;
     OpenCvWebcam Sauron = null;
@@ -84,9 +85,6 @@ public class Aura_Robot
     public static double SlidePower_Up= 1;
     public static double SlidePower_Down = -0.01;
     public static int BUTTON_TRIGGER_TIMER_MS = 500;
-
-    public static double DropoffRestPos = 0.16;
-    public static double DropOffDepositPos = 0.675;
 
     public static WebcamName webcamName       = null;
     public static final String VUFORIA_KEY =
@@ -105,11 +103,11 @@ public class Aura_Robot
     public static double Launcher_Set_Pos = 0;
     public static double Launcher_Fire_Pos = 1;
 
-    public static double Lid_Close_Pos = 0;
-    public  static double Lid_Open_Pos = .25;
+    public static double Lid_Close_Pos = 0.5;
+    public  static double Lid_Open_Pos = 0.85;
 
-    public static double Deposit_Down_Pos = 0;
-    public static double Deposit_Up_Pos = 0;
+    public static double Deposit_Down_Pos =  0.16;
+    public static double Deposit_Up_Pos = 0.675;
     //Slide variables
     public static int LowerLimit     = 0;
     public static int FloorPosition  = 600;
@@ -117,8 +115,7 @@ public class Aura_Robot
     public static int HighJunction_Auto = 15250;
     public static int UpperLimit     = 18000;
 
-    public static Pose2d Blue1Start = new Pose2d(12,62,Math.toRadians(270));
-    public static Pose2d Blue1CenterPos = new Pose2d(12,36, Math.toRadians(270));
+    public static Pose2d Blue1Start = new Pose2d(-66,12,Math.toRadians(90));
 
     public
 
@@ -168,7 +165,8 @@ public class Aura_Robot
 
         noodleWash = new Aura_IntakeController(hwMap);
         boeing747 = new Aura_LaunchController(hwMap);
-        flipper = new Aura_ServoPIDController(hwMap,"DepositServo", DropoffRestPos, DropoffRestPos);
+
+        depositFlipper = new Aura_DepositController(hwMap);
     }
     String formatAngle( AngleUnit angleUnit, double angle) {
         return formatDegrees(angleUnit.DEGREES.fromUnit(angleUnit, angle));
@@ -193,16 +191,16 @@ public class Aura_Robot
     {
 
         switch (eWhichMotor){
-            case Upper_Left:
+            case UPPER_LEFT:
                 Upper_Left.setMode(eMode);
                 break;
-            case Upper_Right:
+            case UPPER_RIGHT:
                 Upper_Right.setMode(eMode);
                 break;
-            case Lower_Left:
+            case LOWER_LEFT:
                 Lower_Left.setMode(eMode);
                 break;
-            case Lower_Right:
+            case LOWER_RIGHT:
                 Lower_Right.setMode(eMode);
                 break;
 //            case CAT_MOUSE:
@@ -232,16 +230,16 @@ public class Aura_Robot
     {
 
         switch (eWhichMotor){
-            case Upper_Left:
+            case UPPER_LEFT:
                 Upper_Left.setPower(dPower);
                 break;
-            case Upper_Right:
+            case UPPER_RIGHT:
                 Upper_Right.setPower(dPower);
                 break;
-            case Lower_Left:
+            case LOWER_LEFT:
                 Lower_Left.setPower(dPower);
                 break;
-            case Lower_Right:
+            case LOWER_RIGHT:
                 Lower_Right.setPower(dPower);
                 break;
             case INTAKE:
@@ -263,13 +261,13 @@ public class Aura_Robot
     {
         switch(eWhichMotor)
         {
-            case Upper_Left:
+            case UPPER_LEFT:
                 return Upper_Left.getCurrentPosition();
-            case Lower_Left:
+            case LOWER_LEFT:
                 return Lower_Left.getCurrentPosition();
-            case Upper_Right:
+            case UPPER_RIGHT:
                 return Upper_Right.getCurrentPosition();
-            case Lower_Right:
+            case LOWER_RIGHT:
                 return Lower_Right.getCurrentPosition();
             default:
                 return 0;
@@ -282,13 +280,13 @@ public class Aura_Robot
 
         switch(eWhichMotor)
         {
-            case Upper_Left: // upper left
+            case UPPER_LEFT: // upper left
                 return Upper_Left.isBusy();
-            case Lower_Left: // lower left
+            case LOWER_LEFT: // lower left
                 return Lower_Left.isBusy();
-            case Upper_Right: // upper right
+            case UPPER_RIGHT: // upper right
                 return Upper_Right.isBusy();
-            case Lower_Right: // lower right
+            case LOWER_RIGHT: // lower right
                 return Lower_Right.isBusy();
 //            case CAT_MOUSE:
 //                return Jerry.isBusy() && Tom.isBusy();
@@ -305,16 +303,16 @@ public class Aura_Robot
 
     public void setTargetPosition(AuraMotors eWhichMotor, int iPos ) {
         switch (eWhichMotor) {
-            case Upper_Left:
+            case UPPER_LEFT:
                 Upper_Left.setTargetPosition(iPos);
                 break;
-            case Lower_Left:
+            case LOWER_LEFT:
                 Lower_Left.setTargetPosition(iPos);
                 break;
-            case Upper_Right:
+            case UPPER_RIGHT:
                 Upper_Right.setTargetPosition(iPos);
                 break;
-            case Lower_Right:
+            case LOWER_RIGHT:
                 Lower_Right.setTargetPosition(iPos);
                 break;
 //            case CAT_MOUSE:

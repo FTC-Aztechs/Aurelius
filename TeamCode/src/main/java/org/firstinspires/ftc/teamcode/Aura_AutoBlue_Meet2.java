@@ -30,6 +30,9 @@
 package org.firstinspires.ftc.teamcode;
 
 import static com.qualcomm.robotcore.util.ElapsedTime.Resolution.MILLISECONDS;
+import static org.firstinspires.ftc.teamcode.Aura_DepositController.DepositState.Down;
+import static org.firstinspires.ftc.teamcode.Aura_DepositController.DepositState.Open;
+import static org.firstinspires.ftc.teamcode.Aura_DepositController.DepositState.Up;
 import static org.firstinspires.ftc.teamcode.Aura_Robot.AuraMotors.INTAKE;
 import static org.firstinspires.ftc.teamcode.Aura_Robot.Blue1Start;
 
@@ -209,28 +212,28 @@ public class Aura_AutoBlue_Meet2 extends LinearOpMode {
                     // Go to position 1
                     dropOffPurplePixel();
                     // Go to Position 1 on Backdrop
-                    // dropOffYellowPixel();
+                    dropOffYellowPixel();
                     // Go to Park
                     break;
                 case 2:
                     // Go to position 2
                     dropOffPurplePixel();
                     // Go to Position 2 on Backdrop
-                    // dropOffYellowPixel();
+                    dropOffYellowPixel();
                     // Go to Park
                     break;
                 case 3:
                     // Go to position 3
                     dropOffPurplePixel();
                     // Go to Position 3 on Backdrop
-                    // dropOffYellowPixel();
+                    dropOffYellowPixel();
                     // Go to Park
                     break;
                 default:
                     // Go to position 3
                     dropOffPurplePixel();
                     // Go to Position 3 on Backdrop
-                    // dropOffYellowPixel();
+                    dropOffYellowPixel();
                     break;
             }
         }
@@ -242,7 +245,17 @@ public class Aura_AutoBlue_Meet2 extends LinearOpMode {
         Pose2d beginPose = new Pose2d(0,0,0);
 
         Action Blue1PurplePixel = Aurelius.AuraMecanumDrive.actionBuilder(Blue1Start)
-                //.lineToXLinearHeading(new Pose2d(12, 36, Math.toRadians(270)))
+                //drive to purple
+                .lineToX(-40)
+                //dropoff purple
+                .lineToX(-36)
+                //drive to backdrop
+                .setTangent(0)
+                .lineToY(48)
+                //dropoff yellow
+                //park
+                .lineToX(-12)
+                .lineToY(66)
 
                         .build();
     }
@@ -259,6 +272,7 @@ public class Aura_AutoBlue_Meet2 extends LinearOpMode {
 
     void dropOffPurplePixel()
     {
+        runtime.reset();
         while(runtime.seconds() < 1.75) {
             Aurelius.setPower(INTAKE, -0.2);
         }
@@ -267,6 +281,31 @@ public class Aura_AutoBlue_Meet2 extends LinearOpMode {
 
     void dropOffYellowPixel()
     {
+        telemetry.addData("Deposit State", "down");
+        telemetry.update();
+
+        sleep(3000);
+
+        Aurelius.depositFlipper.setTargetState(Up);
+        Aurelius.depositFlipper.update();
+        telemetry.addData("Deposit State", "up");
+        telemetry.update();
+
+        sleep(1500);
+
+        Aurelius.depositFlipper.setTargetState(Open);
+        Aurelius.depositFlipper.update();
+        telemetry.addData("Deposit State", "open");
+        telemetry.update();
+
+        sleep(500);
+
+        Aurelius.depositFlipper.setTargetState(Down);
+        Aurelius.depositFlipper.update();
+        telemetry.addData("Deposit State", "down");
+        telemetry.update();
+
+        sleep(1500);
 
     }
 

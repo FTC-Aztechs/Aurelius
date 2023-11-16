@@ -20,7 +20,6 @@ public class Aura_DepositController {
     enum DepositState {
         Up,
         Open,
-
         Down
     }
 
@@ -31,6 +30,8 @@ public class Aura_DepositController {
     public Aura_DepositController(HardwareMap hardwareMap) {
         Deposit = hardwareMap.get(Servo.class, "DepositServo");
         Lid = hardwareMap.get(Servo.class, "LidServo");
+        Deposit.setPosition(Deposit_Down_Pos);
+        Lid.setPosition(Lid_Close_Pos);
         currState = DepositState.Down;
     }
 
@@ -65,12 +66,10 @@ public class Aura_DepositController {
                 break;
             case Up:
                 Deposit.setPosition(Deposit_Up_Pos);
-                Lid.setPosition(Lid_Close_Pos);
                 currState = Aura_DepositController.DepositState.Up;
                 break;
             case Open:
                 Lid.setPosition(Lid_Open_Pos);
-                Deposit.setPosition(Deposit_Up_Pos);
                 currState = Aura_DepositController.DepositState.Open;
                 break;
         }

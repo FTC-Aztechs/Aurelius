@@ -34,8 +34,6 @@ package org.firstinspires.ftc.teamcode;
 
 import static com.qualcomm.robotcore.util.ElapsedTime.Resolution.MILLISECONDS;
 import static org.firstinspires.ftc.teamcode.Aura_Robot.BUTTON_TRIGGER_TIMER_MS;
-import static org.firstinspires.ftc.teamcode.Aura_Robot.DropOffDepositPos;
-import static org.firstinspires.ftc.teamcode.Aura_Robot.DropoffRestPos;
 import static org.firstinspires.ftc.teamcode.Aura_Robot.Launcher_Set_Pos;
 import static org.firstinspires.ftc.teamcode.Aura_Robot.bumperSpeedAdjust;
 import static org.firstinspires.ftc.teamcode.Aura_Robot.dPadIntakeAdjust;
@@ -129,7 +127,7 @@ public class Aura_Manual extends LinearOpMode {
             AuraIntake();
             AuraLauncher();
             AuraManualDrive();
-            AuraDeposit();
+//            AuraDeposit();
             telemetry.addLine("Drive Mode: Forward Facing");
             telemetry.update();
         }
@@ -138,8 +136,6 @@ public class Aura_Manual extends LinearOpMode {
     public void initAurelius() {
         FtcDashboard Dash = auraDashboard;
         Aurelius.boeing747.launcher.setPosition(Launcher_Set_Pos);
-        Aurelius.flipper.controlledServo.setPosition(DropoffRestPos);
-
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         telemetry.addLine("Status: Robot is ready to roll!");
         telemetry.update();
@@ -244,19 +240,19 @@ public class Aura_Manual extends LinearOpMode {
         Aurelius.setPower(Aura_Robot.AuraMotors.INTAKE,(dPadIntakeAdjust/10)* gamepad2.right_stick_y);
     }
 
-    public void AuraDeposit()
-    {
-        if(gamepad2.y) {
-            Aurelius.flipper.setTargetPosition(DropOffDepositPos);
-            while (!Aurelius.flipper.update())
-                idle();
-        }
-        if(gamepad2.x) {
-            Aurelius.flipper.setTargetPosition(DropoffRestPos);
-            while (!Aurelius.flipper.update())
-                idle();
-        }
-    }
+//    public void AuraDeposit()
+//    {
+//        if(gamepad2.y) {
+//            Aurelius.flipper.setTargetPosition(DepositDropOffPos);
+//            while (!Aurelius.flipper.update())
+//                idle();
+//        }
+//        if(gamepad2.x) {
+//            Aurelius.flipper.setTargetPosition(DepositRestPos);
+//            while (!Aurelius.flipper.update())
+//                idle();
+//        }
+//    }
 
     public void AuraLauncher(){
         if (gamepad1.left_trigger == 1f) {
