@@ -34,12 +34,23 @@ import static org.firstinspires.ftc.teamcode.Aura_DepositController.DepositState
 import static org.firstinspires.ftc.teamcode.Aura_DepositController.DepositState.Open;
 import static org.firstinspires.ftc.teamcode.Aura_DepositController.DepositState.Up;
 import static org.firstinspires.ftc.teamcode.Aura_Robot.AuraMotors.INTAKE;
-import static org.firstinspires.ftc.teamcode.Aura_Robot.Blue1Start;
+import static org.firstinspires.ftc.teamcode.Aura_Robot.blue_board;
+import static org.firstinspires.ftc.teamcode.Aura_Robot.blue_middle_purple;
+import static org.firstinspires.ftc.teamcode.Aura_Robot.blue_park_pos;
+import static org.firstinspires.ftc.teamcode.Aura_Robot.blue_pos1_purple;
+import static org.firstinspires.ftc.teamcode.Aura_Robot.blue_pos1_yellow;
+import static org.firstinspires.ftc.teamcode.Aura_Robot.blue_pos2_purple;
+import static org.firstinspires.ftc.teamcode.Aura_Robot.blue_pos2_yellow;
+import static org.firstinspires.ftc.teamcode.Aura_Robot.blue_pos3_purple;
+import static org.firstinspires.ftc.teamcode.Aura_Robot.blue_pos3_yellow;
+import static org.firstinspires.ftc.teamcode.Aura_Robot.blue_start_pose;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
-import com.acmerobotics.roadrunner.Pose2d;
+import com.acmerobotics.roadrunner.SequentialAction;
+import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
@@ -153,6 +164,7 @@ public class Aura_AutoBlue_Meet2 extends LinearOpMode {
 
     private ElapsedTime runtime = new ElapsedTime();
 
+
     @Override
     public void runOpMode() throws InterruptedException {
         // TODO: Assume this will be our Auto. The pseudo code below is for camera detection
@@ -209,32 +221,74 @@ public class Aura_AutoBlue_Meet2 extends LinearOpMode {
             //TODO: Run Trajectories
             switch (PurpleDropOffPos) {
                 case 1:
-                    // Go to position 1
-                    dropOffPurplePixel();
-                    // Go to Position 1 on Backdrop
-                    dropOffYellowPixel();
-                    // Go to Park
+                    Actions.runBlocking(
+                        new SequentialAction(
+                            trajPos1Purple,
+                            new Action() {
+                                @Override
+                                public boolean run(TelemetryPacket tPkt) {
+                                    dropOffPurplePixel();
+                                    return false;
+                                }
+                            },
+                            trajPos1Yellow,
+                            new Action() {
+                                @Override
+                                public boolean run(TelemetryPacket tPkt) {
+                                    dropOffYellowPixel();
+                                    return false;
+                                }
+                            },
+                            trajPos1ToPark
+                        ));
                     break;
                 case 2:
                     // Go to position 2
-                    dropOffPurplePixel();
-                    // Go to Position 2 on Backdrop
-                    dropOffYellowPixel();
-                    // Go to Park
+                    Actions.runBlocking(
+                            new SequentialAction(
+                                    trajPos2Purple,
+                                    new Action() {
+                                        @Override
+                                        public boolean run(TelemetryPacket tPkt) {
+                                            dropOffPurplePixel();
+                                            return false;
+                                        }
+                                    },
+                                    trajPos2Yellow,
+                                    new Action() {
+                                        @Override
+                                        public boolean run(TelemetryPacket tPkt) {
+                                            dropOffYellowPixel();
+                                            return false;
+                                        }
+                                    },
+                                    trajPos2ToPark
+                            ));
                     break;
                 case 3:
+                 default:
                     // Go to position 3
-                    dropOffPurplePixel();
-                    // Go to Position 3 on Backdrop
-                    dropOffYellowPixel();
-                    // Go to Park
-                    break;
-                default:
-                    // Go to position 3
-                    dropOffPurplePixel();
-                    // Go to Position 3 on Backdrop
-                    dropOffYellowPixel();
-                    break;
+                     Actions.runBlocking(
+                             new SequentialAction(
+                                     trajPos3Purple,
+                                     new Action() {
+                                         @Override
+                                         public boolean run(TelemetryPacket tPkt) {
+                                             dropOffPurplePixel();
+                                             return false;
+                                         }
+                                     },
+                                     trajPos3Yellow,
+                                     new Action() {
+                                         @Override
+                                         public boolean run(TelemetryPacket tPkt) {
+                                             dropOffYellowPixel();
+                                             return false;
+                                         }
+                                     },
+                                     trajPos3ToPark
+                             ));
+                break;
             }
         }
     }
@@ -242,31 +296,59 @@ public class Aura_AutoBlue_Meet2 extends LinearOpMode {
 
     void buildPurpleTrajectories()
     {
-        Pose2d beginPose = new Pose2d(0,0,0);
+        trajPos1Purple = Aurelius.AuraMecanumDrive.actionBuilder(blue_start_pose.pose2d())
+                .setTangent(blue_pos1_purple.heading)
+                .lineToY(blue_pos1_purple.y)
+                .build();
 
-        Action Blue1PurplePixel = Aurelius.AuraMecanumDrive.actionBuilder(Blue1Start)
-                //drive to purple
-                .lineToX(-40)
-                //dropoff purple
-                .lineToX(-36)
-                //drive to backdrop
-                .setTangent(0)
-                .lineToY(48)
-                //dropoff yellow
-                //park
-                .lineToX(-12)
-                .lineToY(66)
+        trajPos2Purple = Aurelius.AuraMecanumDrive.actionBuilder(blue_start_pose.pose2d())
+                .setTangent(blue_pos2_purple.heading)
+                .lineToY(blue_pos2_purple.y)
+                .build();
 
-                        .build();
+        trajPos3Purple = Aurelius.AuraMecanumDrive.actionBuilder(blue_start_pose.pose2d())
+                .setTangent(blue_pos3_purple.heading)
+                .lineToY(blue_pos2_purple.y)
+                .build();
     }
 
     void buildYellowTrajectories()
     {
+        trajPos1Yellow = Aurelius.AuraMecanumDrive.actionBuilder(blue_pos1_purple.pose2d())
+                .lineToY(blue_middle_purple.y)
+                .setTangent(blue_board.heading)
+                .lineToX(blue_board.x)
+                .strafeToConstantHeading(blue_pos1_yellow.vec2d())
+                .build();
 
+        trajPos2Yellow = Aurelius.AuraMecanumDrive.actionBuilder(blue_pos2_purple.pose2d())
+                .lineToY(blue_middle_purple.y)
+                .setTangent(blue_board.heading)
+                .lineToX(blue_board.x)
+                .strafeToConstantHeading(blue_pos2_yellow.vec2d())
+                .build();
+
+        trajPos3Yellow = Aurelius.AuraMecanumDrive.actionBuilder(blue_pos3_purple.pose2d())
+                .lineToY(blue_middle_purple.y)
+                .setTangent(blue_board.heading)
+                .lineToX(blue_board.x)
+                .strafeToConstantHeading(blue_pos3_yellow.vec2d())
+                .build();
     }
 
     void buildParkTrajectories()
     {
+        trajPos1ToPark = Aurelius.AuraMecanumDrive.actionBuilder(blue_pos1_yellow.pose2d())
+                .strafeToConstantHeading(blue_park_pos.vec2d())
+                .build();
+
+        trajPos2ToPark = Aurelius.AuraMecanumDrive.actionBuilder(blue_pos2_yellow.pose2d())
+                .strafeToConstantHeading(blue_park_pos.vec2d())
+                .build();
+
+        trajPos3ToPark = Aurelius.AuraMecanumDrive.actionBuilder(blue_pos3_yellow.pose2d())
+                .strafeToConstantHeading(blue_park_pos.vec2d())
+                .build();
 
     }
 

@@ -115,11 +115,22 @@ public class Aura_Robot
     public static int HighJunction_Auto = 15250;
     public static int UpperLimit     = 18000;
 
-    public static Pose2d Blue1Start = new Pose2d(-66,12,Math.toRadians(90));
+   //------------------------------------------------------------
+    //Roadrunner poses
+        //Blue 1
+       public static AuraPose2d blue_start_pose = new AuraPose2d(12, 62, Math.toRadians(-90));
+        public static AuraPose2d blue_pos1_purple = new AuraPose2d(0, 0, 0);
+        public static AuraPose2d blue_pos2_purple = new AuraPose2d(12, 32, Math.toRadians(-90));
+        public static AuraPose2d blue_pos3_purple = new AuraPose2d(0, 0, 0);
+        public static AuraPose2d blue_middle_purple = new AuraPose2d(12,36,Math.toRadians(-90));
+        public static AuraPose2d blue_board = new AuraPose2d(51, 36, Math.toRadians(-180));
+        public static AuraPose2d blue_pos1_yellow = new AuraPose2d(0,0,0);
+        public static AuraPose2d blue_pos2_yellow = new AuraPose2d(51,36,Math.toRadians(-180));
+        public static AuraPose2d blue_pos3_yellow = new AuraPose2d(0,0,0);
+        public static AuraPose2d blue_park_pos = new AuraPose2d(51, 60, Math.toRadians(-180));
 
-    public
 
-/* local OpMode members. */
+    /* local OpMode members. */
     HardwareMap hwMap           =  null;
     private ElapsedTime period  = new ElapsedTime();
     MecanumDrive AuraMecanumDrive;
