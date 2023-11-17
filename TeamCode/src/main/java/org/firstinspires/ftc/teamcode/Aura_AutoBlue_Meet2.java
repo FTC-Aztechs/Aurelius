@@ -82,8 +82,8 @@ import java.util.List;
 
 public class Aura_AutoBlue_Meet2 extends LinearOpMode {
 
-    private static final double LEFT_SPIKEMARK_BOUNDARY_X = 0;
-    private static final double RIGHT_SPIKEMARK_BOUNDARY_X = 0;
+    private static final double LEFT_SPIKEMARK_BOUNDARY_X = 250;
+    private static final double RIGHT_SPIKEMARK_BOUNDARY_X = 260;
 
     public static int PurpleDropOffPos = 0;
 
@@ -476,12 +476,12 @@ public class Aura_AutoBlue_Meet2 extends LinearOpMode {
         }
         visionPortal.close();
 
-        if( x < LEFT_SPIKEMARK_BOUNDARY_X )
+        if( x > 0 && x < LEFT_SPIKEMARK_BOUNDARY_X )
             PurpleDropOffPos = 1;
         else if (x > RIGHT_SPIKEMARK_BOUNDARY_X)
-            PurpleDropOffPos = 3;
-        else
             PurpleDropOffPos = 2;
+        else
+            PurpleDropOffPos = 3;
 
         telemetry.addData("Detected Drop off Position = ", PurpleDropOffPos);
 
