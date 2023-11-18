@@ -34,14 +34,6 @@ import static org.firstinspires.ftc.teamcode.Aura_DepositController.DepositState
 import static org.firstinspires.ftc.teamcode.Aura_DepositController.DepositState.Open;
 import static org.firstinspires.ftc.teamcode.Aura_DepositController.DepositState.Up;
 import static org.firstinspires.ftc.teamcode.Aura_Robot.AuraMotors.INTAKE;
-import static org.firstinspires.ftc.teamcode.Aura_Robot.blue_board;
-import static org.firstinspires.ftc.teamcode.Aura_Robot.blue_middle_purple;
-import static org.firstinspires.ftc.teamcode.Aura_Robot.blue_park_pos;
-import static org.firstinspires.ftc.teamcode.Aura_Robot.blue_pos2_purple;
-import static org.firstinspires.ftc.teamcode.Aura_Robot.blue_pos2_yellow;
-import static org.firstinspires.ftc.teamcode.Aura_Robot.blue_pos3_purple;
-import static org.firstinspires.ftc.teamcode.Aura_Robot.blue_pos3_yellow;
-import static org.firstinspires.ftc.teamcode.Aura_Robot.blue_start_pose;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
@@ -217,6 +209,7 @@ public class Aura_AutoBlue_Meet2 extends LinearOpMode {
             telemetryTfod();
         }
 
+        runtime.reset();
         if (opModeIsActive()) {
             DetectPurpleDropoffPos();
             visionPortal.close();
@@ -296,70 +289,64 @@ public class Aura_AutoBlue_Meet2 extends LinearOpMode {
         }
     }
 
-
     void buildPurpleTrajectories()
     {
         trajPos1Purple = BlueShort.actionBuilder(new Pose2d(0,0,0))
+                .lineToXConstantHeading(24)
+                .turn(Math.toRadians(40))
+                .lineToXConstantHeading(28)
+                .build();
+
+        trajPos2Purple = BlueShort.actionBuilder(new Pose2d(0,0,0))
                 .lineToXConstantHeading(24)
                 .turn(Math.toRadians(15))
                 .lineToXConstantHeading(28)
                 .build();
 
-        trajPos2Purple = BlueShort.actionBuilder(blue_start_pose.pose2d())
-//                .setTangent(blue_pos2_purple.heading)
-                .lineToXConstantHeading(blue_pos2_purple.y)
-                .build();
-
-        trajPos3Purple = BlueShort.actionBuilder(blue_start_pose.pose2d())
-//                .setTangent(blue_pos3_purple.heading)
-                .lineToXConstantHeading(blue_pos2_purple.y)
+        trajPos3Purple = BlueShort.actionBuilder(new Pose2d(0,0,0))
+                .lineToXConstantHeading(21)
+                .turn(Math.toRadians(-80))
+                .lineToXConstantHeading(21.5)
                 .build();
     }
 
     void buildYellowTrajectories()
     {
-
         trajPos1Yellow = BlueShort.actionBuilder(new Pose2d(30,0,0))
                 .lineToXConstantHeading(24)
                 .turn(Math.toRadians(-92))
+                .strafeTo(new Vector2d(20, 37))
+                .build();
+
+        trajPos2Yellow = BlueShort.actionBuilder(new Pose2d(30,0,0))
+                .lineToXConstantHeading(24)
+                .turn(Math.toRadians(-92))
                 .lineToYConstantHeading(37)
-//                .turn(-90)
-//                .lineToY(30)
-////                .setTangent(blue_board.heading)
-////                .lineToYConstantHeading(blue_board.x)
-////                .strafeToConstantHeading(blue_pos1_yellow.vec2d())
                 .build();
 
-        trajPos2Yellow = BlueShort.actionBuilder(blue_pos2_purple.pose2d())
-                .lineToXConstantHeading(blue_middle_purple.y)
-                .setTangent(blue_board.heading)
-                .lineToYConstantHeading(blue_board.x)
-                .strafeToConstantHeading(blue_pos2_yellow.vec2d())
-                .build();
-
-        trajPos3Yellow = BlueShort.actionBuilder(blue_pos3_purple.pose2d())
-                .lineToXConstantHeading(blue_middle_purple.y)
-                .setTangent(blue_board.heading)
-                .lineToYConstantHeading(blue_board.x)
-                .strafeToConstantHeading(blue_pos3_yellow.vec2d())
+        trajPos3Yellow = BlueShort.actionBuilder(BlueShort.pose)
+                .lineToXConstantHeading(21)
+                .turn(Math.toRadians(-92))
+                .strafeTo(new Vector2d(34, 37))
                 .build();
     }
 
     void buildParkTrajectories()
     {
-        trajPos1ToPark = BlueShort.actionBuilder(new Pose2d(24,37,Math.toRadians(-92)))
+        trajPos1ToPark = BlueShort.actionBuilder(new Pose2d(21,37,Math.toRadians(-92)))
                 .lineToY(32)
                 .strafeTo(new Vector2d(7, 34))
                 .build();
 
-        trajPos2ToPark = BlueShort.actionBuilder(blue_pos2_yellow.pose2d())
-                .strafeToConstantHeading(blue_park_pos.vec2d())
+        trajPos2ToPark = BlueShort.actionBuilder(new Pose2d(24,37,Math.toRadians(-92)))
+                .lineToY(32)
+                .strafeTo(new Vector2d(7, 34))
                 .build();
 
-        trajPos3ToPark = BlueShort.actionBuilder(blue_pos3_yellow.pose2d())
-                .strafeToConstantHeading(blue_park_pos.vec2d())
+        trajPos3ToPark = BlueShort.actionBuilder(new Pose2d(30,37,Math.toRadians(-92)))
+                .lineToY(32)
+                .strafeTo(new Vector2d(7, 34))
                 .build();
-
     }
 
     void dropOffPurplePixel()
@@ -383,7 +370,7 @@ public class Aura_AutoBlue_Meet2 extends LinearOpMode {
         telemetry.addData("Deposit State", "up");
         telemetry.update();
 
-        sleep(500);
+        sleep(1500);
 
         Aurelius.depositFlipper.setTargetState(Open);
         Aurelius.depositFlipper.update();
@@ -477,14 +464,12 @@ public class Aura_AutoBlue_Meet2 extends LinearOpMode {
         double x = 0, y = 0;
         List<Recognition> currentRecognitions = tfod.getRecognitions();
         for(Recognition recognition : currentRecognitions ) {
-            if (recognition.getLabel() == "Bloopy") {
+            if (recognition.getLabel() == "Pixel") {
                 x = (recognition.getLeft() + recognition.getRight()) / 2;
                 y = (recognition.getTop() + recognition.getBottom()) / 2;
             }
             break;
         }
-        visionPortal.close();
-
         if( x > 0 && x < LEFT_SPIKEMARK_BOUNDARY_X )
             PurpleDropOffPos = 1;
         else if (x > RIGHT_SPIKEMARK_BOUNDARY_X)
@@ -492,9 +477,10 @@ public class Aura_AutoBlue_Meet2 extends LinearOpMode {
         else
             PurpleDropOffPos = 3;
 
-        //TODO REmove this override
-        PurpleDropOffPos = 1;
+//        //TODO REmove this override
+//        PurpleDropOffPos = 1;
 
+        telemetry.addData("Detected Spike Mark X = ", x);
         telemetry.addData("Detected Drop off Position = ", PurpleDropOffPos);
 
         // Push telemetry to the Driver Station.
