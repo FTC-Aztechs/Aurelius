@@ -38,7 +38,6 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.teamcode.roadrunnerbasics.MecanumDrive;
 import org.openftc.easyopencv.OpenCvWebcam;
 
 import java.util.Locale;
@@ -118,22 +117,22 @@ public class Aura_Robot
    //------------------------------------------------------------
     //Roadrunner poses
         //Blue 1
-       public static AuraPose2d blue_start_pose = new AuraPose2d(12, 62, Math.toRadians(-90));
-        public static AuraPose2d blue_pos1_purple = new AuraPose2d(0, 0, 0);
-        public static AuraPose2d blue_pos2_purple = new AuraPose2d(12, 32, Math.toRadians(-90));
-        public static AuraPose2d blue_pos3_purple = new AuraPose2d(0, 0, 0);
-        public static AuraPose2d blue_middle_purple = new AuraPose2d(12,36,Math.toRadians(-90));
-        public static AuraPose2d blue_board = new AuraPose2d(51, 36, Math.toRadians(-180));
-        public static AuraPose2d blue_pos1_yellow = new AuraPose2d(0,0,0);
-        public static AuraPose2d blue_pos2_yellow = new AuraPose2d(51,36,Math.toRadians(-180));
-        public static AuraPose2d blue_pos3_yellow = new AuraPose2d(0,0,0);
-        public static AuraPose2d blue_park_pos = new AuraPose2d(51, 60, Math.toRadians(-180));
+       public static AuraPose2d blue_start_pose = new AuraPose2d(12, 62, Math.toRadians(0));
+        public static AuraPose2d blue_pos1_purple = new AuraPose2d(12, 32, Math.toRadians(0));
+        public static AuraPose2d blue_pos2_purple = new AuraPose2d(12, 32, Math.toRadians(0));
+        public static AuraPose2d blue_pos3_purple = new AuraPose2d(12, 32, Math.toRadians(0));
+        public static AuraPose2d blue_middle_purple = new AuraPose2d(12,36,Math.toRadians(0));
+        public static AuraPose2d blue_board = new AuraPose2d(51, 36, Math.toRadians(-90));
+        public static AuraPose2d blue_pos1_yellow = new AuraPose2d(51,36,Math.toRadians(-90));
+        public static AuraPose2d blue_pos2_yellow = new AuraPose2d(51,36,Math.toRadians(-90));
+        public static AuraPose2d blue_pos3_yellow = new AuraPose2d(51,36,Math.toRadians(-90));
+        public static AuraPose2d blue_park_pos = new AuraPose2d(51, 60, Math.toRadians(-90));
 
 
     /* local OpMode members. */
     HardwareMap hwMap           =  null;
     private ElapsedTime period  = new ElapsedTime();
-    MecanumDrive AuraMecanumDrive;
+//    MecanumDrive AuraMecanumDrive = new MecanumDrive(hwMap,blue_start_pose.pose2d());
     //public static MvrkPIDController control = new MvrkPIDController(11, 0, 0.25, 3600);
 
     /* Constructor */

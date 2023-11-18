@@ -37,8 +37,6 @@ import static org.firstinspires.ftc.teamcode.Aura_Robot.AuraMotors.INTAKE;
 import static org.firstinspires.ftc.teamcode.Aura_Robot.blue_board;
 import static org.firstinspires.ftc.teamcode.Aura_Robot.blue_middle_purple;
 import static org.firstinspires.ftc.teamcode.Aura_Robot.blue_park_pos;
-import static org.firstinspires.ftc.teamcode.Aura_Robot.blue_pos1_purple;
-import static org.firstinspires.ftc.teamcode.Aura_Robot.blue_pos1_yellow;
 import static org.firstinspires.ftc.teamcode.Aura_Robot.blue_pos2_purple;
 import static org.firstinspires.ftc.teamcode.Aura_Robot.blue_pos2_yellow;
 import static org.firstinspires.ftc.teamcode.Aura_Robot.blue_pos3_purple;
@@ -49,7 +47,9 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
+import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.SequentialAction;
+import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -58,6 +58,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
+import org.firstinspires.ftc.teamcode.roadrunnerbasics.MecanumDrive;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.tfod.TfodProcessor;
 import org.openftc.apriltag.AprilTagDetection;
@@ -82,16 +83,18 @@ import java.util.List;
 
 public class Aura_AutoBlue_Meet2 extends LinearOpMode {
 
+
     private static final double LEFT_SPIKEMARK_BOUNDARY_X = 250;
     private static final double RIGHT_SPIKEMARK_BOUNDARY_X = 260;
 
     public static int PurpleDropOffPos = 0;
 
     Aura_Robot Aurelius = new Aura_Robot();
+    MecanumDrive BlueShort;
 
     private static FtcDashboard auraBoard;
 
-    //TODO: declare April Tag stuff
+    //TODO: declare April Tag stuffi
     OpenCvWebcam Sauron = null;
     AprilTagDetectionPipeline pipeline;
 
@@ -179,7 +182,7 @@ public class Aura_AutoBlue_Meet2 extends LinearOpMode {
         //   Option 3: Ditch the VisionProcessor and use EasyOpenCV directly
 
         Aurelius.init(hardwareMap);
-
+        BlueShort = new MecanumDrive(Aurelius.hwMap, new Pose2d(0,0,0));
         ElapsedTime trajectoryTimer = new ElapsedTime(MILLISECONDS);
 
         auraBoard = FtcDashboard.getInstance();
@@ -238,8 +241,8 @@ public class Aura_AutoBlue_Meet2 extends LinearOpMode {
                                     dropOffYellowPixel();
                                     return false;
                                 }
-                            },
-                            trajPos1ToPark
+                            }
+                            ,trajPos1ToPark
                         ));
                     break;
                 case 2:
@@ -296,57 +299,64 @@ public class Aura_AutoBlue_Meet2 extends LinearOpMode {
 
     void buildPurpleTrajectories()
     {
-        trajPos1Purple = Aurelius.AuraMecanumDrive.actionBuilder(blue_start_pose.pose2d())
-                .setTangent(blue_pos1_purple.heading)
-                .lineToY(blue_pos1_purple.y)
+        trajPos1Purple = BlueShort.actionBuilder(new Pose2d(0,0,0))
+                .lineToXConstantHeading(24)
+                .turn(Math.toRadians(15))
+                .lineToXConstantHeading(28)
                 .build();
 
-        trajPos2Purple = Aurelius.AuraMecanumDrive.actionBuilder(blue_start_pose.pose2d())
-                .setTangent(blue_pos2_purple.heading)
-                .lineToY(blue_pos2_purple.y)
+        trajPos2Purple = BlueShort.actionBuilder(blue_start_pose.pose2d())
+//                .setTangent(blue_pos2_purple.heading)
+                .lineToXConstantHeading(blue_pos2_purple.y)
                 .build();
 
-        trajPos3Purple = Aurelius.AuraMecanumDrive.actionBuilder(blue_start_pose.pose2d())
-                .setTangent(blue_pos3_purple.heading)
-                .lineToY(blue_pos2_purple.y)
+        trajPos3Purple = BlueShort.actionBuilder(blue_start_pose.pose2d())
+//                .setTangent(blue_pos3_purple.heading)
+                .lineToXConstantHeading(blue_pos2_purple.y)
                 .build();
     }
 
     void buildYellowTrajectories()
     {
-        trajPos1Yellow = Aurelius.AuraMecanumDrive.actionBuilder(blue_pos1_purple.pose2d())
-                .lineToY(blue_middle_purple.y)
-                .setTangent(blue_board.heading)
-                .lineToX(blue_board.x)
-                .strafeToConstantHeading(blue_pos1_yellow.vec2d())
+
+        trajPos1Yellow = BlueShort.actionBuilder(new Pose2d(30,0,0))
+                .lineToXConstantHeading(24)
+                .turn(Math.toRadians(-92))
+                .lineToYConstantHeading(37)
+//                .turn(-90)
+//                .lineToY(30)
+////                .setTangent(blue_board.heading)
+////                .lineToYConstantHeading(blue_board.x)
+////                .strafeToConstantHeading(blue_pos1_yellow.vec2d())
                 .build();
 
-        trajPos2Yellow = Aurelius.AuraMecanumDrive.actionBuilder(blue_pos2_purple.pose2d())
-                .lineToY(blue_middle_purple.y)
+        trajPos2Yellow = BlueShort.actionBuilder(blue_pos2_purple.pose2d())
+                .lineToXConstantHeading(blue_middle_purple.y)
                 .setTangent(blue_board.heading)
-                .lineToX(blue_board.x)
+                .lineToYConstantHeading(blue_board.x)
                 .strafeToConstantHeading(blue_pos2_yellow.vec2d())
                 .build();
 
-        trajPos3Yellow = Aurelius.AuraMecanumDrive.actionBuilder(blue_pos3_purple.pose2d())
-                .lineToY(blue_middle_purple.y)
+        trajPos3Yellow = BlueShort.actionBuilder(blue_pos3_purple.pose2d())
+                .lineToXConstantHeading(blue_middle_purple.y)
                 .setTangent(blue_board.heading)
-                .lineToX(blue_board.x)
+                .lineToYConstantHeading(blue_board.x)
                 .strafeToConstantHeading(blue_pos3_yellow.vec2d())
                 .build();
     }
 
     void buildParkTrajectories()
     {
-        trajPos1ToPark = Aurelius.AuraMecanumDrive.actionBuilder(blue_pos1_yellow.pose2d())
+        trajPos1ToPark = BlueShort.actionBuilder(new Pose2d(24,37,Math.toRadians(-92)))
+                .lineToY(32)
+                .strafeTo(new Vector2d(7, 34))
+                .build();
+
+        trajPos2ToPark = BlueShort.actionBuilder(blue_pos2_yellow.pose2d())
                 .strafeToConstantHeading(blue_park_pos.vec2d())
                 .build();
 
-        trajPos2ToPark = Aurelius.AuraMecanumDrive.actionBuilder(blue_pos2_yellow.pose2d())
-                .strafeToConstantHeading(blue_park_pos.vec2d())
-                .build();
-
-        trajPos3ToPark = Aurelius.AuraMecanumDrive.actionBuilder(blue_pos3_yellow.pose2d())
+        trajPos3ToPark = BlueShort.actionBuilder(blue_pos3_yellow.pose2d())
                 .strafeToConstantHeading(blue_park_pos.vec2d())
                 .build();
 
@@ -355,7 +365,7 @@ public class Aura_AutoBlue_Meet2 extends LinearOpMode {
     void dropOffPurplePixel()
     {
         runtime.reset();
-        while(runtime.seconds() < 1.75) {
+        while(runtime.seconds() < 1.2) {
             Aurelius.setPower(INTAKE, -0.2);
         }
         Aurelius.setPower(INTAKE, 0);
@@ -366,14 +376,14 @@ public class Aura_AutoBlue_Meet2 extends LinearOpMode {
         telemetry.addData("Deposit State", "down");
         telemetry.update();
 
-        sleep(3000);
+        sleep(500);
 
         Aurelius.depositFlipper.setTargetState(Up);
         Aurelius.depositFlipper.update();
         telemetry.addData("Deposit State", "up");
         telemetry.update();
 
-        sleep(1500);
+        sleep(500);
 
         Aurelius.depositFlipper.setTargetState(Open);
         Aurelius.depositFlipper.update();
@@ -387,8 +397,7 @@ public class Aura_AutoBlue_Meet2 extends LinearOpMode {
         telemetry.addData("Deposit State", "down");
         telemetry.update();
 
-        sleep(1500);
-
+        sleep(500);
     }
 
 
@@ -482,6 +491,9 @@ public class Aura_AutoBlue_Meet2 extends LinearOpMode {
             PurpleDropOffPos = 2;
         else
             PurpleDropOffPos = 3;
+
+        //TODO REmove this override
+        PurpleDropOffPos = 1;
 
         telemetry.addData("Detected Drop off Position = ", PurpleDropOffPos);
 

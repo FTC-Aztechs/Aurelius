@@ -95,7 +95,7 @@ public class Aura_Sandbox extends LinearOpMode
         SMD_WHEEL_MOTOR_PROFILER,
         SMD_INTAKE_OUTTAKE
     }
-    public static SandboxMode sandboxMode = SandboxMode.SMD_WHEEL_MOTOR_PROFILER;
+    public static SandboxMode sandboxMode = SandboxMode.ENCODER_TESTING;
 
 //    MvrkVuforiaPoseEstimator vuforiaPoseEstimator = new MvrkVuforiaPoseEstimator(hardwareMap);
 
