@@ -43,7 +43,7 @@ import org.openftc.easyopencv.OpenCvWebcam;
 import java.util.Locale;
 
 @Config
-public class Aura_Robot
+public class AuraRobot
 {
     enum AuraMotors
     {
@@ -66,8 +66,8 @@ public class Aura_Robot
 
     public DcMotor intakeMotor = null;
 
-    public Aura_IntakeController noodleWash;
-    public Aura_LaunchController boeing747;
+    public AuraIntakeController noodleWash;
+    public AuraLaunchController boeing747;
 
     public Aura_DepositController depositFlipper;
 
@@ -136,7 +136,7 @@ public class Aura_Robot
     //public static MvrkPIDController control = new MvrkPIDController(11, 0, 0.25, 3600);
 
     /* Constructor */
-    public Aura_Robot(){
+    public AuraRobot(){
 
     }
 
@@ -173,8 +173,8 @@ public class Aura_Robot
         //AuraMecanumDrive = new MecanumDrive(hwMap, initPose2d);
         Khimera = hwMap.get(WebcamName.class, "Kemera");
 
-        noodleWash = new Aura_IntakeController(hwMap);
-        boeing747 = new Aura_LaunchController(hwMap);
+        noodleWash = new AuraIntakeController(hwMap);
+        boeing747 = new AuraLaunchController(hwMap);
 
         depositFlipper = new Aura_DepositController(hwMap);
     }

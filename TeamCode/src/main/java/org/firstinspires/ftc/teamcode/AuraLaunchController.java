@@ -1,7 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
-import static org.firstinspires.ftc.teamcode.Aura_Robot.Launcher_Fire_Pos;
-import static org.firstinspires.ftc.teamcode.Aura_Robot.Launcher_Set_Pos;
+import static org.firstinspires.ftc.teamcode.AuraRobot.Launcher_Fire_Pos;
+import static org.firstinspires.ftc.teamcode.AuraRobot.Launcher_Set_Pos;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -10,7 +10,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 @Config
-public class Aura_LaunchController {
+public class AuraLaunchController {
     public Servo launcher;
     enum launchState
     {
@@ -21,7 +21,7 @@ public class Aura_LaunchController {
     launchState targetState;
     Telemetry telemetry;
 
-    public Aura_LaunchController(HardwareMap hardwareMap) {
+    public AuraLaunchController(HardwareMap hardwareMap) {
         launcher = hardwareMap.get(Servo.class, "Launcher");
 //        color = hardwareMap.get(NormalizedColorSensor.class, "Retina");
         currState = launchState.Set;

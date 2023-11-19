@@ -33,7 +33,7 @@ import static com.qualcomm.robotcore.util.ElapsedTime.Resolution.MILLISECONDS;
 import static org.firstinspires.ftc.teamcode.Aura_DepositController.DepositState.Down;
 import static org.firstinspires.ftc.teamcode.Aura_DepositController.DepositState.Open;
 import static org.firstinspires.ftc.teamcode.Aura_DepositController.DepositState.Up;
-import static org.firstinspires.ftc.teamcode.Aura_Robot.AuraMotors.INTAKE;
+import static org.firstinspires.ftc.teamcode.AuraRobot.AuraMotors.INTAKE;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
@@ -71,9 +71,9 @@ import java.util.List;
  * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list
  */
 
-@Autonomous(name="Red_Short", group="Linear OpMode")
+@Autonomous(name="Blue_Short", group="Linear OpMode")
 
-public class Aura_AutoRed_Meet2 extends LinearOpMode {
+public class Aura_AutoBlue_Short_Meet2 extends LinearOpMode {
 
 
     private static final double LEFT_SPIKEMARK_BOUNDARY_X = 250;
@@ -81,8 +81,8 @@ public class Aura_AutoRed_Meet2 extends LinearOpMode {
 
     public static int PurpleDropOffPos = 0;
 
-    Aura_Robot Aurelius = new Aura_Robot();
-    MecanumDrive RedShort;
+    AuraRobot Aurelius = new AuraRobot();
+    MecanumDrive BlueShort;
 
     private static FtcDashboard auraBoard;
 
@@ -121,7 +121,7 @@ public class Aura_AutoRed_Meet2 extends LinearOpMode {
      */
     // TFOD_MODEL_ASSET points to a model file stored in the project Asset location,
     // this is only used for Android Studio when using models in Assets.
-    private static final String TFOD_MODEL_ASSET = "myRedpy.tflite";
+    private static final String TFOD_MODEL_ASSET = "myBloopy.tflite";
 
     // TFOD_MODEL_FILE points to a model file stored onboard the Robot Controller's storage,
     // this is used when uploading models directly to the RC using the model upload interface.
@@ -174,7 +174,7 @@ public class Aura_AutoRed_Meet2 extends LinearOpMode {
         //   Option 3: Ditch the VisionProcessor and use EasyOpenCV directly
 
         Aurelius.init(hardwareMap);
-        RedShort = new MecanumDrive(Aurelius.hwMap, new Pose2d(0,0,0));
+        BlueShort = new MecanumDrive(Aurelius.hwMap, new Pose2d(0,0,0));
         ElapsedTime trajectoryTimer = new ElapsedTime(MILLISECONDS);
 
         auraBoard = FtcDashboard.getInstance();
@@ -291,68 +291,68 @@ public class Aura_AutoRed_Meet2 extends LinearOpMode {
 
     void buildPurpleTrajectories()
     {
-        trajPos1Purple = RedShort.actionBuilder(new Pose2d(0,0,0))
-                .lineToXConstantHeading(21)
-                .turn(Math.toRadians(55))
-                .lineToXConstantHeading(22)
+        trajPos1Purple = BlueShort.actionBuilder(new Pose2d(0,0,0))
+                .lineToXConstantHeading(24)
+                .turn(Math.toRadians(40))
+                .lineToXConstantHeading(28)
                 .build();
 
-        trajPos2Purple = RedShort.actionBuilder(new Pose2d(0,0,0))
+        trajPos2Purple = BlueShort.actionBuilder(new Pose2d(0,0,0))
                 .lineToXConstantHeading(24)
                 .turn(Math.toRadians(15))
                 .lineToXConstantHeading(28)
                 .build();
 
-        trajPos3Purple = RedShort.actionBuilder(new Pose2d(0,0,0))
-                .lineToXConstantHeading(24)
-                .turn(Math.toRadians(-50))
-                .lineToXConstantHeading(28)
+        trajPos3Purple = BlueShort.actionBuilder(new Pose2d(0,0,0))
+                .lineToXConstantHeading(21)
+                .turn(Math.toRadians(-80))
+                .lineToXConstantHeading(21.5)
                 .build();
     }
 
     void buildYellowTrajectories()
     {
-        trajPos1Yellow = RedShort.actionBuilder(new Pose2d(22,0,0))
-                .lineToXConstantHeading(20)
-                .turn(Math.toRadians(92))
-                .strafeTo(new Vector2d(36, -37))
-                .build();
-
-        trajPos2Yellow = RedShort.actionBuilder(new Pose2d(30,0,0))
+        trajPos1Yellow = BlueShort.actionBuilder(new Pose2d(30,0,0))
                 .lineToXConstantHeading(24)
-                .turn(Math.toRadians(92))
-                .strafeTo( new Vector2d(28,-37) )
+                .turn(Math.toRadians(-92))
+                .strafeTo(new Vector2d(19, 37))
                 .build();
 
-        trajPos3Yellow = RedShort.actionBuilder(new Pose2d(30,0,0))
+        trajPos2Yellow = BlueShort.actionBuilder(new Pose2d(30,0,0))
+                .lineToXConstantHeading(24)
+                .turn(Math.toRadians(-92))
+                .lineToYConstantHeading(37)
+                .build();
+
+        trajPos3Yellow = BlueShort.actionBuilder(BlueShort.pose)
                 .lineToXConstantHeading(21)
-                .turn(Math.toRadians(92))
-                .strafeTo(new Vector2d(20, -37))
+                .turn(Math.toRadians(-92))
+                .strafeTo(new Vector2d(34, 37))
                 .build();
     }
 
     void buildParkTrajectories()
     {
-        trajPos1ToPark = RedShort.actionBuilder(new Pose2d(21,-37,Math.toRadians(92)))
-                .lineToY(-32)
-                .strafeTo(new Vector2d(7, -34))
+        trajPos1ToPark = BlueShort.actionBuilder(new Pose2d(21,37,Math.toRadians(-92)))
+                .lineToY(32)
+                .strafeTo(new Vector2d(7, 34))
                 .build();
 
-        trajPos2ToPark = RedShort.actionBuilder(new Pose2d(21,-37,Math.toRadians(92)))
-                .lineToY(-32)
-                .strafeTo(new Vector2d(7, -34))
+        trajPos2ToPark = BlueShort.actionBuilder(new Pose2d(24,37,Math.toRadians(-92)))
+                .lineToY(32)
+                .strafeTo(new Vector2d(7, 34))
                 .build();
 
-        trajPos3ToPark = RedShort.actionBuilder(new Pose2d(21,-37,Math.toRadians(92)))
-                .lineToY(-32)
-                .strafeTo(new Vector2d(7, -34))
+        trajPos3ToPark = BlueShort.actionBuilder(new Pose2d(30,37,Math.toRadians(-92)))
+                .lineToY(32)
+                .strafeTo(new Vector2d(7, 34))
                 .build();
     }
 
     void dropOffPurplePixel()
     {
         runtime.reset();
-        while(runtime.seconds() < 1) {
+        while(runtime.seconds() < 1.2) {
             Aurelius.setPower(INTAKE, -0.2);
         }
         Aurelius.setPower(INTAKE, 0);

@@ -1,10 +1,10 @@
 package org.firstinspires.ftc.teamcode;
 
 
-import static org.firstinspires.ftc.teamcode.Aura_Robot.Deposit_Down_Pos;
-import static org.firstinspires.ftc.teamcode.Aura_Robot.Deposit_Up_Pos;
-import static org.firstinspires.ftc.teamcode.Aura_Robot.Lid_Close_Pos;
-import static org.firstinspires.ftc.teamcode.Aura_Robot.Lid_Open_Pos;
+import static org.firstinspires.ftc.teamcode.AuraRobot.Deposit_Down_Pos;
+import static org.firstinspires.ftc.teamcode.AuraRobot.Deposit_Up_Pos;
+import static org.firstinspires.ftc.teamcode.AuraRobot.Lid_Close_Pos;
+import static org.firstinspires.ftc.teamcode.AuraRobot.Lid_Open_Pos;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.HardwareMap;

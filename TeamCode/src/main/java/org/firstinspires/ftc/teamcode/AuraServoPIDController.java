@@ -8,19 +8,19 @@ import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 @Config
-public class Aura_ServoPIDController {
+public class AuraServoPIDController {
     public Servo controlledServo;
     double tgtPos;
     double currPos;
     public static double kP = 0.25;
-    public static Aura_PIDController servoPID = new Aura_PIDController(kP, 0, 0 , 0);
+    public static AuraPIDController servoPID = new AuraPIDController(kP, 0, 0 , 0);
     private Telemetry telemetry;
 
     public void setTelemetry(Telemetry tele) {
         telemetry = tele;
     }
 
-    public Aura_ServoPIDController(HardwareMap hardwareMap, String servoName, double startPos, double endPos) {
+    public AuraServoPIDController(HardwareMap hardwareMap, String servoName, double startPos, double endPos) {
         controlledServo = hardwareMap.get(Servo.class, servoName);
         tgtPos = startPos;
         currPos = startPos;

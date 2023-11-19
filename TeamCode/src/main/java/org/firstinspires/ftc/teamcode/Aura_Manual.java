@@ -33,13 +33,13 @@ package org.firstinspires.ftc.teamcode;
 //import com.acmerobotics.dashboard.config.Config;
 
 import static com.qualcomm.robotcore.util.ElapsedTime.Resolution.MILLISECONDS;
-import static org.firstinspires.ftc.teamcode.Aura_Robot.BUTTON_TRIGGER_TIMER_MS;
-import static org.firstinspires.ftc.teamcode.Aura_Robot.Launcher_Set_Pos;
-import static org.firstinspires.ftc.teamcode.Aura_Robot.Lid_Open_Pos;
-import static org.firstinspires.ftc.teamcode.Aura_Robot.bumperSpeedAdjust;
-import static org.firstinspires.ftc.teamcode.Aura_Robot.dPadIntakeAdjust;
-import static org.firstinspires.ftc.teamcode.Aura_Robot.dPadSpeedAdjust;
-import static org.firstinspires.ftc.teamcode.Aura_Robot.speedAdjust;
+import static org.firstinspires.ftc.teamcode.AuraRobot.BUTTON_TRIGGER_TIMER_MS;
+import static org.firstinspires.ftc.teamcode.AuraRobot.Launcher_Set_Pos;
+import static org.firstinspires.ftc.teamcode.AuraRobot.Lid_Open_Pos;
+import static org.firstinspires.ftc.teamcode.AuraRobot.bumperSpeedAdjust;
+import static org.firstinspires.ftc.teamcode.AuraRobot.dPadIntakeAdjust;
+import static org.firstinspires.ftc.teamcode.AuraRobot.dPadSpeedAdjust;
+import static org.firstinspires.ftc.teamcode.AuraRobot.speedAdjust;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
@@ -57,7 +57,7 @@ import java.util.concurrent.TimeUnit;
 public class Aura_Manual extends LinearOpMode {
 
     // Declare OpMode members.
-    Aura_Robot Aurelius = new Aura_Robot();
+    AuraRobot Aurelius = new AuraRobot();
 
     private boolean changingWheelSpeed = false; //truer than false;
     private boolean changingIntakeSpeed = false;
@@ -238,7 +238,7 @@ public class Aura_Manual extends LinearOpMode {
             }
         }
 
-        Aurelius.setPower(Aura_Robot.AuraMotors.INTAKE,(dPadIntakeAdjust/10)* gamepad2.right_stick_y);
+        Aurelius.setPower(AuraRobot.AuraMotors.INTAKE,(dPadIntakeAdjust/10)* gamepad2.right_stick_y);
     }
 
     public void AuraDeposit()
@@ -269,11 +269,11 @@ public class Aura_Manual extends LinearOpMode {
                 changingLauncherSpeed = true;
             } else if (timer_gp1_left_trigger.time(TimeUnit.MILLISECONDS) > BUTTON_TRIGGER_TIMER_MS) {
                 if (PlaneLaunched == false) {
-                    Aurelius.boeing747.setTargetState(Aura_LaunchController.launchState.Launch);
+                    Aurelius.boeing747.setTargetState(AuraLaunchController.launchState.Launch);
                     Aurelius.boeing747.update();
                     PlaneLaunched = true;
                 } else {
-                    Aurelius.boeing747.setTargetState(Aura_LaunchController.launchState.Set);
+                    Aurelius.boeing747.setTargetState(AuraLaunchController.launchState.Set);
                     Aurelius.boeing747.update();
                     PlaneLaunched = false;
                 }

@@ -32,15 +32,15 @@ package org.firstinspires.ftc.teamcode;
 
 import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_WITHOUT_ENCODER;
 import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.STOP_AND_RESET_ENCODER;
-import static org.firstinspires.ftc.teamcode.Aura_Robot.AuraMotors.ALL_DRIVES;
-import static org.firstinspires.ftc.teamcode.Aura_Robot.AuraMotors.LOWER_LEFT;
-import static org.firstinspires.ftc.teamcode.Aura_Robot.AuraMotors.LOWER_RIGHT;
-import static org.firstinspires.ftc.teamcode.Aura_Robot.AuraMotors.UPPER_LEFT;
-import static org.firstinspires.ftc.teamcode.Aura_Robot.AuraMotors.UPPER_RIGHT;
-import static org.firstinspires.ftc.teamcode.Aura_Robot.BUTTON_TRIGGER_TIMER_MS;
-import static org.firstinspires.ftc.teamcode.Aura_Robot.bumperSpeedAdjust;
-import static org.firstinspires.ftc.teamcode.Aura_Robot.dPadSpeedAdjust;
-import static org.firstinspires.ftc.teamcode.Aura_Robot.speedAdjust;
+import static org.firstinspires.ftc.teamcode.AuraRobot.AuraMotors.ALL_DRIVES;
+import static org.firstinspires.ftc.teamcode.AuraRobot.AuraMotors.LOWER_LEFT;
+import static org.firstinspires.ftc.teamcode.AuraRobot.AuraMotors.LOWER_RIGHT;
+import static org.firstinspires.ftc.teamcode.AuraRobot.AuraMotors.UPPER_LEFT;
+import static org.firstinspires.ftc.teamcode.AuraRobot.AuraMotors.UPPER_RIGHT;
+import static org.firstinspires.ftc.teamcode.AuraRobot.BUTTON_TRIGGER_TIMER_MS;
+import static org.firstinspires.ftc.teamcode.AuraRobot.bumperSpeedAdjust;
+import static org.firstinspires.ftc.teamcode.AuraRobot.dPadSpeedAdjust;
+import static org.firstinspires.ftc.teamcode.AuraRobot.speedAdjust;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 import com.acmerobotics.dashboard.FtcDashboard;
@@ -75,7 +75,7 @@ public class Aura_Sandbox extends LinearOpMode
 {
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
-    Aura_Robot Aurelius = new Aura_Robot();
+    AuraRobot Aurelius = new AuraRobot();
     private static ElapsedTime timer_gp1_dpad_left = new ElapsedTime();
     private static ElapsedTime timer_gp1_dpad_right = new ElapsedTime();
     boolean changingWheelSpeed = false;
@@ -162,7 +162,7 @@ public class Aura_Sandbox extends LinearOpMode
         }
     }
 
-    public void SandboxMotorProfile(Aura_Robot.AuraMotors eWhichMotor) {
+    public void SandboxMotorProfile(AuraRobot.AuraMotors eWhichMotor) {
 
         // Connect motor and encoder cable to port 1 of Robot Controller
         // Reset encoder.
@@ -267,7 +267,7 @@ public class Aura_Sandbox extends LinearOpMode
             }
         }
 
-        Aurelius.setPower(Aura_Robot.AuraMotors.INTAKE, (dPadSpeedAdjust/10)*gamepad2.right_stick_y);
+        Aurelius.setPower(AuraRobot.AuraMotors.INTAKE, (dPadSpeedAdjust/10)*gamepad2.right_stick_y);
     }
 
     public void getUserInput()
@@ -327,11 +327,11 @@ public class Aura_Sandbox extends LinearOpMode
             } else if (timer_gp1_dpad_right.time(MILLISECONDS) > BUTTON_TRIGGER_TIMER_MS) {
 
                 Aurelius.setRunMode(UPPER_LEFT, STOP_AND_RESET_ENCODER);
-                Aurelius.setRunMode(Aura_Robot.AuraMotors.LOWER_RIGHT, STOP_AND_RESET_ENCODER);
+                Aurelius.setRunMode(AuraRobot.AuraMotors.LOWER_RIGHT, STOP_AND_RESET_ENCODER);
                 Aurelius.setRunMode(UPPER_RIGHT, STOP_AND_RESET_ENCODER);
 
                 Aurelius.setRunMode(UPPER_LEFT, RUN_WITHOUT_ENCODER);
-                Aurelius.setRunMode(Aura_Robot.AuraMotors.LOWER_RIGHT, RUN_WITHOUT_ENCODER);
+                Aurelius.setRunMode(AuraRobot.AuraMotors.LOWER_RIGHT, RUN_WITHOUT_ENCODER);
                 Aurelius.setRunMode(UPPER_RIGHT, RUN_WITHOUT_ENCODER);
 
 

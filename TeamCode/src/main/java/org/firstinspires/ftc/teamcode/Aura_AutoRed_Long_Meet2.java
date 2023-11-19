@@ -33,7 +33,7 @@ import static com.qualcomm.robotcore.util.ElapsedTime.Resolution.MILLISECONDS;
 import static org.firstinspires.ftc.teamcode.Aura_DepositController.DepositState.Down;
 import static org.firstinspires.ftc.teamcode.Aura_DepositController.DepositState.Open;
 import static org.firstinspires.ftc.teamcode.Aura_DepositController.DepositState.Up;
-import static org.firstinspires.ftc.teamcode.Aura_Robot.AuraMotors.INTAKE;
+import static org.firstinspires.ftc.teamcode.AuraRobot.AuraMotors.INTAKE;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
@@ -81,7 +81,7 @@ public class Aura_AutoRed_Long_Meet2 extends LinearOpMode {
 
     public static int PurpleDropOffPos = 0;
 
-    Aura_Robot Aurelius = new Aura_Robot();
+    AuraRobot Aurelius = new AuraRobot();
     MecanumDrive RedLong;
 
     private static FtcDashboard auraBoard;

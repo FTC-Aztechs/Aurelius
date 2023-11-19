@@ -4,7 +4,7 @@ package org.firstinspires.ftc.teamcode;
 
         import com.qualcomm.robotcore.util.ElapsedTime;
 
-public class Aura_PIDController {
+public class AuraPIDController {
     public double Kp;
     public double Ki;
     public double Kd;
@@ -21,14 +21,14 @@ public class Aura_PIDController {
      * @param Ki integral gain
      * @param Kd derivative gain
      */
-    public Aura_PIDController(double Kp, double Ki, double Kd, double Kg) {
+    public AuraPIDController(double Kp, double Ki, double Kd, double Kg) {
         this.Kp = Kp;
         this.Ki = Ki;
         this.Kd = Kd;
         this.Kg = Kg;
     }
 
-    public Aura_PIDController(double Kp, double Ki, double Kd, double Kg, boolean angleWrap) {
+    public AuraPIDController(double Kp, double Ki, double Kd, double Kg, boolean angleWrap) {
         this.Kp = Kp;
         this.Ki = Ki;
         this.Kd = Kd;

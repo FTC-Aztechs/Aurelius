@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 @Config
-public class Aura_IntakeController {
+public class AuraIntakeController {
     private DcMotor intakeMotor;
 
     enum intakeState
@@ -20,7 +20,7 @@ public class Aura_IntakeController {
     intakeState targetState;
     Telemetry telemetry;
 
-    public Aura_IntakeController(HardwareMap hardwareMap) {
+    public AuraIntakeController(HardwareMap hardwareMap) {
         intakeMotor = hardwareMap.get(DcMotor.class, "intakeMotor");
         currState = intakeState.OUT;
     }

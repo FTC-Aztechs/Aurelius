@@ -1,6 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
-public class Aura_AutoActions{
+public class AuraAutoActions {
     //TODO: look at sample action class here and write your own
 //    public class Shooter {
 //        private DcMotorEx motor;

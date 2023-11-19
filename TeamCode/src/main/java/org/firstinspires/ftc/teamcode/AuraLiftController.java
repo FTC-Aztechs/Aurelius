@@ -1,9 +1,9 @@
 package org.firstinspires.ftc.teamcode;
-import static org.firstinspires.ftc.teamcode.Aura_Robot.HighJunction;
-import static org.firstinspires.ftc.teamcode.Aura_Robot.LowerLimit;
-import static org.firstinspires.ftc.teamcode.Aura_Robot.SlidePower_Down;
-import static org.firstinspires.ftc.teamcode.Aura_Robot.SlidePower_Up;
-import static org.firstinspires.ftc.teamcode.Aura_Robot.UpperLimit;
+import static org.firstinspires.ftc.teamcode.AuraRobot.HighJunction;
+import static org.firstinspires.ftc.teamcode.AuraRobot.LowerLimit;
+import static org.firstinspires.ftc.teamcode.AuraRobot.SlidePower_Down;
+import static org.firstinspires.ftc.teamcode.AuraRobot.SlidePower_Up;
+import static org.firstinspires.ftc.teamcode.AuraRobot.UpperLimit;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -13,12 +13,12 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 
 @Config
-public class Aura_LiftController {
+public class AuraLiftController {
     private DcMotor tom;
     private DcMotor jerry;
     double tgtPos;
     double currPos;
-    public static Aura_PIDController liftController = new Aura_PIDController(11, 0, 0.25, 3600);
+    public static AuraPIDController liftController = new AuraPIDController(11, 0, 0.25, 3600);
     private Telemetry telemetry;
 
     public void setTelemetry(Telemetry tele) {
@@ -26,7 +26,7 @@ public class Aura_LiftController {
     }
 
 
-    public Aura_LiftController(HardwareMap hardwareMap) {
+    public AuraLiftController(HardwareMap hardwareMap) {
         jerry = hardwareMap.get(DcMotor.class, "Jerry");
         tom = hardwareMap.get(DcMotor.class, "Tom");
         tgtPos = 0;

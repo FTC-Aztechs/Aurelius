@@ -71,7 +71,7 @@ public class Aura_AutoBlue_Meet1 extends LinearOpMode {
 
     public static int PurpleDropOffPos = 0;
 
-    Aura_Robot Aurelius = new Aura_Robot();
+    AuraRobot Aurelius = new AuraRobot();
 
     private static FtcDashboard auraBoard;
 
