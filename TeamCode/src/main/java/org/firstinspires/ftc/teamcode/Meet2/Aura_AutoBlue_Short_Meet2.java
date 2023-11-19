@@ -27,7 +27,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.Meet2;
 
 import static com.qualcomm.robotcore.util.ElapsedTime.Resolution.MILLISECONDS;
 import static org.firstinspires.ftc.teamcode.Aura_DepositController.DepositState.Down;
@@ -50,6 +50,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
+import org.firstinspires.ftc.teamcode.AprilTagDetectionPipeline;
+import org.firstinspires.ftc.teamcode.AuraRobot;
 import org.firstinspires.ftc.teamcode.roadrunnerbasics.MecanumDrive;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.tfod.TfodProcessor;
@@ -71,9 +73,9 @@ import java.util.List;
  * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list
  */
 
-@Autonomous(name="Red_Long", group="Linear OpMode")
+@Autonomous(name="Blue_Short", group="Linear OpMode")
 
-public class Aura_AutoRed_Long_Meet2 extends LinearOpMode {
+public class Aura_AutoBlue_Short_Meet2 extends LinearOpMode {
 
 
     private static final double LEFT_SPIKEMARK_BOUNDARY_X = 250;
@@ -82,7 +84,7 @@ public class Aura_AutoRed_Long_Meet2 extends LinearOpMode {
     public static int PurpleDropOffPos = 0;
 
     AuraRobot Aurelius = new AuraRobot();
-    MecanumDrive RedLong;
+    MecanumDrive BlueShort;
 
     private static FtcDashboard auraBoard;
 
@@ -121,7 +123,7 @@ public class Aura_AutoRed_Long_Meet2 extends LinearOpMode {
      */
     // TFOD_MODEL_ASSET points to a model file stored in the project Asset location,
     // this is only used for Android Studio when using models in Assets.
-    private static final String TFOD_MODEL_ASSET = "myRedpy.tflite";
+    private static final String TFOD_MODEL_ASSET = "myBloopy.tflite";
 
     // TFOD_MODEL_FILE points to a model file stored onboard the Robot Controller's storage,
     // this is used when uploading models directly to the RC using the model upload interface.
@@ -174,7 +176,7 @@ public class Aura_AutoRed_Long_Meet2 extends LinearOpMode {
         //   Option 3: Ditch the VisionProcessor and use EasyOpenCV directly
 
         Aurelius.init(hardwareMap);
-        RedLong = new MecanumDrive(Aurelius.hwMap, new Pose2d(0,0,0));
+        BlueShort = new MecanumDrive(Aurelius.hwMap, new Pose2d(0,0,0));
         ElapsedTime trajectoryTimer = new ElapsedTime(MILLISECONDS);
 
         auraBoard = FtcDashboard.getInstance();
@@ -226,7 +228,16 @@ public class Aura_AutoRed_Long_Meet2 extends LinearOpMode {
                                     dropOffPurplePixel();
                                     return false;
                                 }
+                            },
+                            trajPos1Yellow,
+                            new Action() {
+                                @Override
+                                public boolean run(TelemetryPacket tPkt) {
+                                    dropOffYellowPixel();
+                                    return false;
+                                }
                             }
+                            ,trajPos1ToPark
                         ));
                     break;
                 case 2:
@@ -240,7 +251,16 @@ public class Aura_AutoRed_Long_Meet2 extends LinearOpMode {
                                             dropOffPurplePixel();
                                             return false;
                                         }
-                                    }
+                                    },
+                                    trajPos2Yellow,
+                                    new Action() {
+                                        @Override
+                                        public boolean run(TelemetryPacket tPkt) {
+                                            dropOffYellowPixel();
+                                            return false;
+                                        }
+                                    },
+                                    trajPos2ToPark
                             ));
                     break;
                 case 3:
@@ -255,7 +275,16 @@ public class Aura_AutoRed_Long_Meet2 extends LinearOpMode {
                                              dropOffPurplePixel();
                                              return false;
                                          }
-                                     }
+                                     },
+                                     trajPos3Yellow,
+                                     new Action() {
+                                         @Override
+                                         public boolean run(TelemetryPacket tPkt) {
+                                             dropOffYellowPixel();
+                                             return false;
+                                         }
+                                     },
+                                     trajPos3ToPark
                              ));
                 break;
             }
@@ -264,19 +293,19 @@ public class Aura_AutoRed_Long_Meet2 extends LinearOpMode {
 
     void buildPurpleTrajectories()
     {
-        trajPos1Purple = RedLong.actionBuilder(new Pose2d(0,0,0))
-                .lineToXConstantHeading(21)
-                .turn(Math.toRadians(55))
-                .lineToXConstantHeading(22)
+        trajPos1Purple = BlueShort.actionBuilder(new Pose2d(0,0,0))
+                .lineToXConstantHeading(24)
+                .turn(Math.toRadians(40))
+                .lineToXConstantHeading(28)
                 .build();
 
-        trajPos2Purple = RedLong.actionBuilder(new Pose2d(0,0,0))
+        trajPos2Purple = BlueShort.actionBuilder(new Pose2d(0,0,0))
                 .lineToXConstantHeading(24)
                 .turn(Math.toRadians(15))
                 .lineToXConstantHeading(28)
                 .build();
 
-        trajPos3Purple = RedLong.actionBuilder(new Pose2d(0,0,0))
+        trajPos3Purple = BlueShort.actionBuilder(new Pose2d(0,0,0))
                 .lineToXConstantHeading(21)
                 .turn(Math.toRadians(-80))
                 .lineToXConstantHeading(21.5)
@@ -285,19 +314,19 @@ public class Aura_AutoRed_Long_Meet2 extends LinearOpMode {
 
     void buildYellowTrajectories()
     {
-        trajPos1Yellow = RedLong.actionBuilder(new Pose2d(30,0,0))
+        trajPos1Yellow = BlueShort.actionBuilder(new Pose2d(30,0,0))
                 .lineToXConstantHeading(24)
                 .turn(Math.toRadians(-92))
-                .strafeTo(new Vector2d(20, 37))
+                .strafeTo(new Vector2d(19, 37))
                 .build();
 
-        trajPos2Yellow = RedLong.actionBuilder(new Pose2d(30,0,0))
+        trajPos2Yellow = BlueShort.actionBuilder(new Pose2d(30,0,0))
                 .lineToXConstantHeading(24)
                 .turn(Math.toRadians(-92))
                 .lineToYConstantHeading(37)
                 .build();
 
-        trajPos3Yellow = RedLong.actionBuilder(RedLong.pose)
+        trajPos3Yellow = BlueShort.actionBuilder(BlueShort.pose)
                 .lineToXConstantHeading(21)
                 .turn(Math.toRadians(-92))
                 .strafeTo(new Vector2d(34, 37))
@@ -306,17 +335,17 @@ public class Aura_AutoRed_Long_Meet2 extends LinearOpMode {
 
     void buildParkTrajectories()
     {
-        trajPos1ToPark = RedLong.actionBuilder(new Pose2d(21,37,Math.toRadians(-92)))
+        trajPos1ToPark = BlueShort.actionBuilder(new Pose2d(21,37,Math.toRadians(-92)))
                 .lineToY(32)
                 .strafeTo(new Vector2d(7, 34))
                 .build();
 
-        trajPos2ToPark = RedLong.actionBuilder(new Pose2d(24,37,Math.toRadians(-92)))
+        trajPos2ToPark = BlueShort.actionBuilder(new Pose2d(24,37,Math.toRadians(-92)))
                 .lineToY(32)
                 .strafeTo(new Vector2d(7, 34))
                 .build();
 
-        trajPos3ToPark = RedLong.actionBuilder(new Pose2d(30,37,Math.toRadians(-92)))
+        trajPos3ToPark = BlueShort.actionBuilder(new Pose2d(30,37,Math.toRadians(-92)))
                 .lineToY(32)
                 .strafeTo(new Vector2d(7, 34))
                 .build();

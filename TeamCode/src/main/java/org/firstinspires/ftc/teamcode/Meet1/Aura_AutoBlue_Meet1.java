@@ -27,7 +27,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.Meet1;
 
 import static com.qualcomm.robotcore.util.ElapsedTime.Resolution.MILLISECONDS;
 
@@ -42,6 +42,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
+import org.firstinspires.ftc.teamcode.AprilTagDetectionPipeline;
+import org.firstinspires.ftc.teamcode.AuraRobot;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.tfod.TfodProcessor;
 import org.openftc.apriltag.AprilTagDetection;
@@ -77,7 +79,7 @@ public class Aura_AutoBlue_Meet1 extends LinearOpMode {
 
     //TODO: declare April Tag stuff
     OpenCvWebcam Sauron = null;
-    AprilTagDetectionPipeline pipeline;
+    public AprilTagDetectionPipeline pipeline;
 
     private static int iTeleCt = 1;
 

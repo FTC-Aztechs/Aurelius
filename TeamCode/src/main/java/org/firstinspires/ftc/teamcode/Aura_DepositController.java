@@ -17,7 +17,7 @@ public class Aura_DepositController {
     public Servo Deposit;
     public Servo Lid;
 
-    enum DepositState {
+    public enum DepositState {
         Up,
         Open,
         Down

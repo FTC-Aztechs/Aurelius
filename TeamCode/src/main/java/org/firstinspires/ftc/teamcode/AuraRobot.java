@@ -45,7 +45,7 @@ import java.util.Locale;
 @Config
 public class AuraRobot
 {
-    enum AuraMotors
+    public enum AuraMotors
     {
         UPPER_LEFT,
         LOWER_LEFT,
@@ -130,7 +130,7 @@ public class AuraRobot
 
 
     /* local OpMode members. */
-    HardwareMap hwMap           =  null;
+    public  HardwareMap hwMap           =  null;
     private ElapsedTime period  = new ElapsedTime();
 //    MecanumDrive AuraMecanumDrive = new MecanumDrive(hwMap,blue_start_pose.pose2d());
     //public static MvrkPIDController control = new MvrkPIDController(11, 0, 0.25, 3600);
