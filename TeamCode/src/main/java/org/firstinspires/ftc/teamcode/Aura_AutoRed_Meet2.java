@@ -305,7 +305,7 @@ public class Aura_AutoRed_Meet2 extends LinearOpMode {
 
         trajPos3Purple = RedShort.actionBuilder(new Pose2d(0,0,0))
                 .lineToXConstantHeading(24)
-                .turn(Math.toRadians(-40))
+                .turn(Math.toRadians(-50))
                 .lineToXConstantHeading(28)
                 .build();
     }

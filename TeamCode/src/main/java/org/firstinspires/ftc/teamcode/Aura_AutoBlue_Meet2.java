@@ -315,7 +315,7 @@ public class Aura_AutoBlue_Meet2 extends LinearOpMode {
         trajPos1Yellow = BlueShort.actionBuilder(new Pose2d(30,0,0))
                 .lineToXConstantHeading(24)
                 .turn(Math.toRadians(-92))
-                .strafeTo(new Vector2d(20, 37))
+                .strafeTo(new Vector2d(19, 37))
                 .build();
 
         trajPos2Yellow = BlueShort.actionBuilder(new Pose2d(30,0,0))

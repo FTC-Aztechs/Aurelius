@@ -34,6 +34,7 @@ import static com.qualcomm.robotcore.util.ElapsedTime.Resolution.MILLISECONDS;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
@@ -62,7 +63,7 @@ import java.util.List;
  */
 
 @Autonomous(name="Aura_Auto", group="Linear OpMode")
-
+@Disabled
 public class Aura_AutoBlue_Meet1 extends LinearOpMode {
 
     private static final double LEFT_SPIKEMARK_BOUNDARY_X = 0;

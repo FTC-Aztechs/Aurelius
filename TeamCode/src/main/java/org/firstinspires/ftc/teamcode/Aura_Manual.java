@@ -35,6 +35,7 @@ package org.firstinspires.ftc.teamcode;
 import static com.qualcomm.robotcore.util.ElapsedTime.Resolution.MILLISECONDS;
 import static org.firstinspires.ftc.teamcode.Aura_Robot.BUTTON_TRIGGER_TIMER_MS;
 import static org.firstinspires.ftc.teamcode.Aura_Robot.Launcher_Set_Pos;
+import static org.firstinspires.ftc.teamcode.Aura_Robot.Lid_Open_Pos;
 import static org.firstinspires.ftc.teamcode.Aura_Robot.bumperSpeedAdjust;
 import static org.firstinspires.ftc.teamcode.Aura_Robot.dPadIntakeAdjust;
 import static org.firstinspires.ftc.teamcode.Aura_Robot.dPadSpeedAdjust;
@@ -127,7 +128,7 @@ public class Aura_Manual extends LinearOpMode {
             AuraIntake();
             AuraLauncher();
             AuraManualDrive();
-//            AuraDeposit();
+            //AuraDeposit();
             telemetry.addLine("Drive Mode: Forward Facing");
             telemetry.update();
         }
@@ -240,19 +241,26 @@ public class Aura_Manual extends LinearOpMode {
         Aurelius.setPower(Aura_Robot.AuraMotors.INTAKE,(dPadIntakeAdjust/10)* gamepad2.right_stick_y);
     }
 
-//    public void AuraDeposit()
-//    {
-//        if(gamepad2.y) {
-//            Aurelius.flipper.setTargetPosition(DepositDropOffPos);
-//            while (!Aurelius.flipper.update())
-//                idle();
-//        }
-//        if(gamepad2.x) {
-//            Aurelius.flipper.setTargetPosition(DepositRestPos);
-//            while (!Aurelius.flipper.update())
-//                idle();
-//        }
-//    }
+    public void AuraDeposit()
+    {
+        ElapsedTime timer = new ElapsedTime();
+        if(gamepad2.a)
+            timer_gp2_buttonA.reset();
+            if(timer_gp2_buttonA.time(TimeUnit.MILLISECONDS) > BUTTON_TRIGGER_TIMER_MS) {
+                Aurelius.depositFlipper.setTargetState(Aura_DepositController.DepositState.Up);
+                Aurelius.depositFlipper.update();
+            }
+        if(timer_gp2_buttonY.time(TimeUnit.MILLISECONDS) > BUTTON_TRIGGER_TIMER_MS) {
+            Aurelius.depositFlipper.Lid.setPosition(Lid_Open_Pos);
+            Aurelius.depositFlipper.update();
+
+        }
+        if(timer_gp2_buttonB.time(TimeUnit.MILLISECONDS) > BUTTON_TRIGGER_TIMER_MS) {
+            Aurelius.depositFlipper.setTargetState(Aura_DepositController.DepositState.Down);
+            Aurelius.depositFlipper.update();
+
+        }
+    }
 
     public void AuraLauncher(){
         if (gamepad1.left_trigger == 1f) {
