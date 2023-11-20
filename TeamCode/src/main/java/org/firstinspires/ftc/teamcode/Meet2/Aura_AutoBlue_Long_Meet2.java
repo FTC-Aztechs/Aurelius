@@ -73,7 +73,7 @@ import java.util.List;
  * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list
  */
 
-@Autonomous(name="Blue_Long", group="Linear OpMode")
+@Autonomous(name="Blue_Long_Meet2", group="Linear OpMode")
 
 public class Aura_AutoBlue_Long_Meet2 extends LinearOpMode {
 

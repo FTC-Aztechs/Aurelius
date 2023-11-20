@@ -105,8 +105,8 @@ public class AuraRobot
     public static double Lid_Close_Pos = 0.5;
     public  static double Lid_Open_Pos = 0.85;
 
-    public static double Deposit_Down_Pos =  0.16;
-    public static double Deposit_Up_Pos = 0.675;
+    public static double Deposit_Down_Pos =  0.04;
+    public static double Deposit_Up_Pos = 0.5;
     //Slide variables
     public static int LowerLimit     = 0;
     public static int FloorPosition  = 600;
