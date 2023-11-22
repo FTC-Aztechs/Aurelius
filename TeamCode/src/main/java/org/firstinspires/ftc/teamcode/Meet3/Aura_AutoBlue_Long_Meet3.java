@@ -77,6 +77,22 @@ import java.util.List;
 
 public class Aura_AutoBlue_Long_Meet3 extends LinearOpMode {
 
+    //**** Roadrunner Pose2ds ****
+
+    Pose2d StartPos = new Pose2d(0,0,0);
+
+    Pose2d Purple1Pos = new Pose2d(27, 19, Math.toRadians(-90));
+    Pose2d Purple2Pos = new Pose2d(37, 12, Math.toRadians(-90));
+    Pose2d Purple3Pos = new Pose2d(27, 0, Math.toRadians(-90));
+
+    Pose2d Yellow1Pos = new Pose2d(20, 37, Math.toRadians(-90));
+    Pose2d Yellow2Pos = new Pose2d(28, 37, Math.toRadians(-90));
+    Pose2d Yellow3Pos = new Pose2d(27,0,Math.toRadians(-90));
+    Vector2d ParkPos = new Vector2d(7, 37);
+
+    //************
+
+
 
     private static final double LEFT_SPIKEMARK_BOUNDARY_X = 250;
     private static final double RIGHT_SPIKEMARK_BOUNDARY_X = 260;
@@ -266,73 +282,51 @@ public class Aura_AutoBlue_Long_Meet3 extends LinearOpMode {
 
     void buildPurpleTrajectories()
     {
-        trajPos1Purple = BlueLong.actionBuilder(new Pose2d(0,0,0))
-                .lineToXConstantHeading(21)
-                .turn(Math.toRadians(60))
-                .lineToXConstantHeading(22.5)
+        trajPos1Purple = BlueLong.actionBuilder(StartPos)
+                .splineToLinearHeading(Purple1Pos, Math.toRadians(0))
                 .build();
 
-        trajPos2Purple = BlueLong.actionBuilder(new Pose2d(0,0,0))
-                .lineToXConstantHeading(24)
-                .turn(Math.toRadians(15))
-                .lineToXConstantHeading(28)
+        trajPos2Purple = BlueLong.actionBuilder(StartPos)
+                .splineToLinearHeading(Purple2Pos, Math.toRadians(0))
                 .build();
 
-        trajPos3Purple = BlueLong.actionBuilder(new Pose2d(0,0,0))
-                .lineToXConstantHeading(21)
-                .turn(Math.toRadians(-80))
-                .lineToXConstantHeading(21.5)
-//                .setTangent(Math.toRadians(90))
-//                .splineToLinearHeading(new Pose2d(10, 26), 30)
+        trajPos3Purple = BlueLong.actionBuilder(StartPos)
+                .splineToLinearHeading(Purple3Pos, Math.toRadians(0))
                 .build();
     }
 
     void buildYellowTrajectories()
     {
-        trajPos1Yellow = BlueLong.actionBuilder(new Pose2d(30,0,0))
-                .lineToXConstantHeading(24)
-                .turn(Math.toRadians(-92))
-                .strafeTo(new Vector2d(20, 37))
+        trajPos1Yellow = BlueLong.actionBuilder(Purple1Pos)
+                .setReversed(true)
+                .splineToLinearHeading(Yellow1Pos, Math.toRadians(90))
                 .build();
 
-        trajPos2Yellow = BlueLong.actionBuilder(new Pose2d(30,0,0))
-                .lineToXConstantHeading(24)
-                .turn(Math.toRadians(-92))
-                .lineToYConstantHeading(37)
+        trajPos2Yellow = BlueLong.actionBuilder(Purple2Pos)
+                .setReversed(true)
+                .splineToLinearHeading(Yellow2Pos, Math.toRadians(90))
                 .build();
 
-        trajPos3Yellow = BlueLong.actionBuilder(BlueLong.pose)
-                .lineToXConstantHeading(21)
-                .turn(Math.toRadians(-92))
-                .strafeTo(new Vector2d(34, 37))
+        trajPos3Yellow = BlueLong.actionBuilder(Purple3Pos)
+                .setReversed(true)
+                .splineToLinearHeading(Yellow3Pos, Math.toRadians(90))
                 .build();
-    }
-    void buildBoardTrajectories() {
-        //trajPos1Board = BlueLong.actionBuilder(new Pose2d(,32.25,0))
-
-//        trajPos2Board = BlueLong.actionBuilder(new Pose2d(,32.25,0))
-//        trajPos3Board = BlueLong.actionBuilder(new Pose2d(,32.25,0))
-
     }
 
     void buildParkTrajectories()
     {
-        trajPos1ToPark = BlueLong.actionBuilder(new Pose2d(21,37,Math.toRadians(-92)))
-                .lineToY(32)
-                .strafeTo(new Vector2d(7, 34))
+        trajPos1ToPark = BlueLong.actionBuilder(Yellow1Pos)
+                .strafeTo(ParkPos)
                 .build();
 
-        trajPos2ToPark = BlueLong.actionBuilder(new Pose2d(24,37,Math.toRadians(-92)))
-                .lineToY(32)
-                .strafeTo(new Vector2d(7, 34))
+        trajPos2ToPark = BlueLong.actionBuilder(Yellow2Pos)
+                .strafeTo(ParkPos)
                 .build();
 
-        trajPos3ToPark = BlueLong.actionBuilder(new Pose2d(30,37,Math.toRadians(-92)))
-                .lineToY(32)
-                .strafeTo(new Vector2d(7, 34))
+        trajPos3ToPark = BlueLong.actionBuilder(Yellow3Pos)
+                .strafeTo(ParkPos)
                 .build();
     }
-
     void dropOffPurplePixel()
     {
         runtime.reset();
