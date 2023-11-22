@@ -36,6 +36,7 @@ import static org.firstinspires.ftc.teamcode.Aura_DepositController.DepositState
 import static org.firstinspires.ftc.teamcode.Aura_DepositController.DepositState.Up;
 
 import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
@@ -73,9 +74,23 @@ import java.util.List;
  * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list
  */
 
+@Config
 @Autonomous(name="Blue_Short", group="Linear OpMode")
 
 public class Aura_AutoBlue_Short_Meet3 extends LinearOpMode {
+
+    //**** Roadrunner Pose2ds ****
+
+    Pose2d StartPos = new Pose2d(0,0,0);
+
+    Pose2d Purple1Pos = new Pose2d(27, 19, Math.toRadians(-90));
+    Pose2d Purple2Pos = new Pose2d(37, 12, Math.toRadians(-90));
+    Pose2d Purple3Pos = new Pose2d(27, 0, Math.toRadians(-90));
+
+    Pose2d Yellow1Pos = new Pose2d(20, 37, Math.toRadians(-90));
+    Pose2d Yellow2Pos = new Pose2d(28, 37, Math.toRadians(-90));
+    Pose2d Yellow3Pos = new Pose2d(27,0,Math.toRadians(-90));
+    Vector2d ParkPos = new Vector2d(7, 37);
 
 
     private static final double LEFT_SPIKEMARK_BOUNDARY_X = 250;
@@ -213,7 +228,7 @@ public class Aura_AutoBlue_Short_Meet3 extends LinearOpMode {
 
         runtime.reset();
         if (opModeIsActive()) {
-            DetectPurpleDropoffPos();
+//            DetectPurpleDropoffPos();
             visionPortal.close();
 
             //TODO: Run Trajectories
@@ -293,63 +308,49 @@ public class Aura_AutoBlue_Short_Meet3 extends LinearOpMode {
 
     void buildPurpleTrajectories()
     {
-        trajPos1Purple = BlueShort.actionBuilder(new Pose2d(0,0,0))
-                .lineToXConstantHeading(24)
-                .turn(Math.toRadians(40))
-                .lineToXConstantHeading(28)
+        trajPos1Purple = BlueShort.actionBuilder(StartPos)
+                .splineToLinearHeading(Purple1Pos, Math.toRadians(0))
                 .build();
 
-        trajPos2Purple = BlueShort.actionBuilder(new Pose2d(0,0,0))
-                .lineToXConstantHeading(24)
-                .turn(Math.toRadians(15))
-                .lineToXConstantHeading(28)
+        trajPos2Purple = BlueShort.actionBuilder(StartPos)
+                .splineToLinearHeading(Purple2Pos, Math.toRadians(0))
                 .build();
 
-        trajPos3Purple = BlueShort.actionBuilder(new Pose2d(0,0,0))
-//                .lineToXConstantHeading(21)
-//                .turn(Math.toRadians(-80))
-                .setTangent(-89)
-                .splineToLinearHeading(new Pose2d(5, 21, 0), Math.toRadians(-89))
-                .lineToXConstantHeading(21.5)
+        trajPos3Purple = BlueShort.actionBuilder(StartPos)
+                .splineToLinearHeading(Purple3Pos, Math.toRadians(0))
                 .build();
     }
 
     void buildYellowTrajectories()
     {
-        trajPos1Yellow = BlueShort.actionBuilder(new Pose2d(30,0,0))
-                .lineToXConstantHeading(24)
-                .turn(Math.toRadians(-92))
-                .strafeTo(new Vector2d(19, 37))
+        trajPos1Yellow = BlueShort.actionBuilder(Purple1Pos)
+                .setReversed(true)
+                .splineToLinearHeading(Yellow1Pos, Math.toRadians(90))
                 .build();
 
-        trajPos2Yellow = BlueShort.actionBuilder(new Pose2d(30,0,0))
-                .lineToXConstantHeading(24)
-                .turn(Math.toRadians(-92))
-                .lineToYConstantHeading(37)
+        trajPos2Yellow = BlueShort.actionBuilder(Purple2Pos)
+                .setReversed(true)
+                .splineToLinearHeading(Yellow2Pos, Math.toRadians(90))
                 .build();
 
-        trajPos3Yellow = BlueShort.actionBuilder(BlueShort.pose)
-                .lineToXConstantHeading(21)
-                .turn(Math.toRadians(-92))
-                .strafeTo(new Vector2d(34, 37))
+        trajPos3Yellow = BlueShort.actionBuilder(Purple3Pos)
+                .setReversed(true)
+                .splineToLinearHeading(Yellow3Pos, Math.toRadians(90))
                 .build();
     }
 
     void buildParkTrajectories()
     {
-        trajPos1ToPark = BlueShort.actionBuilder(new Pose2d(21,37,Math.toRadians(-92)))
-                .lineToY(32)
-                .strafeTo(new Vector2d(7, 34))
+        trajPos1ToPark = BlueShort.actionBuilder(Yellow1Pos)
+                .strafeTo(ParkPos)
                 .build();
 
-        trajPos2ToPark = BlueShort.actionBuilder(new Pose2d(24,37,Math.toRadians(-92)))
-                .lineToY(32)
-                .strafeTo(new Vector2d(7, 34))
+        trajPos2ToPark = BlueShort.actionBuilder(Yellow2Pos)
+                .strafeTo(ParkPos)
                 .build();
 
-        trajPos3ToPark = BlueShort.actionBuilder(new Pose2d(30,37,Math.toRadians(-92)))
-                .lineToY(32)
-                .strafeTo(new Vector2d(7, 34))
+        trajPos3ToPark = BlueShort.actionBuilder(Yellow3Pos)
+                .strafeTo(ParkPos)
                 .build();
     }
 
