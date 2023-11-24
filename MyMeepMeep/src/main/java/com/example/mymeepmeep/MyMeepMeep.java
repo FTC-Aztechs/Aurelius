@@ -19,18 +19,19 @@ public class MyMeepMeep {
                         //Blue Long Pos 3
                         drive.trajectorySequenceBuilder(new Pose2d(0 + StartPos.getX(), 0 + StartPos.getY(), Math.toRadians(0) + StartPos.getHeading()))
                                 //purple
-                                .splineToLinearHeading(new Pose2d(-22 + StartPos.getX(), -28 + StartPos.getY(), Math.toRadians(90) + StartPos.getHeading()), Math.toRadians(-90))
+                                .setReversed(true)
+                                .splineToLinearHeading(new Pose2d(2 + StartPos.getX(), -28 + StartPos.getY(), Math.toRadians(90) + StartPos.getHeading()), Math.toRadians(-90))
                                 //strafe to in front of gate
-                                .strafeTo(new Vector2d(-22 + StartPos.getX(), -50  + StartPos.getY()))
+                                .setReversed(false)
+                                .strafeTo(new Vector2d(2 + StartPos.getX(), -50  + StartPos.getY()))
                                 //strafe through gate
                                 .lineToLinearHeading(new Pose2d(50 + StartPos.getX(), -50  + StartPos.getY(), Math.toRadians(90) + StartPos.getHeading()))
                                 //spline to board and turn around
-                                .splineToLinearHeading(new Pose2d(82 + StartPos.getX(), -33 + StartPos.getY(), Math.toRadians(-90) + StartPos.getHeading()), Math.toRadians(90))
+                                .splineToLinearHeading(new Pose2d(82 + StartPos.getX(), -22 + StartPos.getY(), Math.toRadians(-90) + StartPos.getHeading()), Math.toRadians(90))
                                 //park
                                 .strafeTo(new Vector2d(82 + StartPos.getX(), -50 + StartPos.getY()))
                                 .build()
                 );
-
         meepMeep.setBackground(MeepMeep.Background.FIELD_CENTERSTAGE_JUICE_DARK)
                 .setDarkMode(true)
                 .setBackgroundAlpha(0.95f)

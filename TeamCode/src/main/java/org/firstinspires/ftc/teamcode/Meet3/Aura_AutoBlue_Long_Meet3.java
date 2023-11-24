@@ -36,6 +36,7 @@ import static org.firstinspires.ftc.teamcode.Aura_DepositController.DepositState
 import static org.firstinspires.ftc.teamcode.Aura_DepositController.DepositState.Up;
 
 import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
@@ -73,6 +74,7 @@ import java.util.List;
  * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list
  */
 
+@Config
 @Autonomous(name="Blue_Long", group="Linear OpMode")
 
 public class Aura_AutoBlue_Long_Meet3 extends LinearOpMode {
@@ -81,14 +83,20 @@ public class Aura_AutoBlue_Long_Meet3 extends LinearOpMode {
 
     Pose2d StartPos = new Pose2d(0,0,0);
 
-    Pose2d Purple1Pos = new Pose2d(27, 19, Math.toRadians(-90));
-    Pose2d Purple2Pos = new Pose2d(37, 12, Math.toRadians(-90));
-    Pose2d Purple3Pos = new Pose2d(27, 0, Math.toRadians(-90));
+    Pose2d Purple1Pos = new Pose2d(28, 2, Math.toRadians(90));
+    Pose2d Purple2Pos = new Pose2d(36, -14, Math.toRadians(90));
+    Pose2d Purple3Pos = new Pose2d(26, -19, Math.toRadians(90));
 
-    Pose2d Yellow1Pos = new Pose2d(20, 37, Math.toRadians(-90));
-    Pose2d Yellow2Pos = new Pose2d(28, 37, Math.toRadians(-90));
-    Pose2d Yellow3Pos = new Pose2d(27,0,Math.toRadians(-90));
-    Vector2d ParkPos = new Vector2d(7, 37);
+    Vector2d BeforeGatePos1 = new Vector2d(50,2);
+    Vector2d BeforeGatePos2 = new Vector2d(50,-14);
+    Vector2d BeforeGatePos3 = new Vector2d(50,-19);
+    Vector2d AfterGatePos = new Vector2d(50,58);
+
+    Pose2d Yellow1Pos = new Pose2d(22, 82, Math.toRadians(-90));
+    Pose2d Yellow2Pos = new Pose2d(28, 82, Math.toRadians(-90));
+    Pose2d Yellow3Pos = new Pose2d(33, 82, Math.toRadians(-90));
+
+    Vector2d ParkPos = new Vector2d(50, 82);
 
     //************
 
@@ -98,6 +106,8 @@ public class Aura_AutoBlue_Long_Meet3 extends LinearOpMode {
     private static final double RIGHT_SPIKEMARK_BOUNDARY_X = 260;
 
     public static int PurpleDropOffPos = 0;
+    public static double SplineAngle = 0;
+    public static double TangentAngle = -70;
 
     AuraRobot Aurelius = new AuraRobot();
     MecanumDrive BlueLong;
@@ -229,7 +239,7 @@ public class Aura_AutoBlue_Long_Meet3 extends LinearOpMode {
 
         runtime.reset();
         if (opModeIsActive()) {
-            DetectPurpleDropoffPos();
+//            DetectPurpleDropoffPos();
             visionPortal.close();
 
             //TODO: Run Trajectories
@@ -244,7 +254,16 @@ public class Aura_AutoBlue_Long_Meet3 extends LinearOpMode {
                                             dropOffPurplePixel();
                                             return false;
                                         }
+                                    },
+                                    trajPos1Yellow,
+                                    new Action() {
+                                        @Override
+                                        public boolean run(TelemetryPacket tPkt) {
+                                            dropOffYellowPixel();
+                                            return false;
+                                        }
                                     }
+                                    ,trajPos1ToPark
                             ));
                     break;
                 case 2:
@@ -258,7 +277,16 @@ public class Aura_AutoBlue_Long_Meet3 extends LinearOpMode {
                                             dropOffPurplePixel();
                                             return false;
                                         }
-                                    }
+                                    },
+                                    trajPos2Yellow,
+                                    new Action() {
+                                        @Override
+                                        public boolean run(TelemetryPacket tPkt) {
+                                            dropOffYellowPixel();
+                                            return false;
+                                        }
+                                    },
+                                    trajPos2ToPark
                             ));
                     break;
                 case 3:
@@ -273,7 +301,16 @@ public class Aura_AutoBlue_Long_Meet3 extends LinearOpMode {
                                             dropOffPurplePixel();
                                             return false;
                                         }
-                                    }
+                                    },
+                                    trajPos3Yellow,
+                                    new Action() {
+                                        @Override
+                                        public boolean run(TelemetryPacket tPkt) {
+                                            dropOffYellowPixel();
+                                            return false;
+                                        }
+                                    },
+                                    trajPos3ToPark
                             ));
                     break;
             }
@@ -283,14 +320,17 @@ public class Aura_AutoBlue_Long_Meet3 extends LinearOpMode {
     void buildPurpleTrajectories()
     {
         trajPos1Purple = BlueLong.actionBuilder(StartPos)
-                .splineToLinearHeading(Purple1Pos, Math.toRadians(0))
+                .setTangent(Math.toRadians(0))
+                .splineToLinearHeading(Purple1Pos, Math.toRadians(30))
                 .build();
 
         trajPos2Purple = BlueLong.actionBuilder(StartPos)
+                .setTangent(Math.toRadians(-70))
                 .splineToLinearHeading(Purple2Pos, Math.toRadians(0))
                 .build();
 
         trajPos3Purple = BlueLong.actionBuilder(StartPos)
+                .setTangent(Math.toRadians(-70))
                 .splineToLinearHeading(Purple3Pos, Math.toRadians(0))
                 .build();
     }
@@ -298,17 +338,25 @@ public class Aura_AutoBlue_Long_Meet3 extends LinearOpMode {
     void buildYellowTrajectories()
     {
         trajPos1Yellow = BlueLong.actionBuilder(Purple1Pos)
-                .setReversed(true)
-                .splineToLinearHeading(Yellow1Pos, Math.toRadians(90))
+                .setReversed(false)
+                .strafeTo(BeforeGatePos1)
+                .strafeTo(AfterGatePos)
+                .splineToLinearHeading(Yellow3Pos, Math.toRadians(90))
+                .strafeTo(new Vector2d(Yellow1Pos.component1().x,Yellow1Pos.component1().y))
                 .build();
 
         trajPos2Yellow = BlueLong.actionBuilder(Purple2Pos)
-                .setReversed(true)
-                .splineToLinearHeading(Yellow2Pos, Math.toRadians(90))
+                .setReversed(false)
+                .strafeTo(BeforeGatePos2)
+                .strafeTo(AfterGatePos)
+                .splineToLinearHeading(Yellow3Pos, Math.toRadians(90))
+                .strafeTo(new Vector2d(Yellow2Pos.component1().x,Yellow2Pos.component1().y))
                 .build();
 
         trajPos3Yellow = BlueLong.actionBuilder(Purple3Pos)
-                .setReversed(true)
+                .setReversed(false)
+                .strafeTo(BeforeGatePos3)
+                .strafeTo(AfterGatePos)
                 .splineToLinearHeading(Yellow3Pos, Math.toRadians(90))
                 .build();
     }

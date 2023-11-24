@@ -89,7 +89,8 @@ public class Aura_AutoBlue_Short_Meet3 extends LinearOpMode {
 
     Pose2d Yellow1Pos = new Pose2d(20, 37, Math.toRadians(-90));
     Pose2d Yellow2Pos = new Pose2d(28, 37, Math.toRadians(-90));
-    Pose2d Yellow3Pos = new Pose2d(27,0,Math.toRadians(-90));
+    Pose2d Yellow3Pos = new Pose2d(33,37, Math.toRadians(-90));
+
     Vector2d ParkPos = new Vector2d(7, 37);
 
 
