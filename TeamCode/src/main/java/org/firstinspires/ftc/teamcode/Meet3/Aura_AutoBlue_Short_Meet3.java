@@ -229,7 +229,7 @@ public class Aura_AutoBlue_Short_Meet3 extends LinearOpMode {
 
         runtime.reset();
         if (opModeIsActive()) {
-//            DetectPurpleDropoffPos();
+            DetectPurpleDropoffPos();
             visionPortal.close();
 
             //TODO: Run Trajectories

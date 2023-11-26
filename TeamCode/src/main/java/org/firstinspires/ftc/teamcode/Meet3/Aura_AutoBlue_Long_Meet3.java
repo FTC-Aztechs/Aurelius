@@ -92,9 +92,9 @@ public class Aura_AutoBlue_Long_Meet3 extends LinearOpMode {
     Vector2d BeforeGatePos3 = new Vector2d(50,-19);
     Vector2d AfterGatePos = new Vector2d(50,58);
 
-    Pose2d Yellow1Pos = new Pose2d(22, 82, Math.toRadians(-90));
-    Pose2d Yellow2Pos = new Pose2d(28, 82, Math.toRadians(-90));
-    Pose2d Yellow3Pos = new Pose2d(33, 82, Math.toRadians(-90));
+    Pose2d Yellow1Pos = new Pose2d(22, 84, Math.toRadians(-90));
+    Pose2d Yellow2Pos = new Pose2d(28, 84, Math.toRadians(-90));
+    Pose2d Yellow3Pos = new Pose2d(33, 84, Math.toRadians(-90));
 
     Vector2d ParkPos = new Vector2d(50, 82);
 
@@ -239,7 +239,7 @@ public class Aura_AutoBlue_Long_Meet3 extends LinearOpMode {
 
         runtime.reset();
         if (opModeIsActive()) {
-//            DetectPurpleDropoffPos();
+            DetectPurpleDropoffPos();
             visionPortal.close();
 
             //TODO: Run Trajectories
