@@ -78,6 +78,11 @@ public class Aura_Sandbox extends LinearOpMode
     AuraRobot Aurelius = new AuraRobot();
     private static ElapsedTime timer_gp1_dpad_left = new ElapsedTime();
     private static ElapsedTime timer_gp1_dpad_right = new ElapsedTime();
+    private static ElapsedTime timer_gp2_x = new ElapsedTime();
+
+    private static ElapsedTime timer_qp2_y = new ElapsedTime();
+    private static ElapsedTime timer_qp2_a = new ElapsedTime();
+
     boolean changingWheelSpeed = false;
     public static int SANDBOX_MODE = 0;
 
@@ -364,6 +369,22 @@ public class Aura_Sandbox extends LinearOpMode
         Aurelius.Upper_Right.setPower((moveDir + strafeDir + turnDir) * (-speedAdjust / 10)); // 0
 
         return;
+    }
+
+    public void HangManual() {
+        if(gamepad2.x){
+            timer_gp2_x.reset();
+            if(timer_gp2_x.time(MILLISECONDS) > BUTTON_TRIGGER_TIMER_MS) {
+                Aurelius.hanger.setTargetState(AuraHangController.HangState.Idle);
+            }
+        } else if(gamepad2.y) {
+            timer_qp2_y.reset();
+            if (timer_qp2_y.time(MILLISECONDS) > BUTTON_TRIGGER_TIMER_MS) {
+                Aurelius.hanger.setTargetState(AuraHangController.HangState.Up);
+            } else if(gamepad2.a) {
+                Aurelius.hanger.setTargetState(AuraHangController.HangState.Hang);
+            }
+        }
     }
 
     private void logTelemetryToHTML() {

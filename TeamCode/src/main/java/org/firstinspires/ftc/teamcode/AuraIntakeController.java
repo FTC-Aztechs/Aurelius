@@ -37,6 +37,22 @@ public class AuraIntakeController {
     public void update(float speed) {
         //  Open -> Open: No-op
         //  Open -> Close: Close, update curr
+        //  Open -> Open: No-op
+        //  Open -> Close: Close, update curr
+
+        if (currState == targetState)
+            return;
+
+        switch (targetState) {
+            case OUT:
+                intakeMotor.setPower(speed);
+                currState = intakeState.OUT;
+                break;
+            case IN:
+                intakeMotor.setPower(-speed);
+                currState = intakeState.IN;
+                break;
+        }
 
         if (currState == targetState)
             return;

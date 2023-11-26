@@ -69,6 +69,7 @@ public class AuraRobot
     public AuraIntakeController noodleWash;
     public AuraLaunchController boeing747;
 
+    public AuraHangController hanger;
     public Aura_DepositController depositFlipper;
 
     public WebcamName Khimera = null;
@@ -113,6 +114,11 @@ public class AuraRobot
     public static int HighJunction   = 15400; // 15400
     public static int HighJunction_Auto = 15250;
     public static int UpperLimit     = 18000;
+
+    public static double HangExtend = 0;
+    public static double HangIdle = 0;
+    public static double HangRotate = 0;
+
 
    //------------------------------------------------------------
     //Roadrunner poses
@@ -175,7 +181,7 @@ public class AuraRobot
 
         noodleWash = new AuraIntakeController(hwMap);
         boeing747 = new AuraLaunchController(hwMap);
-
+        hanger = new AuraHangController(hwMap);
         depositFlipper = new Aura_DepositController(hwMap);
     }
     String formatAngle( AngleUnit angleUnit, double angle) {
