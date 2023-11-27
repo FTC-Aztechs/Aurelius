@@ -41,6 +41,8 @@ import static org.firstinspires.ftc.teamcode.AuraRobot.dPadIntakeAdjust;
 import static org.firstinspires.ftc.teamcode.AuraRobot.dPadSpeedAdjust;
 import static org.firstinspires.ftc.teamcode.AuraRobot.speedAdjust;
 
+import android.annotation.SuppressLint;
+
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
@@ -241,6 +243,7 @@ public class Aura_Manual extends LinearOpMode {
         Aurelius.setPower(AuraRobot.AuraMotors.INTAKE,(dPadIntakeAdjust/10)* gamepad2.right_stick_y);
     }
 
+    @SuppressLint("SuspiciousIndentation")
     public void AuraDeposit()
     {
         ElapsedTime timer = new ElapsedTime();

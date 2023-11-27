@@ -92,11 +92,11 @@ public class Aura_AutoBlue_Long_Meet3 extends LinearOpMode {
     Vector2d BeforeGatePos3 = new Vector2d(50,-19);
     Vector2d AfterGatePos = new Vector2d(50,58);
 
-    Pose2d Yellow1Pos = new Pose2d(22, 84, Math.toRadians(-90));
-    Pose2d Yellow2Pos = new Pose2d(28, 84, Math.toRadians(-90));
-    Pose2d Yellow3Pos = new Pose2d(33, 84, Math.toRadians(-90));
+    Pose2d Yellow1Pos = new Pose2d(14, 87, Math.toRadians(-90));
+    Pose2d Yellow2Pos = new Pose2d(28, 87, Math.toRadians(-90));
+    Pose2d Yellow3Pos = new Pose2d(33, 87, Math.toRadians(-90));
 
-    Vector2d ParkPos = new Vector2d(50, 82);
+    Vector2d ParkPos = new Vector2d(42, 82);
 
     //Roadrunner quick guide brought to you by Lavanya
 
@@ -352,6 +352,7 @@ public class Aura_AutoBlue_Long_Meet3 extends LinearOpMode {
     {
         trajPos1Yellow = BlueLong.actionBuilder(Purple1Pos)
                 .setReversed(false)
+                .lineToY(-2)
                 .strafeTo(BeforeGatePos1)
                 .strafeTo(AfterGatePos)
                 .splineToLinearHeading(Yellow3Pos, Math.toRadians(90))
