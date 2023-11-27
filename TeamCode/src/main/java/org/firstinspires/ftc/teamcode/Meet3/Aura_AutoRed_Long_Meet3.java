@@ -378,7 +378,7 @@ public class Aura_AutoRed_Long_Meet3 extends LinearOpMode {
     void dropOffPurplePixel()
     {
         runtime.reset();
-        while(runtime.seconds() < 1.2) {
+        while(runtime.seconds() < 0.8) {
             Aurelius.setPower(INTAKE, -0.2);
         }
         Aurelius.setPower(INTAKE, 0);

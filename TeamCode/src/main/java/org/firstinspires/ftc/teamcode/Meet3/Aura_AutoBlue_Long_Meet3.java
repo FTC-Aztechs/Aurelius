@@ -98,8 +98,21 @@ public class Aura_AutoBlue_Long_Meet3 extends LinearOpMode {
 
     Vector2d ParkPos = new Vector2d(50, 82);
 
-    //************
+    //Roadrunner quick guide brought to you by Lavanya
 
+    //x+ robot drives toward backdroo
+    //x- robot drives away from backdrop
+    //y- robot drives closer to starting wall
+    //y+ robot drives toward the center of the field
+
+    //tangent parameter in splines = changing angle changes the shape of the path
+    //setTangent() = changes the direction in which the robot initially starts to drive
+    //90 = to the left
+    //180 = to the back
+    //-90 = to the right
+    //0 = forward
+
+    //************
 
 
     private static final double LEFT_SPIKEMARK_BOUNDARY_X = 250;
@@ -378,7 +391,7 @@ public class Aura_AutoBlue_Long_Meet3 extends LinearOpMode {
     void dropOffPurplePixel()
     {
         runtime.reset();
-        while(runtime.seconds() < 1.2) {
+        while(runtime.seconds() < 0.8) {
             Aurelius.setPower(INTAKE, -0.2);
         }
         Aurelius.setPower(INTAKE, 0);
