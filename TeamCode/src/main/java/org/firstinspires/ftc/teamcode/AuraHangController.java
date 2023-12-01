@@ -1,9 +1,10 @@
 package org.firstinspires.ftc.teamcode;
 
 
+import static org.firstinspires.ftc.teamcode.AuraRobot.FunkyIdle;
+import static org.firstinspires.ftc.teamcode.AuraRobot.FunkyUp;
 import static org.firstinspires.ftc.teamcode.AuraRobot.HangExtend;
 import static org.firstinspires.ftc.teamcode.AuraRobot.HangIdle;
-import static org.firstinspires.ftc.teamcode.AuraRobot.HangRotate;
 
 
 import com.acmerobotics.dashboard.config.Config;
@@ -18,6 +19,8 @@ public class AuraHangController {
     public Servo hanger;
 
     public Servo funky;
+
+    private DcMotor hangMotor;
     enum HangState
     {
         Idle,
@@ -29,8 +32,11 @@ public class AuraHangController {
     Telemetry telemetry;
 
     public AuraHangController(HardwareMap hardwareMap) {
-        hanger = hardwareMap.get(Servo.class, "Hang");
+        hanger = hardwareMap.get(Servo.class, "Extend");
+        funky = hardwareMap.get(Servo.class, "Funky");
+        hangMotor = hardwareMap.get(DcMotor.class, "hangMotor");
         currState = AuraHangController.HangState.Idle;
+        targetState = HangState.Idle;
     }
 
     public void setTelemetry(Telemetry tele)
@@ -52,21 +58,22 @@ public class AuraHangController {
         //  Auto->Open: Open, update curr
         //  Auto->Close: Close, update curr
         //  Auto->Auto : Auto, update curr
-        if (currState == targetState)
+        if (currState != HangState.Idle && currState == targetState)
             return;
 
         switch (targetState) {
             case Hang:
-                hanger.setPosition(HangExtend);
-                currState = AuraHangController.HangState.Idle;
+
+                currState = AuraHangController.HangState.Hang;
                 break;
             case Up:
-                funky.setPosition(HangRotate);
+                hanger.setPosition(HangExtend);
+                funky.setPosition(FunkyUp);
                 currState = HangState.Up;
             case Idle:
                 hanger.setPosition(HangIdle);
-                funky.setPosition(0);
-                currState = AuraHangController.HangState.Hang;
+                funky.setPosition(FunkyIdle);
+                currState = AuraHangController.HangState.Idle;
                 break;
         }
 

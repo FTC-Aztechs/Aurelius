@@ -81,6 +81,7 @@ public class Aura_Sandbox extends LinearOpMode
     private static ElapsedTime timer_gp2_x = new ElapsedTime();
 
     private static ElapsedTime timer_qp2_y = new ElapsedTime();
+    private static ElapsedTime Timer_qp2_a = new ElapsedTime();
     private static ElapsedTime timer_qp2_a = new ElapsedTime();
 
     boolean changingWheelSpeed = false;
@@ -98,9 +99,10 @@ public class Aura_Sandbox extends LinearOpMode
     {
         ENCODER_TESTING,   // Default - prints encoder ticks.
         SMD_WHEEL_MOTOR_PROFILER,
-        SMD_INTAKE_OUTTAKE
+        SMD_INTAKE_OUTTAKE,
+        HANG
     }
-    public static SandboxMode sandboxMode = SandboxMode.ENCODER_TESTING;
+    public static SandboxMode sandboxMode = SandboxMode.HANG;
 
 //    MvrkVuforiaPoseEstimator vuforiaPoseEstimator = new MvrkVuforiaPoseEstimator(hardwareMap);
 
@@ -137,6 +139,9 @@ public class Aura_Sandbox extends LinearOpMode
             switch(sandboxMode) {
                 case SMD_INTAKE_OUTTAKE:
                     SandboxIntakeOuttake();
+                    break;
+                case HANG:
+                    HangManual();
                     break;
                 case SMD_WHEEL_MOTOR_PROFILER:
                     logFile = new File("/sdcard/FIRST/www/SandboxTelemetry.html");
@@ -381,10 +386,15 @@ public class Aura_Sandbox extends LinearOpMode
             timer_qp2_y.reset();
             if (timer_qp2_y.time(MILLISECONDS) > BUTTON_TRIGGER_TIMER_MS) {
                 Aurelius.hanger.setTargetState(AuraHangController.HangState.Up);
-            } else if(gamepad2.a) {
-                Aurelius.hanger.setTargetState(AuraHangController.HangState.Hang);
+
+            }
+         else if(gamepad2.a) {
+             timer_qp2_a.reset();
+                if(timer_qp2_a.time(MILLISECONDS) > BUTTON_TRIGGER_TIMER_MS);
+                    Aurelius.hanger.setTargetState(AuraHangController.HangState.Hang);
             }
         }
+        Aurelius.hanger.update();
     }
 
     private void logTelemetryToHTML() {

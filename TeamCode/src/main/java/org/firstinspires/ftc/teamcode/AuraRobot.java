@@ -115,9 +115,11 @@ public class AuraRobot
     public static int HighJunction_Auto = 15250;
     public static int UpperLimit     = 18000;
 
-    public static double HangExtend = 0;
+    public static double HangExtend = 0.3;
     public static double HangIdle = 0;
-    public static double HangRotate = 0;
+    public static double FunkyIdle = 0.9;
+
+    public static double FunkyUp = 0.57;
 
 
    //------------------------------------------------------------
