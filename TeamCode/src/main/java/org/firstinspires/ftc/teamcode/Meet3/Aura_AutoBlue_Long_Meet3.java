@@ -255,6 +255,11 @@ public class Aura_AutoBlue_Long_Meet3 extends LinearOpMode {
             DetectPurpleDropoffPos();
             visionPortal.close();
 
+            runtime.reset();
+            while (runtime.seconds() < 5) {
+                idle();
+            }
+
             //TODO: Run Trajectories
             switch (PurpleDropOffPos) {
                 case 1:
@@ -370,7 +375,7 @@ public class Aura_AutoBlue_Long_Meet3 extends LinearOpMode {
 
         trajPos3Yellow = BlueLong.actionBuilder(Purple3Pos)
                 .setReversed(false)
-                .lineToY(-23)
+                .lineToY(-21)
                 .strafeTo(BeforeGatePos3)
                 .strafeTo(AfterGatePos)
                 .splineToLinearHeading(Yellow3Pos, Math.toRadians(90))

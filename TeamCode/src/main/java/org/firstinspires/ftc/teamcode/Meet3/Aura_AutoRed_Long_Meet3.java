@@ -83,23 +83,22 @@ public class Aura_AutoRed_Long_Meet3 extends LinearOpMode {
 
     Pose2d StartPos = new Pose2d(0,0,0);
 
-    Pose2d Purple3Pos = new Pose2d(27, 0, Math.toRadians(-90));
+    Pose2d Purple1Pos = new Pose2d(28, 17, Math.toRadians(-90));
     Pose2d Purple2Pos = new Pose2d(37, 12, Math.toRadians(-90));
-    Pose2d Purple1Pos = new Pose2d(27, 19, Math.toRadians(-90));
+    Pose2d Purple3Pos = new Pose2d(27, 0, Math.toRadians(-90));
 
-    Vector2d BeforeGatePos3 = new Vector2d(50,4);
-    Vector2d BeforeGatePos2 = new Vector2d(50,16);
     Vector2d BeforeGatePos1 = new Vector2d(50,23);
+    Vector2d BeforeGatePos2 = new Vector2d(50,16);
+    Vector2d BeforeGatePos3 = new Vector2d(50,4);
     Vector2d AfterGatePos = new Vector2d(50,-58);
 
-    Pose2d Yellow3Pos = new Pose2d(14, -87.25, Math.toRadians(90));
-    Pose2d Yellow2Pos = new Pose2d(20, -87.25, Math.toRadians(90));
     Pose2d Yellow1Pos = new Pose2d(30, -87.25, Math.toRadians(90));
+    Pose2d Yellow2Pos = new Pose2d(20, -87.25, Math.toRadians(90));
+    Pose2d Yellow3Pos = new Pose2d(14, -87.25, Math.toRadians(90));
 
     Vector2d ParkPos = new Vector2d(50, -87.25);
 
     //************
-
 
 
     private static final double LEFT_SPIKEMARK_BOUNDARY_X = 250;
@@ -149,11 +148,11 @@ public class Aura_AutoRed_Long_Meet3 extends LinearOpMode {
      */
     // TFOD_MODEL_ASSET points to a model file stored in the project Asset location,
     // this is only used for Android Studio when using models in Assets.
-    private static final String TFOD_MODEL_ASSET = "myBloopy.tflite";
+    private static final String TFOD_MODEL_ASSET = "myRedpy.tflite";
 
     // TFOD_MODEL_FILE points to a model file stored onboard the Robot Controller's storage,
     // this is used when uploading models directly to the RC using the model upload interface.
-//    private static final String TFOD_MODEL_FILE = "C:\\Sashank\\FTC CenterStage\\Aurelius\\Aurelius\\TeamCode\\src\\main\\java\\org\\firstinspires\\ftc\\teamcode\\myBloopy.tflite";
+//    private static final String TFOD_MODEL_FILE = "C:\\Sashank\\FTC CenterStage\\Aurelius\\Aurelius\\TeamCode\\src\\main\\java\\org\\firstinspires\\ftc\\teamcode\\myRedpy.tflite";
 
     // Define the labels recognized in the model for TFOD (must be in training order!)
     private static final String[] LABELS = {
@@ -241,6 +240,11 @@ public class Aura_AutoRed_Long_Meet3 extends LinearOpMode {
         if (opModeIsActive()) {
             DetectPurpleDropoffPos();
             visionPortal.close();
+
+            runtime.reset();
+            while (runtime.seconds() < 5) {
+                idle();
+            }
 
             //TODO: Run Trajectories
             switch (PurpleDropOffPos) {
@@ -336,7 +340,7 @@ public class Aura_AutoRed_Long_Meet3 extends LinearOpMode {
     {
         trajPos1Yellow = RedLong.actionBuilder(Purple1Pos)
                 .setReversed(false)
-                .lineToY(23)
+                .lineToY(19)
                 .strafeTo(BeforeGatePos1)
                 .strafeTo(AfterGatePos)
                 .splineToLinearHeading(Yellow1Pos, Math.toRadians(-90))
