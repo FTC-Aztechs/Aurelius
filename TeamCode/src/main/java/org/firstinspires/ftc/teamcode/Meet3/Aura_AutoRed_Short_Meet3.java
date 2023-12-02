@@ -81,22 +81,23 @@ public class Aura_AutoRed_Short_Meet3 extends LinearOpMode {
 
     //**** Roadrunner Pose2ds ****
 
-    Pose2d StartPos = new Pose2d(0,0,180);
+    Pose2d StartPos = new Pose2d(0,0,0);
 
-    Pose2d Purple3Pos = new Pose2d(-27, 19, Math.toRadians(90));
-    Pose2d Purple2Pos = new Pose2d(-37, 12, Math.toRadians(90));
-    Pose2d Purple1Pos = new Pose2d(-27, 0, Math.toRadians(90));
+    Pose2d Purple1Pos = new Pose2d(28, 2, Math.toRadians(90));
+    Pose2d Purple2Pos = new Pose2d(36, -12, Math.toRadians(90));
+    Pose2d Purple3Pos = new Pose2d(28, -19, Math.toRadians(90));
 
-    Pose2d Yellow3Pos = new Pose2d(-20, 37, Math.toRadians(90));
-    Pose2d Yellow2Pos = new Pose2d(-28, 37, Math.toRadians(90));
-    Pose2d Yellow1Pos = new Pose2d(-33,37, Math.toRadians(90));
+    Pose2d Yellow3Pos = new Pose2d(20, -37, Math.toRadians(90));
+    Pose2d Yellow2Pos = new Pose2d(28, -37, Math.toRadians(90));
+    Pose2d Yellow1Pos = new Pose2d(33,-37, Math.toRadians(90));
 
-    Vector2d ParkPos = new Vector2d(-7, 37);
+    Vector2d ParkPos = new Vector2d(7, -37);
 
 
     private static final double LEFT_SPIKEMARK_BOUNDARY_X = 250;
     private static final double RIGHT_SPIKEMARK_BOUNDARY_X = 260;
 
+    public static double SplineAngle = 90;
     public static int PurpleDropOffPos = 0;
 
     AuraRobot Aurelius = new AuraRobot();
@@ -139,12 +140,11 @@ public class Aura_AutoRed_Short_Meet3 extends LinearOpMode {
      */
     // TFOD_MODEL_ASSET points to a model file stored in the project Asset location,
     // this is only used for Android Studio when using models in Assets.
-    private static final String TFOD_MODEL_ASSET = "myBloopy.tflite";
+    private static final String TFOD_MODEL_ASSET = "myRedpy.tflite";
 
     // TFOD_MODEL_FILE points to a model file stored onboard the Robot Controller's storage,
     // this is used when uploading models directly to the RC using the model upload interface.
 //    private static final String TFOD_MODEL_FILE = "C:\\Sashank\\FTC CenterStage\\Aurelius\\Aurelius\\TeamCode\\src\\main\\java\\org\\firstinspires\\ftc\\teamcode\\myBloopy.tflite";
-
     // Define the labels recognized in the model for TFOD (must be in training order!)
     private static final String[] LABELS = {
             "Pixel",
@@ -192,7 +192,7 @@ public class Aura_AutoRed_Short_Meet3 extends LinearOpMode {
         //   Option 3: Ditch the VisionProcessor and use EasyOpenCV directly
 
         Aurelius.init(hardwareMap);
-        RedShort = new MecanumDrive(Aurelius.hwMap, new Pose2d(0,0,0));
+        RedShort = new MecanumDrive(Aurelius.hwMap, new Pose2d(0,0,Math.toRadians(0)));
         ElapsedTime trajectoryTimer = new ElapsedTime(MILLISECONDS);
 
         auraBoard = FtcDashboard.getInstance();
@@ -310,15 +310,18 @@ public class Aura_AutoRed_Short_Meet3 extends LinearOpMode {
     void buildPurpleTrajectories()
     {
         trajPos1Purple = RedShort.actionBuilder(StartPos)
-                .splineToLinearHeading(Purple1Pos, Math.toRadians(180))
+                .setTangent(Math.toRadians(0))
+                .splineToLinearHeading(Purple1Pos, Math.toRadians(30))
                 .build();
 
         trajPos2Purple = RedShort.actionBuilder(StartPos)
-                .splineToLinearHeading(Purple2Pos, Math.toRadians(180))
+                .setTangent(Math.toRadians(-70))
+                .splineToLinearHeading(Purple2Pos, Math.toRadians(0))
                 .build();
 
         trajPos3Purple = RedShort.actionBuilder(StartPos)
-                .splineToLinearHeading(Purple3Pos, Math.toRadians(180))
+                .setTangent(Math.toRadians(-70))
+                .splineToLinearHeading(Purple3Pos, Math.toRadians(0))
                 .build();
     }
 

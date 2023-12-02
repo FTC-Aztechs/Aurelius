@@ -81,22 +81,22 @@ public class Aura_AutoRed_Long_Meet3 extends LinearOpMode {
 
     //**** Roadrunner Pose2ds ****
 
-    Pose2d StartPos = new Pose2d(0,0,180);
+    Pose2d StartPos = new Pose2d(0,0,0);
 
-    Pose2d Purple3Pos = new Pose2d(-28, 2, Math.toRadians(-90));
-    Pose2d Purple2Pos = new Pose2d(-36, -14, Math.toRadians(-90));
-    Pose2d Purple1Pos = new Pose2d(-26, -19, Math.toRadians(-90));
+    Pose2d Purple3Pos = new Pose2d(27, 0, Math.toRadians(-90));
+    Pose2d Purple2Pos = new Pose2d(37, 12, Math.toRadians(-90));
+    Pose2d Purple1Pos = new Pose2d(27, 19, Math.toRadians(-90));
 
-    Vector2d BeforeGatePos3 = new Vector2d(-50,2);
-    Vector2d BeforeGatePos2 = new Vector2d(-50,-14);
-    Vector2d BeforeGatePos1 = new Vector2d(-50,-19);
-    Vector2d AfterGatePos = new Vector2d(-50,58);
+    Vector2d BeforeGatePos3 = new Vector2d(50,4);
+    Vector2d BeforeGatePos2 = new Vector2d(50,16);
+    Vector2d BeforeGatePos1 = new Vector2d(50,23);
+    Vector2d AfterGatePos = new Vector2d(50,-58);
 
-    Pose2d Yellow3Pos = new Pose2d(-22, 84, Math.toRadians(90));
-    Pose2d Yellow2Pos = new Pose2d(-28, 84, Math.toRadians(90));
-    Pose2d Yellow1Pos = new Pose2d(-33, 84, Math.toRadians(90));
+    Pose2d Yellow3Pos = new Pose2d(14, -87.25, Math.toRadians(90));
+    Pose2d Yellow2Pos = new Pose2d(20, -87.25, Math.toRadians(90));
+    Pose2d Yellow1Pos = new Pose2d(30, -87.25, Math.toRadians(90));
 
-    Vector2d ParkPos = new Vector2d(-50, 82);
+    Vector2d ParkPos = new Vector2d(50, -87.25);
 
     //************
 
@@ -262,8 +262,8 @@ public class Aura_AutoRed_Long_Meet3 extends LinearOpMode {
                                             dropOffYellowPixel();
                                             return false;
                                         }
-                                    }
-                                    , trajPos1ToPark
+                                    },
+                                    trajPos1ToPark
                             ));
                     break;
                 case 2:
@@ -320,18 +320,15 @@ public class Aura_AutoRed_Long_Meet3 extends LinearOpMode {
     void buildPurpleTrajectories()
     {
         trajPos1Purple = RedLong.actionBuilder(StartPos)
-                .setTangent(Math.toRadians(70))
-                .splineToLinearHeading(Purple1Pos, Math.toRadians(180))
+                .splineToLinearHeading(Purple1Pos, Math.toRadians(0))
                 .build();
 
         trajPos2Purple = RedLong.actionBuilder(StartPos)
-                .setTangent(Math.toRadians(70))
-                .splineToLinearHeading(Purple2Pos, Math.toRadians(180))
+                .splineToLinearHeading(Purple2Pos, Math.toRadians(0))
                 .build();
 
         trajPos3Purple = RedLong.actionBuilder(StartPos)
-                .setTangent(Math.toRadians(180))
-                .splineToLinearHeading(Purple3Pos, Math.toRadians(-30))
+                .splineToLinearHeading(Purple3Pos, Math.toRadians(0))
                 .build();
     }
 
@@ -339,13 +336,16 @@ public class Aura_AutoRed_Long_Meet3 extends LinearOpMode {
     {
         trajPos1Yellow = RedLong.actionBuilder(Purple1Pos)
                 .setReversed(false)
+                .lineToY(23)
                 .strafeTo(BeforeGatePos1)
                 .strafeTo(AfterGatePos)
                 .splineToLinearHeading(Yellow1Pos, Math.toRadians(-90))
+                .strafeTo(new Vector2d(Yellow1Pos.component1().x,Yellow1Pos.component1().y))
                 .build();
 
         trajPos2Yellow = RedLong.actionBuilder(Purple2Pos)
                 .setReversed(false)
+                .lineToY(16)
                 .strafeTo(BeforeGatePos2)
                 .strafeTo(AfterGatePos)
                 .splineToLinearHeading(Yellow1Pos, Math.toRadians(-90))
@@ -354,6 +354,7 @@ public class Aura_AutoRed_Long_Meet3 extends LinearOpMode {
 
         trajPos3Yellow = RedLong.actionBuilder(Purple3Pos)
                 .setReversed(false)
+                .lineToY(4)
                 .strafeTo(BeforeGatePos3)
                 .strafeTo(AfterGatePos)
                 .splineToLinearHeading(Yellow1Pos, Math.toRadians(-90))

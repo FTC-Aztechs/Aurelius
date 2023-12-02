@@ -85,25 +85,25 @@ public class Aura_AutoBlue_Long_Meet3 extends LinearOpMode {
 
     Pose2d Purple1Pos = new Pose2d(28, 2, Math.toRadians(90));
     Pose2d Purple2Pos = new Pose2d(36, -14, Math.toRadians(90));
-    Pose2d Purple3Pos = new Pose2d(26, -19, Math.toRadians(90));
+    Pose2d Purple3Pos = new Pose2d(28, -19, Math.toRadians(90));
 
     Vector2d BeforeGatePos1 = new Vector2d(50,2);
     Vector2d BeforeGatePos2 = new Vector2d(50,-14);
     Vector2d BeforeGatePos3 = new Vector2d(50,-19);
-    Vector2d AfterGatePos = new Vector2d(50,58);
+    Vector2d AfterGatePos = new Vector2d(45,58);
 
-    Pose2d Yellow1Pos = new Pose2d(14, 87, Math.toRadians(-90));
-    Pose2d Yellow2Pos = new Pose2d(28, 87, Math.toRadians(-90));
-    Pose2d Yellow3Pos = new Pose2d(33, 87, Math.toRadians(-90));
+    Pose2d Yellow1Pos = new Pose2d(15, 88, Math.toRadians(-90));
+    Pose2d Yellow2Pos = new Pose2d(20, 87.25, Math.toRadians(-90));
+    Pose2d Yellow3Pos = new Pose2d(30, 87.25, Math.toRadians(-90));
 
     Vector2d ParkPos = new Vector2d(42, 82);
 
     //Roadrunner quick guide brought to you by Lavanya
 
-    //x+ robot drives toward backdroo
-    //x- robot drives away from backdrop
-    //y- robot drives closer to starting wall
-    //y+ robot drives toward the center of the field
+    //y+ robot drives toward backdroo
+    //y- robot drives away from backdrop
+    //x- robot drives closer to starting wall
+    //x+ robot drives toward the center of the field
 
     //tangent parameter in splines = changing angle changes the shape of the path
     //setTangent() = changes the direction in which the robot initially starts to drive
@@ -361,6 +361,7 @@ public class Aura_AutoBlue_Long_Meet3 extends LinearOpMode {
 
         trajPos2Yellow = BlueLong.actionBuilder(Purple2Pos)
                 .setReversed(false)
+                .lineToY(-18)
                 .strafeTo(BeforeGatePos2)
                 .strafeTo(AfterGatePos)
                 .splineToLinearHeading(Yellow3Pos, Math.toRadians(90))
@@ -369,6 +370,7 @@ public class Aura_AutoBlue_Long_Meet3 extends LinearOpMode {
 
         trajPos3Yellow = BlueLong.actionBuilder(Purple3Pos)
                 .setReversed(false)
+                .lineToY(-23)
                 .strafeTo(BeforeGatePos3)
                 .strafeTo(AfterGatePos)
                 .splineToLinearHeading(Yellow3Pos, Math.toRadians(90))

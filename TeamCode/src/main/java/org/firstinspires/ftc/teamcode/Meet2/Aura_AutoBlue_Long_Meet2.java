@@ -270,6 +270,7 @@ public class Aura_AutoBlue_Long_Meet2 extends LinearOpMode {
                 .turn(Math.toRadians(60))
                 .lineToXConstantHeading(22.5)
                 .build();
+        BlueLong.updatePoseEstimate();
 
         trajPos2Purple = BlueLong.actionBuilder(new Pose2d(0,0,0))
                 .lineToXConstantHeading(24)

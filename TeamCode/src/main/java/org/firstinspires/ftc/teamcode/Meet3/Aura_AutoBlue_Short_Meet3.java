@@ -95,10 +95,10 @@ public class Aura_AutoBlue_Short_Meet3 extends LinearOpMode {
 
     //Roadrunner quick guide brought to you by Lavanya
 
-    //x+ robot drives toward backdroo
-    //x- robot drives away from backdrop
-    //y- robot drives closer to starting wall
-    //y+ robot drives toward the center of the field
+    //y+ robot drives toward backdroo
+    //y- robot drives away from backdrop
+    //x- robot drives closer to starting wall
+    //x+ robot drives toward the center of the field
 
     //tangent parameter in splines = changing angle changes the shape of the path
     //setTangent() = changes the direction in which the robot initially starts to drive
