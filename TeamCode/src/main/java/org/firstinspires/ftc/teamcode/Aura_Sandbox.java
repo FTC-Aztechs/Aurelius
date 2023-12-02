@@ -80,11 +80,12 @@ public class Aura_Sandbox extends LinearOpMode
     private static ElapsedTime timer_gp1_dpad_right = new ElapsedTime();
     private static ElapsedTime timer_gp2_x = new ElapsedTime();
 
-    private static ElapsedTime timer_qp2_y = new ElapsedTime();
-    private static ElapsedTime Timer_qp2_a = new ElapsedTime();
-    private static ElapsedTime timer_qp2_a = new ElapsedTime();
+    private static ElapsedTime timer_gp2_y = new ElapsedTime();
+    private static ElapsedTime timer_gp2_a = new ElapsedTime();
 
     boolean changingWheelSpeed = false;
+
+    boolean changingState = false;
     public static int SANDBOX_MODE = 0;
 
     public static int Smd_profileTime = 5000;
@@ -377,21 +378,35 @@ public class Aura_Sandbox extends LinearOpMode
     }
 
     public void HangManual() {
-        if(gamepad2.x){
-            timer_gp2_x.reset();
-            if(timer_gp2_x.time(MILLISECONDS) > BUTTON_TRIGGER_TIMER_MS) {
+        if(gamepad2.x) {
+            if (!changingState) {
+                timer_gp2_x.reset();
+                changingState = true;
+            } else if (timer_gp2_x.time(MILLISECONDS) > BUTTON_TRIGGER_TIMER_MS) {
                 Aurelius.hanger.setTargetState(AuraHangController.HangState.Idle);
+                telemetry.addData("State ", " Idle");
+                changingState = false;
             }
-        } else if(gamepad2.y) {
-            timer_qp2_y.reset();
-            if (timer_qp2_y.time(MILLISECONDS) > BUTTON_TRIGGER_TIMER_MS) {
+        }
+        if (gamepad2.y) {
+            if (!changingState) {
+                timer_gp2_y.reset();
+                changingState = true;
+            } else if (timer_gp2_y.time(MILLISECONDS) > BUTTON_TRIGGER_TIMER_MS) {
                 Aurelius.hanger.setTargetState(AuraHangController.HangState.Up);
-
+                telemetry.addData("State ", " Up");
+                changingState = false;
             }
-         else if(gamepad2.a) {
-             timer_qp2_a.reset();
-                if(timer_qp2_a.time(MILLISECONDS) > BUTTON_TRIGGER_TIMER_MS);
-                    Aurelius.hanger.setTargetState(AuraHangController.HangState.Hang);
+        }
+        if (gamepad2.a) {
+            if (!changingState) {
+                timer_gp2_a.reset();
+                changingState = true;
+            } else if (timer_gp2_a.time(MILLISECONDS) > BUTTON_TRIGGER_TIMER_MS) {
+                Aurelius.hanger.setTargetState(AuraHangController.HangState.Hang);
+                telemetry.addData("State ", " Hang");
+
+                changingState = false;
             }
         }
         Aurelius.hanger.update();

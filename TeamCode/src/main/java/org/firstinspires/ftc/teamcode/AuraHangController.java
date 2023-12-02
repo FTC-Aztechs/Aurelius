@@ -5,6 +5,8 @@ import static org.firstinspires.ftc.teamcode.AuraRobot.FunkyIdle;
 import static org.firstinspires.ftc.teamcode.AuraRobot.FunkyUp;
 import static org.firstinspires.ftc.teamcode.AuraRobot.HangExtend;
 import static org.firstinspires.ftc.teamcode.AuraRobot.HangIdle;
+import static org.firstinspires.ftc.teamcode.AuraRobot.motorTicks;
+import static org.firstinspires.ftc.teamcode.AuraRobot.numRotations;
 
 
 import com.acmerobotics.dashboard.config.Config;
@@ -35,6 +37,7 @@ public class AuraHangController {
         hanger = hardwareMap.get(Servo.class, "Extend");
         funky = hardwareMap.get(Servo.class, "Funky");
         hangMotor = hardwareMap.get(DcMotor.class, "hangMotor");
+        hangMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         currState = AuraHangController.HangState.Idle;
         targetState = HangState.Idle;
     }
@@ -63,13 +66,17 @@ public class AuraHangController {
 
         switch (targetState) {
             case Hang:
-
+//                telemetry.addData("MOTOR TICKS",(int)Math.floor(numRotations * motorTicks));
+                hangMotor.setTargetPosition((int)Math.floor(numRotations * motorTicks));
+                hangMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                hangMotor.setPower(1);
                 currState = AuraHangController.HangState.Hang;
                 break;
             case Up:
                 hanger.setPosition(HangExtend);
                 funky.setPosition(FunkyUp);
                 currState = HangState.Up;
+                break;
             case Idle:
                 hanger.setPosition(HangIdle);
                 funky.setPosition(FunkyIdle);

@@ -65,6 +65,8 @@ public class Aura_Manual extends LinearOpMode {
     private boolean changingIntakeSpeed = false;
     private boolean changingLauncherSpeed = false;
 
+    private boolean changingState = false;
+
 
     private int slide_currentPos = 0;
     private int slide_newPos = slide_currentPos;
@@ -87,6 +89,11 @@ public class Aura_Manual extends LinearOpMode {
     private static ElapsedTime timer_gp2_buttonB = new ElapsedTime(MILLISECONDS);
     private static ElapsedTime timer_gp1_dpad_left = new ElapsedTime(MILLISECONDS);
     private static ElapsedTime timer_gp1_dpad_right = new ElapsedTime(MILLISECONDS);
+
+    private static ElapsedTime timer_gp2_x = new ElapsedTime(MILLISECONDS);
+
+    private static ElapsedTime timer_gp2_y = new ElapsedTime(MILLISECONDS);
+    private static ElapsedTime timer_gp2_a = new ElapsedTime(MILLISECONDS);
     private static ElapsedTime timer_gp2_dpad_up = new ElapsedTime(MILLISECONDS);
     private static ElapsedTime timer_gp2_dpad_down = new ElapsedTime(MILLISECONDS);
     //    private static ElapsedTime timer_gp2_buttonA = new ElapsedTime(MILLISECONDS);
@@ -130,6 +137,7 @@ public class Aura_Manual extends LinearOpMode {
             AuraIntake();
             AuraLauncher();
             AuraManualDrive();
+            AuraManualHang();
             //AuraDeposit();
             telemetry.addLine("Drive Mode: Forward Facing");
             telemetry.update();
@@ -204,6 +212,41 @@ public class Aura_Manual extends LinearOpMode {
         Aurelius.Upper_Right.setPower((moveDir + strafeDir + turnDir) * (-speedAdjust / 10)); // 0
 
         return;
+    }
+
+    public void AuraManualHang() {
+        if(gamepad2.x) {
+            if (!changingState) {
+                timer_gp2_x.reset();
+                changingState = true;
+            } else if (timer_gp2_x.time(TimeUnit.MILLISECONDS) > BUTTON_TRIGGER_TIMER_MS) {
+                Aurelius.hanger.setTargetState(AuraHangController.HangState.Idle);
+                telemetry.addData("State ", " Idle");
+                changingState = false;
+            }
+        }
+        if (gamepad2.y) {
+            if (!changingState) {
+                timer_gp2_y.reset();
+                changingState = true;
+            } else if (timer_gp2_y.time(TimeUnit.MILLISECONDS) > BUTTON_TRIGGER_TIMER_MS) {
+                Aurelius.hanger.setTargetState(AuraHangController.HangState.Up);
+                telemetry.addData("State ", " Up");
+                changingState = false;
+            }
+        }
+        if (gamepad2.a) {
+            if (!changingState) {
+                timer_gp2_a.reset();
+                changingState = true;
+            } else if (timer_gp2_a.time(TimeUnit.MILLISECONDS) > BUTTON_TRIGGER_TIMER_MS) {
+                Aurelius.hanger.setTargetState(AuraHangController.HangState.Hang);
+                telemetry.addData("State ", " Hang");
+
+                changingState = false;
+            }
+        }
+        Aurelius.hanger.update();
     }
 
     public void AuraIntake() {

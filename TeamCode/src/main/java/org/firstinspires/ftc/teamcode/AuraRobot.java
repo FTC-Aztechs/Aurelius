@@ -52,7 +52,7 @@ public class AuraRobot
         UPPER_RIGHT,
         LOWER_RIGHT,
         INTAKE,
-        CAT_MOUSE,
+        HANG,
         ALL_DRIVES,
         ALL_ATTACHMENTS,
         ALL
@@ -97,7 +97,10 @@ public class AuraRobot
     public static final float halfField        = 72 * mmPerInch;
     public static final float halfTile         = 12 * mmPerInch;
     public static final float oneAndHalfTile   = 36 * mmPerInch;
-    
+
+
+    public static double motorTicks  = 537.7;
+    public static double numRotations = 20;
 
     //claw variables
     public static double Launcher_Set_Pos = 0;
