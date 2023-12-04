@@ -31,6 +31,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.Pose2d;
+import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
@@ -74,6 +75,9 @@ public class AuraRobot
 
     public WebcamName Khimera = null;
     OpenCvWebcam Sauron = null;
+
+    public static BNO055IMU imu = null;
+
 
     // speeds/times
     public static double UpAdjust = 10;

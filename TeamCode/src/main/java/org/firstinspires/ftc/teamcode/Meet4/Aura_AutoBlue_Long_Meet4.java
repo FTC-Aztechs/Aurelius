@@ -27,7 +27,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.firstinspires.ftc.teamcode.Meet3;
+package org.firstinspires.ftc.teamcode.Meet4;
 
 import static com.qualcomm.robotcore.util.ElapsedTime.Resolution.MILLISECONDS;
 import static org.firstinspires.ftc.teamcode.AuraRobot.AuraMotors.INTAKE;
@@ -75,32 +75,44 @@ import java.util.List;
  */
 
 @Config
-@Autonomous(name="Red_Long3", group="Linear OpMode")
+@Autonomous(name="Blue_Long", group="Linear OpMode")
 
-public class Aura_AutoRed_Long_Meet3 extends LinearOpMode {
+public class Aura_AutoBlue_Long_Meet4 extends LinearOpMode {
 
     //**** Roadrunner Pose2ds ****
 
     Pose2d StartPos = new Pose2d(0,0,0);
 
-    Pose2d Purple1Pos = new Pose2d(27, 19, Math.toRadians(-90));
-    Pose2d Purple2Pos = new Pose2d(37, 12, Math.toRadians(-90));
+    Pose2d Purple1Pos = new Pose2d(28, 2, Math.toRadians(90));
+    Pose2d Purple2Pos = new Pose2d(36, -14, Math.toRadians(90));
+    Pose2d Purple3Pos = new Pose2d(28, -19, Math.toRadians(90));
 
-    Pose2d Purple3Pos = new Pose2d(27, 0, Math.toRadians(-90));
+    Vector2d BeforeGatePos1 = new Vector2d(50,2);
+    Vector2d BeforeGatePos2 = new Vector2d(50,-14);
+    Vector2d BeforeGatePos3 = new Vector2d(50,-19);
+    Vector2d AfterGatePos = new Vector2d(45,58);
 
-    Vector2d BeforeGatePos3 = new Vector2d(50,4);
-    Vector2d BeforeGatePos2 = new Vector2d(50,16);
-    Vector2d BeforeGatePos1 = new Vector2d(50,23);
-    Vector2d AfterGatePos = new Vector2d(50,-58);
+    Pose2d Yellow1Pos = new Pose2d(15, 88, Math.toRadians(-90));
+    Pose2d Yellow2Pos = new Pose2d(20, 87.25, Math.toRadians(-90));
+    Pose2d Yellow3Pos = new Pose2d(30, 87.25, Math.toRadians(-90));
 
-    Pose2d Yellow3Pos = new Pose2d(14, -87.25, Math.toRadians(90));
-    Pose2d Yellow2Pos = new Pose2d(20, -87.25, Math.toRadians(90));
-    Pose2d Yellow1Pos = new Pose2d(30, -87.25, Math.toRadians(90));
+    Vector2d ParkPos = new Vector2d(42, 82);
 
-    Vector2d ParkPos = new Vector2d(50, -87.25);
+    //Roadrunner quick guide brought to you by Lavanya
+
+    //y+ robot drives toward backdroo
+    //y- robot drives away from backdrop
+    //x- robot drives closer to starting wall
+    //x+ robot drives toward the center of the field
+
+    //tangent parameter in splines = changing angle changes the shape of the path
+    //setTangent() = changes the direction in which the robot initially starts to drive
+    //90 = to the left
+    //180 = to the back
+    //-90 = to the right
+    //0 = forward
 
     //************
-
 
 
     private static final double LEFT_SPIKEMARK_BOUNDARY_X = 250;
@@ -111,7 +123,7 @@ public class Aura_AutoRed_Long_Meet3 extends LinearOpMode {
     public static double TangentAngle = -70;
 
     AuraRobot Aurelius = new AuraRobot();
-    MecanumDrive RedLong;
+    MecanumDrive BlueLong;
 
     private static FtcDashboard auraBoard;
 
@@ -150,11 +162,11 @@ public class Aura_AutoRed_Long_Meet3 extends LinearOpMode {
      */
     // TFOD_MODEL_ASSET points to a model file stored in the project Asset location,
     // this is only used for Android Studio when using models in Assets.
-    private static final String TFOD_MODEL_ASSET = "myRedpy.tflite";
+    private static final String TFOD_MODEL_ASSET = "myBloopy.tflite";
 
     // TFOD_MODEL_FILE points to a model file stored onboard the Robot Controller's storage,
     // this is used when uploading models directly to the RC using the model upload interface.
-//    private static final String TFOD_MODEL_FILE = "C:\\Sashank\\FTC CenterStage\\Aurelius\\Aurelius\\TeamCode\\src\\main\\java\\org\\firstinspires\\ftc\\teamcode\\myRedpy.tflite";
+//    private static final String TFOD_MODEL_FILE = "C:\\Sashank\\FTC CenterStage\\Aurelius\\Aurelius\\TeamCode\\src\\main\\java\\org\\firstinspires\\ftc\\teamcode\\myBloopy.tflite";
 
     // Define the labels recognized in the model for TFOD (must be in training order!)
     private static final String[] LABELS = {
@@ -172,19 +184,19 @@ public class Aura_AutoRed_Long_Meet3 extends LinearOpMode {
 
     // TODO: define trajectory variables here
     // Purple Trajectories
-    private Action trajPos3Purple;
-    private Action trajPos2Purple;
     private Action trajPos1Purple;
+    private Action trajPos2Purple;
+    private Action trajPos3Purple;
 
     // Yellow Trajectories
-    private Action trajPos3Yellow;
-    private Action trajPos2Yellow;
     private Action trajPos1Yellow;
+    private Action trajPos2Yellow;
+    private Action trajPos3Yellow;
 
     // Park Trajectories
-    private Action trajPos3ToPark;
-    private Action trajPos2ToPark;
     private Action trajPos1ToPark;
+    private Action trajPos2ToPark;
+    private Action trajPos3ToPark;
 
     private ElapsedTime runtime = new ElapsedTime();
 
@@ -203,7 +215,7 @@ public class Aura_AutoRed_Long_Meet3 extends LinearOpMode {
         //   Option 3: Ditch the VisionProcessor and use EasyOpenCV directly
 
         Aurelius.init(hardwareMap);
-        RedLong = new MecanumDrive(Aurelius.hwMap, new Pose2d(0,0,0));
+        BlueLong = new MecanumDrive(Aurelius.hwMap, new Pose2d(0,0,0));
         ElapsedTime trajectoryTimer = new ElapsedTime(MILLISECONDS);
 
         auraBoard = FtcDashboard.getInstance();
@@ -243,6 +255,11 @@ public class Aura_AutoRed_Long_Meet3 extends LinearOpMode {
             DetectPurpleDropoffPos();
             visionPortal.close();
 
+            runtime.reset();
+            while (runtime.seconds() < 5) {
+                idle();
+            }
+
             //TODO: Run Trajectories
             switch (PurpleDropOffPos) {
                 case 1:
@@ -263,8 +280,8 @@ public class Aura_AutoRed_Long_Meet3 extends LinearOpMode {
                                             dropOffYellowPixel();
                                             return false;
                                         }
-                                    },
-                                    trajPos1ToPark
+                                    }
+                                    ,trajPos1ToPark
                             ));
                     break;
                 case 2:
@@ -320,60 +337,62 @@ public class Aura_AutoRed_Long_Meet3 extends LinearOpMode {
 
     void buildPurpleTrajectories()
     {
-        trajPos1Purple = RedLong.actionBuilder(StartPos)
-                .splineToLinearHeading(Purple1Pos, Math.toRadians(0))
+        trajPos1Purple = BlueLong.actionBuilder(StartPos)
+                .setTangent(Math.toRadians(0))
+                .splineToLinearHeading(Purple1Pos, Math.toRadians(30))
                 .build();
 
-        trajPos2Purple = RedLong.actionBuilder(StartPos)
+        trajPos2Purple = BlueLong.actionBuilder(StartPos)
+                .setTangent(Math.toRadians(-70))
                 .splineToLinearHeading(Purple2Pos, Math.toRadians(0))
                 .build();
 
-        trajPos3Purple = RedLong.actionBuilder(StartPos)
+        trajPos3Purple = BlueLong.actionBuilder(StartPos)
+                .setTangent(Math.toRadians(-70))
                 .splineToLinearHeading(Purple3Pos, Math.toRadians(0))
                 .build();
     }
 
     void buildYellowTrajectories()
     {
-        trajPos1Yellow = RedLong.actionBuilder(Purple1Pos)
+        trajPos1Yellow = BlueLong.actionBuilder(Purple1Pos)
                 .setReversed(false)
-                .lineToY(23)
+                .lineToY(-2)
                 .strafeTo(BeforeGatePos1)
                 .strafeTo(AfterGatePos)
-                .splineToLinearHeading(Yellow1Pos, Math.toRadians(-90))
+                .splineToLinearHeading(Yellow3Pos, Math.toRadians(90))
                 .strafeTo(new Vector2d(Yellow1Pos.component1().x,Yellow1Pos.component1().y))
                 .build();
 
-        trajPos2Yellow = RedLong.actionBuilder(Purple2Pos)
+        trajPos2Yellow = BlueLong.actionBuilder(Purple2Pos)
                 .setReversed(false)
-                .lineToY(16)
+                .lineToY(-18)
                 .strafeTo(BeforeGatePos2)
                 .strafeTo(AfterGatePos)
-                .splineToLinearHeading(Yellow1Pos, Math.toRadians(-90))
+                .splineToLinearHeading(Yellow3Pos, Math.toRadians(90))
                 .strafeTo(new Vector2d(Yellow2Pos.component1().x,Yellow2Pos.component1().y))
                 .build();
 
-        trajPos3Yellow = RedLong.actionBuilder(Purple3Pos)
+        trajPos3Yellow = BlueLong.actionBuilder(Purple3Pos)
                 .setReversed(false)
-                .lineToY(4)
+                .lineToY(-21)
                 .strafeTo(BeforeGatePos3)
                 .strafeTo(AfterGatePos)
-                .splineToLinearHeading(Yellow1Pos, Math.toRadians(-90))
-                .strafeTo(new Vector2d(Yellow3Pos.component1().x, Yellow3Pos.component1().y))
+                .splineToLinearHeading(Yellow3Pos, Math.toRadians(90))
                 .build();
     }
 
     void buildParkTrajectories()
     {
-        trajPos1ToPark = RedLong.actionBuilder(Yellow1Pos)
+        trajPos1ToPark = BlueLong.actionBuilder(Yellow1Pos)
                 .strafeTo(ParkPos)
                 .build();
 
-        trajPos2ToPark = RedLong.actionBuilder(Yellow2Pos)
+        trajPos2ToPark = BlueLong.actionBuilder(Yellow2Pos)
                 .strafeTo(ParkPos)
                 .build();
 
-        trajPos3ToPark = RedLong.actionBuilder(Yellow3Pos)
+        trajPos3ToPark = BlueLong.actionBuilder(Yellow3Pos)
                 .strafeTo(ParkPos)
                 .build();
     }

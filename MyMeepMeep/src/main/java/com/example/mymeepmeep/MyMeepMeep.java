@@ -20,21 +20,29 @@ public class MyMeepMeep {
                 .setColorScheme(new ColorSchemeBlueDark())
                 .setConstraints(60, 60, Math.toRadians(180), Math.toRadians(180), 15)
                 .followTrajectorySequence(drive ->
-                        //Blue Long Pos 3
-                        drive.trajectorySequenceBuilder(new Pose2d(0 + StartPos.getX(), 0 + StartPos.getY(), Math.toRadians(0) + StartPos.getHeading()))
-                                //purple
-                                .setReversed(true)
-                                .splineToLinearHeading(new Pose2d(2 + StartPos.getX(), -28 + StartPos.getY(), Math.toRadians(90) + StartPos.getHeading()), Math.toRadians(-90))
-                                //strafe to in front of gate
-                                .setReversed(false)
-                                .strafeTo(new Vector2d(2 + StartPos.getX(), -50  + StartPos.getY()))
-                                //strafe through gate
-                                .lineToLinearHeading(new Pose2d(50 + StartPos.getX(), -50  + StartPos.getY(), Math.toRadians(90) + StartPos.getHeading()))
-                                //spline to board and turn around
-                                .splineToLinearHeading(new Pose2d(82 + StartPos.getX(), -22 + StartPos.getY(), Math.toRadians(-90) + StartPos.getHeading()), Math.toRadians(90))
-                                //park
-                                .strafeTo(new Vector2d(82 + StartPos.getX(), -50 + StartPos.getY()))
+                        drive.trajectorySequenceBuilder(new Pose2d(0,0,Math.toRadians(0)))
+                                .lineTo(new Vector2d(0,24))
+                                .strafeTo(new Vector2d(24,24))
+                                .lineTo(new Vector2d (24,0))
+                                .strafeTo(new Vector2d(0,0))
+                                .splineTo(new Vector2d(24,24),Math.toRadians(90))
+                                .splineToConstantHeading(new Vector2d(0,0),Math.toRadians(0))
                                 .build()
+//                        //Blue Long Pos 3
+//                        drive.trajectorySequenceBuilder(new Pose2d(0 + StartPos.getX(), 0 + StartPos.getY(), Math.toRadians(0) + StartPos.getHeading()))
+//                                //purple
+//                                .setReversed(true)
+//                                .splineToLinearHeading(new Pose2d(2 + StartPos.getX(), -28 + StartPos.getY(), Math.toRadians(90) + StartPos.getHeading()), Math.toRadians(-90))
+//                                //strafe to in front of gate
+//                                .setReversed(false)
+//                                .strafeTo(new Vector2d(2 + StartPos.getX(), -50  + StartPos.getY()))
+//                                //strafe through gate
+//                                .lineToLinearHeading(new Pose2d(50 + StartPos.getX(), -50  + StartPos.getY(), Math.toRadians(90) + StartPos.getHeading()))
+//                                //spline to board and turn around
+//                                .splineToLinearHeading(new Pose2d(82 + StartPos.getX(), -22 + StartPos.getY(), Math.toRadians(-90) + StartPos.getHeading()), Math.toRadians(90))
+//                                //park
+//                                .strafeTo(new Vector2d(82 + StartPos.getX(), -50 + StartPos.getY()))
+//                                .build()
                 );
 
         RoadRunnerBotEntity mySecondBot = new DefaultBotBuilder(meepMeep)
@@ -43,7 +51,7 @@ public class MyMeepMeep {
                 .setConstraints(60, 60, Math.toRadians(180), Math.toRadians(180), 15)
                 .followTrajectorySequence(drive ->
                         //Blue Long Pos 3
-                        drive.trajectorySequenceBuilder(new Pose2d(0 + rStartPos.getX(), 0 + rStartPos.getY(), Math.toRadians(180) + rStartPos.getHeading()))
+                        drive.trajectorySequenceBuilder(new Pose2d(0 + rStartPos.getX(), 0 + rStartPos.getY(), Math.toRadians(0) + rStartPos.getHeading()))
                                 //purple
                                 .setReversed(true)
                                 .splineToLinearHeading(new Pose2d(2 + rStartPos.getX(), 28 + rStartPos.getY(), Math.toRadians(-90) + rStartPos.getHeading()), Math.toRadians(90))

@@ -75,7 +75,7 @@ import java.util.List;
  */
 
 @Config
-@Autonomous(name="Red_Short", group="Linear OpMode")
+@Autonomous(name="Red_Short3", group="Linear OpMode")
 
 public class Aura_AutoRed_Short_Meet3 extends LinearOpMode {
 

@@ -27,7 +27,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.firstinspires.ftc.teamcode.Meet3;
+package org.firstinspires.ftc.teamcode.Meet4;
 
 import static com.qualcomm.robotcore.util.ElapsedTime.Resolution.MILLISECONDS;
 import static org.firstinspires.ftc.teamcode.AuraRobot.AuraMotors.INTAKE;
@@ -75,9 +75,9 @@ import java.util.List;
  */
 
 @Config
-@Autonomous(name="Red_Long3", group="Linear OpMode")
+@Autonomous(name="Red_Long", group="Linear OpMode")
 
-public class Aura_AutoRed_Long_Meet3 extends LinearOpMode {
+public class Aura_AutoRed_Long_Meet4 extends LinearOpMode {
 
     //**** Roadrunner Pose2ds ****
 

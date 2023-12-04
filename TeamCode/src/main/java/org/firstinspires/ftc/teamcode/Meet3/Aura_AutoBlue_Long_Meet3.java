@@ -75,7 +75,8 @@ import java.util.List;
  */
 
 @Config
-@Autonomous(name="Blue_Long", group="Linear OpMode")
+@Autonomous(name="Blue_Long3", group="Linear OpMode")
+
 
 public class Aura_AutoBlue_Long_Meet3 extends LinearOpMode {
 
