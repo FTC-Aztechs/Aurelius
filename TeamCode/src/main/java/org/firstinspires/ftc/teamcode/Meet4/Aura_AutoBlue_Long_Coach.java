@@ -52,7 +52,6 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.teamcode.AprilTagDetectionPipeline;
-import org.firstinspires.ftc.teamcode.AuraHeadingEstimator;
 import org.firstinspires.ftc.teamcode.AuraRobot;
 import org.firstinspires.ftc.teamcode.roadrunnerbasics.MecanumDrive;
 import org.firstinspires.ftc.vision.VisionPortal;
@@ -76,9 +75,9 @@ import java.util.List;
  */
 
 @Config
-@Autonomous(name="Blue_Long", group="Linear OpMode")
+@Autonomous(name="Coach_Blue_Long", group="Linear OpMode")
 
-public class Aura_AutoBlue_Long_Meet4 extends LinearOpMode {
+public class Aura_AutoBlue_Long_Coach extends LinearOpMode {
 
     //**** Roadrunner Pose2ds ****
 
@@ -97,7 +96,18 @@ public class Aura_AutoBlue_Long_Meet4 extends LinearOpMode {
     Pose2d Yellow2Pos = new Pose2d(20, 87.25, Math.toRadians(-90));
     Pose2d Yellow3Pos = new Pose2d(30, 87.25, Math.toRadians(-90));
 
+    Pose2d CalculatedPoseFromAprilTag = new Pose2d(0,0,0);
+    boolean bProceedToYellow = false;
+
     Vector2d ParkPos = new Vector2d(42, 82);
+
+    public static double purpleOffset1 = 1.0;
+    public static double purpleOffset2 = 1.0;
+    public static double purpleOffset3 = 1.0;
+    public static double yellowOffset1 = 1.0;
+    public static double yellowOffset2 = 1.0;
+    public static double yellowOffset3 = 1.0;
+
 
     //Roadrunner quick guide brought to you by Lavanya
 
@@ -115,6 +125,73 @@ public class Aura_AutoBlue_Long_Meet4 extends LinearOpMode {
 
     //************
 
+    public class IntakeController implements Action {
+        @Override
+        public boolean run(TelemetryPacket tPkt) {
+            ElapsedTime actionTimer = new ElapsedTime();
+            actionTimer.reset();
+            while(actionTimer.seconds() < 0.8) {
+                Aurelius.setPower(INTAKE, -0.2);
+            }
+            Aurelius.setPower(INTAKE, 0);
+            return false;
+        }
+    }
+
+    public Action ejectPurple = new IntakeController();
+
+    public class DepositController implements Action {
+        @Override
+        public boolean run (TelemetryPacket tPkt) {
+            sleep(500);
+            Aurelius.depositFlipper.setTargetState(Up);
+            Aurelius.depositFlipper.update();
+
+            sleep(1500);
+            Aurelius.depositFlipper.setTargetState(Open);
+            Aurelius.depositFlipper.update();
+
+            sleep(500);
+            Aurelius.depositFlipper.setTargetState(Down);
+            Aurelius.depositFlipper.update();
+
+            sleep(500);
+
+            return false;
+        }
+    }
+
+    public Action depositYellow = new DepositController();
+
+    public class IMUController implements Action {
+        @Override
+        public boolean run(TelemetryPacket tPkt) {
+            return false;
+
+        }
+    }
+
+    public Action rectifyHeadingError = new IMUController();
+
+    public class AprilTagController implements Action {
+        @Override
+        public boolean run(TelemetryPacket tPkt) {
+            if(isTagOnBackdropVisible(PurpleDropOffPos)) {
+                BlueLong.pose = CalculatedPoseFromAprilTag;
+                bProceedToYellow = true;
+            } else {
+                sleep(5000);
+                if(isTagOnBackdropVisible(PurpleDropOffPos)) {
+                    BlueLong.pose = CalculatedPoseFromAprilTag;
+                    bProceedToYellow = true;
+                    return false;
+                }
+            }
+            return false;
+        }
+    }
+
+    public Action updatePosUsingAprilTags = new AprilTagController();
 
     private static final double LEFT_SPIKEMARK_BOUNDARY_X = 250;
     private static final double RIGHT_SPIKEMARK_BOUNDARY_X = 260;
@@ -125,42 +202,10 @@ public class Aura_AutoBlue_Long_Meet4 extends LinearOpMode {
 
     AuraRobot Aurelius = new AuraRobot();
     MecanumDrive BlueLong;
-    public AuraHeadingEstimator myHeadingEstimator;
-
 
     private static FtcDashboard auraBoard;
 
-
-//TODO: imu
-    public class IMUController implements Action {
-        @Override
-        public boolean run(TelemetryPacket tPkt) {
-
-            Pose2d expectedPose = null;
-            switch (PurpleDropOffPos) {
-                case 1:
-                    expectedPose = new Pose2d(BeforeGatePos1.x, BeforeGatePos1.y, Math.toRadians(90));
-                case 2:
-                    expectedPose = new Pose2d(BeforeGatePos2.x, BeforeGatePos2.y, Math.toRadians(90));
-                default:
-                    expectedPose = new Pose2d(BeforeGatePos3.x, BeforeGatePos3.y, Math.toRadians(90));
-            }
-            double oldHeading = BlueLong.pose.heading.log();
-            telemetry.addData("Old heading", Math.toDegrees(oldHeading));
-            double yaw = myHeadingEstimator.getYaw();
-            telemetry.addData("Yaw correction: ", Math.toDegrees(yaw - oldHeading));
-            telemetry.addData("Corrected heading:", Math.toDegrees(yaw));
-            telemetry.update();
-
-            BlueLong.pose = new Pose2d(expectedPose.position.x, expectedPose.position.y, yaw);
-
-            return false;
-        }
-    }
-
-    public Action rectifyHeadingError = new Aura_AutoBlue_Long_Meet4.IMUController();
-
-    //TODO: declare April Tag stuff
+    //TODO: declare April Tag stuffi
     OpenCvWebcam Sauron = null;
     AprilTagDetectionPipeline pipeline;
 
@@ -217,39 +262,25 @@ public class Aura_AutoBlue_Long_Meet4 extends LinearOpMode {
 
     // TODO: define trajectory variables here
     // Purple Trajectories
-    private Action trajPos1Purple;
-    private Action trajPos2Purple;
-    private Action trajPos3Purple;
+    private Action dropOffPurpleAtPos1;
+    private Action dropOffPurpleAtPos2;
+    private Action dropOffPurpleAtPos3;
 
-    // Yellow Trajectories
-    private Action trajPos1Yellow;
-    private Action trajPos2Yellow;
-    private Action trajPos3Yellow;
+     // Yellow Trajectories
+    private Action dropOffYellowAtPos1;
+    private Action dropOffYellowAtPos2;
+    private Action dropOffYellowAtPos3;
 
     // Park Trajectories
-    private Action trajPos1ToPark;
-    private Action trajPos2ToPark;
-    private Action trajPos3ToPark;
+    private Action dropOffYellowAtPark;
 
     private ElapsedTime runtime = new ElapsedTime();
 
-
     @Override
     public void runOpMode() throws InterruptedException {
-        // TODO: Assume this will be our Auto. The pseudo code below is for camera detection
-        //   Option 1: Use TFOD - in this case, we simply use the ConceptTFod detector and extend it with our trained model
-        //   Option 2: Develop our own OpenCV based image processor
-        //               1. Implement a new VisionProcessor (kemmaProcessor)
-        //                  - Implement init, processFrame and onDrawFrame methods - look at the AprilTagProcessorImpl and TfodProcesorImpl for examples.
-        //                  - ProcessFrame needs to have the algorithm to detect the black (color of team element) pixels in the rectangle
-        //               2. Use the VisionPortal pattern to implement camera detection (see AprilTag and tFodProcessor examples)
-        //               3. Register the kemmaProcessor with VisionPortal
-        //               4. Implement a method on kemmaProcessor to return detected position based on which of the 3 rectangles returns most positive
-        //   Option 3: Ditch the VisionProcessor and use EasyOpenCV directly
 
         Aurelius.init(hardwareMap);
         BlueLong = new MecanumDrive(Aurelius.hwMap, new Pose2d(0,0,0));
-        myHeadingEstimator = new AuraHeadingEstimator(Aurelius.hwMap);
         ElapsedTime trajectoryTimer = new ElapsedTime(MILLISECONDS);
 
         auraBoard = FtcDashboard.getInstance();
@@ -284,198 +315,135 @@ public class Aura_AutoBlue_Long_Meet4 extends LinearOpMode {
             telemetryTfod();
         }
 
-        myHeadingEstimator.resetYaw();
-
         runtime.reset();
         if (opModeIsActive()) {
             DetectPurpleDropoffPos();
             visionPortal.close();
 
-            runtime.reset();
-            while (runtime.seconds() < 5) {
-                idle();
-            }
-
             //TODO: Run Trajectories
             switch (PurpleDropOffPos) {
                 case 1:
-                    Actions.runBlocking(
-                            new SequentialAction(
-                                    trajPos1Purple,
-                                    new Action() {
-                                        @Override
-                                        public boolean run(TelemetryPacket tPkt) {
-                                            dropOffPurplePixel();
-                                            return false;
-                                        }
-                                    },
-                                    trajPos1Yellow,
-                                    new Action() {
-                                        @Override
-                                        public boolean run(TelemetryPacket tPkt) {
-                                            dropOffYellowPixel();
-                                            return false;
-                                        }
-                                    }
-                                    ,trajPos1ToPark
-                            ));
+                    // Go to position 2
+                    Actions.runBlocking( new SequentialAction(
+                            dropOffPurpleAtPos1,
+                            updatePosUsingAprilTags
+                    ));
+                    if(bProceedToYellow)
+                        Actions.runBlocking( new SequentialAction( dropOffYellowAtPos1 ));
+                    else
+                        Actions.runBlocking( new SequentialAction( dropOffYellowAtPark ));
                     break;
                 case 2:
                     // Go to position 2
-                    Actions.runBlocking(
-                            new SequentialAction(
-                                    trajPos2Purple,
-                                    new Action() {
-                                        @Override
-                                        public boolean run(TelemetryPacket tPkt) {
-                                            dropOffPurplePixel();
-                                            return false;
-                                        }
-                                    },
-                                    trajPos2Yellow,
-                                    new Action() {
-                                        @Override
-                                        public boolean run(TelemetryPacket tPkt) {
-                                            dropOffYellowPixel();
-                                            return false;
-                                        }
-                                    },
-                                    trajPos2ToPark
+                    Actions.runBlocking( new SequentialAction(
+                                dropOffPurpleAtPos2,
+                                updatePosUsingAprilTags
                             ));
+                    if(bProceedToYellow)
+                        Actions.runBlocking( new SequentialAction( dropOffYellowAtPos2 ));
+                    else
+                        Actions.runBlocking( new SequentialAction( dropOffYellowAtPark ));
                     break;
                 case 3:
                 default:
-                    // Go to position 3
-                    Actions.runBlocking(
-                            new SequentialAction(
-                                    trajPos3Purple,
-                                    new Action() {
-                                        @Override
-                                        public boolean run(TelemetryPacket tPkt) {
-                                            dropOffPurplePixel();
-                                            return false;
-                                        }
-                                    },
-                                    trajPos3Yellow,
-                                    new Action() {
-                                        @Override
-                                        public boolean run(TelemetryPacket tPkt) {
-                                            dropOffYellowPixel();
-                                            return false;
-                                        }
-                                    },
-                                    trajPos3ToPark
-                            ));
+                    // Go to position 2
+                    Actions.runBlocking( new SequentialAction(
+                            dropOffPurpleAtPos3,
+                            updatePosUsingAprilTags
+                    ));
+                    if(bProceedToYellow)
+                        Actions.runBlocking( new SequentialAction( dropOffYellowAtPos3 ));
+                    else
+                        Actions.runBlocking( new SequentialAction( dropOffYellowAtPark ));
                     break;
             }
         }
     }
 
-    void buildPurpleTrajectories()
+    boolean isTagOnBackdropVisible(int iPos)
     {
-        trajPos1Purple = BlueLong.actionBuilder(StartPos)
-                .setTangent(Math.toRadians(0))
-                .splineToLinearHeading(Purple1Pos, Math.toRadians(30))
-                .build();
-
-        trajPos2Purple = BlueLong.actionBuilder(StartPos)
-                .setTangent(Math.toRadians(-70))
-                .splineToLinearHeading(Purple2Pos, Math.toRadians(0))
-                .build();
-
-        trajPos3Purple = BlueLong.actionBuilder(StartPos)
-                .setTangent(Math.toRadians(-70))
-                .splineToLinearHeading(Purple3Pos, Math.toRadians(0))
-                .build();
+        return true;
     }
 
-    void buildYellowTrajectories()
+    void buildPurpleTrajectories()
     {
-        trajPos1Yellow = BlueLong.actionBuilder(Purple1Pos)
+        dropOffPurpleAtPos1 = BlueLong.actionBuilder(StartPos)
+                .setTangent(Math.toRadians(0))
+                .splineToLinearHeading(Purple1Pos, Math.toRadians(30))
+                .stopAndAdd(ejectPurple)
+                .waitSeconds(0.8)
                 .setReversed(false)
                 .lineToY(-2)
                 .strafeTo(BeforeGatePos1)
                 .stopAndAdd(rectifyHeadingError)
                 .strafeTo(AfterGatePos)
-                .splineToLinearHeading(Yellow3Pos, Math.toRadians(90))
-                .strafeTo(new Vector2d(Yellow1Pos.component1().x,Yellow1Pos.component1().y))
                 .build();
 
-        trajPos2Yellow = BlueLong.actionBuilder(Purple2Pos)
+        dropOffPurpleAtPos2 = BlueLong.actionBuilder(StartPos)
+                .setTangent(Math.toRadians(-70))
+                .splineToLinearHeading(Purple2Pos, Math.toRadians(0))
+                .stopAndAdd(ejectPurple)
+                .waitSeconds(0.8)
                 .setReversed(false)
                 .lineToY(-18)
                 .strafeTo(BeforeGatePos2)
                 .stopAndAdd(rectifyHeadingError)
                 .strafeTo(AfterGatePos)
-                .splineToLinearHeading(Yellow3Pos, Math.toRadians(90))
-                .strafeTo(new Vector2d(Yellow2Pos.component1().x,Yellow2Pos.component1().y))
                 .build();
 
-        trajPos3Yellow = BlueLong.actionBuilder(Purple3Pos)
+        dropOffPurpleAtPos3 = BlueLong.actionBuilder(StartPos)
+                .setTangent(Math.toRadians(-70))
+                .splineToLinearHeading(Purple3Pos, Math.toRadians(0))
+                .stopAndAdd(ejectPurple)
+                .waitSeconds(0.8)
                 .setReversed(false)
                 .lineToY(-21)
                 .strafeTo(BeforeGatePos3)
                 .stopAndAdd(rectifyHeadingError)
                 .strafeTo(AfterGatePos)
+                .build();
+    }
+
+    void buildYellowTrajectories()
+    {
+        dropOffYellowAtPos1 = BlueLong.actionBuilder(new Pose2d(AfterGatePos.x,AfterGatePos.y, Math.toRadians(90)))
+                .setReversed(false)
                 .splineToLinearHeading(Yellow3Pos, Math.toRadians(90))
+                .strafeTo(new Vector2d(Yellow1Pos.component1().x,Yellow1Pos.component1().y))
+                .stopAndAdd(depositYellow)
+                .waitSeconds(3)
+                .strafeTo(ParkPos)
+                .build();
+
+        dropOffYellowAtPos2 = BlueLong.actionBuilder(new Pose2d(AfterGatePos.x,AfterGatePos.y, Math.toRadians(90)))
+                .setReversed(false)
+                .splineToLinearHeading(Yellow3Pos, Math.toRadians(90))
+                .strafeTo(new Vector2d(Yellow2Pos.component1().x,Yellow2Pos.component1().y))
+                .stopAndAdd(depositYellow)
+                .waitSeconds(3)
+                .strafeTo(ParkPos)
+                .build();
+
+        dropOffYellowAtPos3 = BlueLong.actionBuilder(new Pose2d(AfterGatePos.x,AfterGatePos.y, Math.toRadians(90)))
+                .setReversed(false)
+                .splineToLinearHeading(Yellow3Pos, Math.toRadians(90))
+                .stopAndAdd(depositYellow)
+                .waitSeconds(3)
+                .strafeTo(ParkPos)
                 .build();
     }
 
     void buildParkTrajectories()
     {
-        trajPos1ToPark = BlueLong.actionBuilder(Yellow1Pos)
+        dropOffYellowAtPark = BlueLong.actionBuilder(new Pose2d(AfterGatePos.x, AfterGatePos.y, Math.toRadians(90)))
                 .strafeTo(ParkPos)
-                .build();
-
-        trajPos2ToPark = BlueLong.actionBuilder(Yellow2Pos)
-                .strafeTo(ParkPos)
-                .build();
-
-        trajPos3ToPark = BlueLong.actionBuilder(Yellow3Pos)
-                .strafeTo(ParkPos)
+                .stopAndAdd(depositYellow)
                 .build();
     }
-    void dropOffPurplePixel()
-    {
-        runtime.reset();
-        while(runtime.seconds() < 0.8) {
-            Aurelius.setPower(INTAKE, -0.2);
-        }
-        Aurelius.setPower(INTAKE, 0);
-    }
 
-    void dropOffYellowPixel()
-    {
-        telemetry.addData("Deposit State", "down");
-        telemetry.update();
-
-        sleep(500);
-
-        Aurelius.depositFlipper.setTargetState(Up);
-        Aurelius.depositFlipper.update();
-        telemetry.addData("Deposit State", "up");
-        telemetry.update();
-
-        sleep(1500);
-
-        Aurelius.depositFlipper.setTargetState(Open);
-        Aurelius.depositFlipper.update();
-        telemetry.addData("Deposit State", "open");
-        telemetry.update();
-
-        sleep(500);
-
-        Aurelius.depositFlipper.setTargetState(Down);
-        Aurelius.depositFlipper.update();
-        telemetry.addData("Deposit State", "down");
-        telemetry.update();
-
-        sleep(500);
-    }
 
 
 //TODO: Use April Tags to get current pos
-
 //TODO: write trajectories as different functions
 
     //TODO: add any motors/servos that initialized later

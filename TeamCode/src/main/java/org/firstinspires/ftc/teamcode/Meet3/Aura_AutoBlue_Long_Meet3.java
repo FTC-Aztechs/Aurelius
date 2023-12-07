@@ -128,6 +128,7 @@ public class Aura_AutoBlue_Long_Meet3 extends LinearOpMode {
 
     private static FtcDashboard auraBoard;
 
+
     //TODO: declare April Tag stuffi
     OpenCvWebcam Sauron = null;
     AprilTagDetectionPipeline pipeline;
