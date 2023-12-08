@@ -29,6 +29,7 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -87,11 +88,12 @@ import java.util.concurrent.TimeUnit;
  *
  */
 
+
 @TeleOp(name="Omni Drive To AprilTag", group = "Concept")
 public class RobotAutoDriveToAprilTagOmni extends LinearOpMode
 {
     // Adjust these numbers to suit your robot.
-    final double DESIRED_DISTANCE = 12.0; //  this is how close the camera should get to the target (inches)
+    final double DESIRED_DISTANCE = 2.0; //  this is how close the camera should get to the target (inches)
 
     //  Set the GAIN constants to control the relationship between the measured position error, and how much power is
     //  applied to the drive motors to correct the error.
@@ -136,10 +138,11 @@ public class RobotAutoDriveToAprilTagOmni extends LinearOpMode
         // To drive forward, most robots need the motor on one side to be reversed, because the axles point in opposite directions.
         // When run, this OpMode should start both motors driving forward. So adjust these two lines based on your first test drive.
         // Note: The settings here assume direct drive on left and right wheels.  Gear Reduction or 90 Deg drives may require direction flips
-        Upper_Left.setDirection(DcMotor.Direction.REVERSE);
-        Lower_Left.setDirection(DcMotor.Direction.FORWARD);
+        Upper_Left.setDirection(DcMotor.Direction.FORWARD);
         Upper_Right.setDirection(DcMotor.Direction.REVERSE);
-        Lower_Right.setDirection(DcMotor.Direction.FORWARD);
+        Lower_Left.setDirection(DcMotor.Direction.FORWARD);
+        Lower_Right.setDirection(DcMotor.Direction.REVERSE);
+
 
         if (USE_WEBCAM)
             setManualExposure(6, 250);  // Use low exposure time to reduce motion blur
@@ -271,7 +274,7 @@ public class RobotAutoDriveToAprilTagOmni extends LinearOpMode
         // Create the vision portal by using a builder.
         if (USE_WEBCAM) {
             visionPortal = new VisionPortal.Builder()
-                    .setCamera(hardwareMap.get(WebcamName.class, "Kemera"))
+                    .setCamera(hardwareMap.get(WebcamName.class, "Eyeball"))
                     .addProcessor(aprilTag)
                     .build();
         } else {
@@ -286,7 +289,7 @@ public class RobotAutoDriveToAprilTagOmni extends LinearOpMode
      Manually set the camera gain and exposure.
      This can only be called AFTER calling initAprilTag(), and only works for Webcams;
     */
-    private void    setManualExposure(int exposureMS, int gain) {
+    private void setManualExposure(int exposureMS, int gain) {
         // Wait for the camera to be open, then use the controls
 
         if (visionPortal == null) {
