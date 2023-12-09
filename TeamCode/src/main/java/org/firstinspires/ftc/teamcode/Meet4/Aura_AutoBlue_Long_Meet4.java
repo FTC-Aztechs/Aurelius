@@ -91,13 +91,13 @@ public class Aura_AutoBlue_Long_Meet4 extends LinearOpMode {
     Vector2d BeforeGatePos1 = new Vector2d(50,2);
     Vector2d BeforeGatePos2 = new Vector2d(50,-14);
     Vector2d BeforeGatePos3 = new Vector2d(50,-19);
-    Vector2d AfterGatePos = new Vector2d(45,58);
+    Vector2d AfterGatePos = new Vector2d(50, 58);
 
-    Pose2d Yellow1Pos = new Pose2d(15, 88, Math.toRadians(-90));
-    Pose2d Yellow2Pos = new Pose2d(20, 87.25, Math.toRadians(-90));
-    Pose2d Yellow3Pos = new Pose2d(30, 87.25, Math.toRadians(-90));
+    Pose2d Yellow1Pos = new Pose2d(22, 90, Math.toRadians(-90));
+    Pose2d Yellow2Pos = new Pose2d(28, 90, Math.toRadians(-90));
+    Pose2d Yellow3Pos = new Pose2d(33, 90, Math.toRadians(-90));
 
-    Vector2d ParkPos = new Vector2d(42, 82);
+    Vector2d ParkPos = new Vector2d(50, 82);
 
     //Roadrunner quick guide brought to you by Lavanya
 
@@ -136,15 +136,6 @@ public class Aura_AutoBlue_Long_Meet4 extends LinearOpMode {
         @Override
         public boolean run(TelemetryPacket tPkt) {
 
-            Pose2d expectedPose = null;
-            switch (PurpleDropOffPos) {
-                case 1:
-                    expectedPose = new Pose2d(BeforeGatePos1.x, BeforeGatePos1.y, Math.toRadians(90));
-                case 2:
-                    expectedPose = new Pose2d(BeforeGatePos2.x, BeforeGatePos2.y, Math.toRadians(90));
-                default:
-                    expectedPose = new Pose2d(BeforeGatePos3.x, BeforeGatePos3.y, Math.toRadians(90));
-            }
             double oldHeading = BlueLong.pose.heading.log();
             telemetry.addData("Old heading", Math.toDegrees(oldHeading));
             double yaw = myHeadingEstimator.getYaw();
@@ -152,7 +143,7 @@ public class Aura_AutoBlue_Long_Meet4 extends LinearOpMode {
             telemetry.addData("Corrected heading:", Math.toDegrees(yaw));
             telemetry.update();
 
-            BlueLong.pose = new Pose2d(expectedPose.position.x, expectedPose.position.y, yaw);
+            BlueLong.pose = new Pose2d(BlueLong.pose.position.x, BlueLong.pose.position.y, yaw);
 
             return false;
         }
@@ -397,6 +388,7 @@ public class Aura_AutoBlue_Long_Meet4 extends LinearOpMode {
                 .strafeTo(BeforeGatePos1)
                 .stopAndAdd(rectifyHeadingError)
                 .strafeTo(AfterGatePos)
+                .stopAndAdd(rectifyHeadingError)
                 .splineToLinearHeading(Yellow3Pos, Math.toRadians(90))
                 .strafeTo(new Vector2d(Yellow1Pos.component1().x,Yellow1Pos.component1().y))
                 .build();
@@ -407,6 +399,7 @@ public class Aura_AutoBlue_Long_Meet4 extends LinearOpMode {
                 .strafeTo(BeforeGatePos2)
                 .stopAndAdd(rectifyHeadingError)
                 .strafeTo(AfterGatePos)
+                .stopAndAdd(rectifyHeadingError)
                 .splineToLinearHeading(Yellow3Pos, Math.toRadians(90))
                 .strafeTo(new Vector2d(Yellow2Pos.component1().x,Yellow2Pos.component1().y))
                 .build();
@@ -417,6 +410,7 @@ public class Aura_AutoBlue_Long_Meet4 extends LinearOpMode {
                 .strafeTo(BeforeGatePos3)
                 .stopAndAdd(rectifyHeadingError)
                 .strafeTo(AfterGatePos)
+                .stopAndAdd(rectifyHeadingError)
                 .splineToLinearHeading(Yellow3Pos, Math.toRadians(90))
                 .build();
     }
