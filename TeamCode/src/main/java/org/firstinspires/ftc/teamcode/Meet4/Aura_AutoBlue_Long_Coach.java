@@ -49,17 +49,22 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.ExposureControl;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.GainControl;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.teamcode.AprilTagDetectionPipeline;
 import org.firstinspires.ftc.teamcode.AuraRobot;
 import org.firstinspires.ftc.teamcode.roadrunnerbasics.MecanumDrive;
 import org.firstinspires.ftc.vision.VisionPortal;
+import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 import org.firstinspires.ftc.vision.tfod.TfodProcessor;
 import org.openftc.apriltag.AprilTagDetection;
 import org.openftc.easyopencv.OpenCvWebcam;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /*
  * This file contains an minimal example of a Linear "OpMode". An OpMode is a 'program' that runs in either
@@ -101,6 +106,7 @@ public class Aura_AutoBlue_Long_Coach extends LinearOpMode {
 
     Vector2d ParkPos = new Vector2d(42, 82);
 
+
     public static double purpleOffset1 = 1.0;
     public static double purpleOffset2 = 1.0;
     public static double purpleOffset3 = 1.0;
@@ -108,6 +114,11 @@ public class Aura_AutoBlue_Long_Coach extends LinearOpMode {
     public static double yellowOffset2 = 1.0;
     public static double yellowOffset3 = 1.0;
 
+    public static double CalibratedYaw = 0;
+
+    public static double CalibratedBearing = 0;
+
+    public static double CalibratedRange = 0;
 
     //Roadrunner quick guide brought to you by Lavanya
 
@@ -200,6 +211,7 @@ public class Aura_AutoBlue_Long_Coach extends LinearOpMode {
     public static double SplineAngle = 0;
     public static double TangentAngle = -70;
 
+
     AuraRobot Aurelius = new AuraRobot();
     MecanumDrive BlueLong;
 
@@ -259,6 +271,13 @@ public class Aura_AutoBlue_Long_Coach extends LinearOpMode {
      * The variable to store our instance of the vision portal.
      */
     private VisionPortal visionPortal;
+
+    private static final boolean USE_WEBCAM = true;
+    private static final int DESIRED_TAG_ID = 1;     // Choose the tag you want to approach or set to -1 for ANY tag.
+    private AprilTagProcessor aprilTag;              // Used for managing the AprilTag detection process.
+    private org.firstinspires.ftc.vision.apriltag.AprilTagDetection desiredTag = null;     // Used to hold the data for a detected AprilTag
+    boolean targetFound     = false;    // Set to true when an AprilTag target is detected
+
 
     // TODO: define trajectory variables here
     // Purple Trajectories
@@ -362,7 +381,33 @@ public class Aura_AutoBlue_Long_Coach extends LinearOpMode {
 
     boolean updatePosfromBackwallAprilTag(int iPos)
     {
+        initAprilTag(); // initializing the april tag processor
+        setManualExposure(6, 250); // accounting for motion blur
+        targetFound = false;
+        desiredTag  = null;
 
+        List<org.firstinspires.ftc.vision.apriltag.AprilTagDetection> currentDetections = aprilTag.getDetections();
+        for (org.firstinspires.ftc.vision.apriltag.AprilTagDetection detection : currentDetections) {
+            // Look to see if we have size info on this tag.
+            if (detection.metadata != null) {
+                //  Check to see if we want to track towards this tag.
+                if ((DESIRED_TAG_ID < 0) || (detection.id == DESIRED_TAG_ID)) {
+                    targetFound = true;
+                    desiredTag = detection;
+                    break;
+                } else {
+                    telemetry.addData("Skipping", "Tag ID %d is not desired", detection.id);
+                }
+            } else {
+                telemetry.addData("Unknown", "Tag ID %d is not in TagLibrary", detection.id);
+            }
+        }
+        if(targetFound) {
+            telemetry.addData("Found", "ID %d (%s)", desiredTag.id, desiredTag.metadata.fieldPosition);
+            telemetry.addData("Range",  "%5.1f inches", desiredTag.ftcPose.range);
+            telemetry.addData("Bearing","%3.0f degrees", desiredTag.ftcPose.bearing);
+            telemetry.addData("Yaw","%3.0f degrees", desiredTag.ftcPose.yaw);
+        }
         return true;
     }
 
@@ -514,6 +559,66 @@ public class Aura_AutoBlue_Long_Coach extends LinearOpMode {
 
     }   // end method telemetryTfod()
 
+    private void initAprilTag() {
+        // Create the AprilTag processor by using a builder.
+        aprilTag = new AprilTagProcessor.Builder().build();
+
+        // Adjust Image Decimation to trade-off detection-range for detection-rate.
+        // eg: Some typical detection data using a Logitech C920 WebCam
+        // Decimation = 1 ..  Detect 2" Tag from 10 feet away at 10 Frames per second
+        // Decimation = 2 ..  Detect 2" Tag from 6  feet away at 22 Frames per second
+        // Decimation = 3 ..  Detect 2" Tag from 4  feet away at 30 Frames Per Second
+        // Decimation = 3 ..  Detect 5" Tag from 10 feet away at 30 Frames Per Second
+        // Note: Decimation can be changed on-the-fly to adapt during a match.
+        aprilTag.setDecimation(2);
+
+        // Create the vision portal by using a builder.
+        if (USE_WEBCAM) {
+            visionPortal = new VisionPortal.Builder()
+                    .setCamera(hardwareMap.get(WebcamName.class, "Eyeball"))
+                    .addProcessor(aprilTag)
+                    .build();
+        } else {
+            visionPortal = new VisionPortal.Builder()
+                    .setCamera(BuiltinCameraDirection.BACK)
+                    .addProcessor(aprilTag)
+                    .build();
+        }
+    }
+
+    private void setManualExposure(int exposureMS, int gain) {
+        // Wait for the camera to be open, then use the controls
+
+        if (visionPortal == null) {
+            return;
+        }
+
+        // Make sure camera is streaming before we try to set the exposure controls
+        if (visionPortal.getCameraState() != VisionPortal.CameraState.STREAMING) {
+            telemetry.addData("Camera", "Waiting");
+            telemetry.update();
+            while (!isStopRequested() && (visionPortal.getCameraState() != VisionPortal.CameraState.STREAMING)) {
+                sleep(20);
+            }
+            telemetry.addData("Camera", "Ready");
+            telemetry.update();
+        }
+
+        // Set camera controls unless we are stopping.
+        if (!isStopRequested())
+        {
+            ExposureControl exposureControl = visionPortal.getCameraControl(ExposureControl.class);
+            if (exposureControl.getMode() != ExposureControl.Mode.Manual) {
+                exposureControl.setMode(ExposureControl.Mode.Manual);
+                sleep(50);
+            }
+            exposureControl.setExposure((long)exposureMS, TimeUnit.MILLISECONDS);
+            sleep(20);
+            GainControl gainControl = visionPortal.getCameraControl(GainControl.class);
+            gainControl.setGain(gain);
+            sleep(20);
+        }
+    }
     void DetectPurpleDropoffPos()
     {
         double x = 0, y = 0;

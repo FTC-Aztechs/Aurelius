@@ -212,6 +212,7 @@ public class AuraRobot
         return result;
     }
 
+
     public void setRunMode(AuraMotors eWhichMotor, DcMotor.RunMode eMode )
     {
 

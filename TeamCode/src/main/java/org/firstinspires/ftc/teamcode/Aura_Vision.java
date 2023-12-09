@@ -28,7 +28,7 @@ public class Aura_Vision extends LinearOpMode {
                 .build();
         VisionPortal visionPortal = new VisionPortal.Builder()
                 .addProcessors(tagProcessor)
-                .setCamera(hardwareMap.get(WebcamName.class, "Kemera"))
+                .setCamera(hardwareMap.get(WebcamName.class, "Eyeball"))
                 .setCameraResolution(new Size(640, 480))
                 .build();
         waitForStart();
