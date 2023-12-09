@@ -176,12 +176,12 @@ public class Aura_AutoBlue_Long_Coach extends LinearOpMode {
     public class AprilTagController implements Action {
         @Override
         public boolean run(TelemetryPacket tPkt) {
-            if(isTagOnBackdropVisible(PurpleDropOffPos)) {
+            if(updatePosfromBackwallAprilTag(PurpleDropOffPos)) {
                 BlueLong.pose = CalculatedPoseFromAprilTag;
                 bProceedToYellow = true;
             } else {
                 sleep(5000);
-                if(isTagOnBackdropVisible(PurpleDropOffPos)) {
+                if(updatePosfromBackwallAprilTag(PurpleDropOffPos)) {
                     BlueLong.pose = CalculatedPoseFromAprilTag;
                     bProceedToYellow = true;
                     return false;
@@ -360,8 +360,9 @@ public class Aura_AutoBlue_Long_Coach extends LinearOpMode {
         }
     }
 
-    boolean isTagOnBackdropVisible(int iPos)
+    boolean updatePosfromBackwallAprilTag(int iPos)
     {
+
         return true;
     }
 
