@@ -49,11 +49,20 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.ExposureControl;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.GainControl;
+import org.firstinspires.ftc.vision.VisionPortal;
+import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
+import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 
@@ -74,17 +83,21 @@ import java.util.concurrent.TimeUnit;
 public class Aura_Sandbox extends LinearOpMode
 {
     // Declare OpMode members.
+    private static final boolean USE_WEBCAM = true;  // Set true to use a webcam, or false for a phone camera
+    private static final int DESIRED_TAG_ID = 1;     // Choose the tag you want to approach or set to -1 for ANY tag.
+    private VisionPortal visionPortal;               // Used to manage the video source.
+    private AprilTagProcessor aprilTag;              // Used for managing the AprilTag detection process.
+    private AprilTagDetection desiredTag = null;     // Used to hold the data for a detected AprilTag
     private ElapsedTime runtime = new ElapsedTime();
     AuraRobot Aurelius = new AuraRobot();
     private static ElapsedTime timer_gp1_dpad_left = new ElapsedTime();
     private static ElapsedTime timer_gp1_dpad_right = new ElapsedTime();
     private static ElapsedTime timer_gp2_x = new ElapsedTime();
-
     private static ElapsedTime timer_gp2_y = new ElapsedTime();
     private static ElapsedTime timer_gp2_a = new ElapsedTime();
 
     boolean changingWheelSpeed = false;
-
+    boolean targetFound = false;    // Set to true when an AprilTag target is detected
     boolean changingState = false;
     public static int SANDBOX_MODE = 0;
 
@@ -101,15 +114,15 @@ public class Aura_Sandbox extends LinearOpMode
         ENCODER_TESTING,   // Default - prints encoder ticks.
         SMD_WHEEL_MOTOR_PROFILER,
         SMD_INTAKE_OUTTAKE,
-        HANG
+        HANG,
+        APRIL
     }
-    public static SandboxMode sandboxMode = SandboxMode.HANG;
+    public static SandboxMode sandboxMode = SandboxMode.APRIL;
 
 //    MvrkVuforiaPoseEstimator vuforiaPoseEstimator = new MvrkVuforiaPoseEstimator(hardwareMap);
 
     @Override
     public void runOpMode() {
-
         Aurelius.init(hardwareMap);
 
         // Telemetry and HTML Log file
@@ -127,6 +140,10 @@ public class Aura_Sandbox extends LinearOpMode
         telemetry.addData("Right Tracking wheel: ", Aurelius.getCurrentPosition(LOWER_LEFT));
         telemetry.addData("Left Tracking wheel: ", Aurelius.getCurrentPosition(UPPER_RIGHT));
         telemetry.addData("Strafe Tracking wheel: ", Aurelius.getCurrentPosition(LOWER_RIGHT));
+        initAprilTag();
+        if(USE_WEBCAM) {
+            setManualExposure(6,250);
+        }
 
         waitForStart();
         //getUserInput();
@@ -142,7 +159,10 @@ public class Aura_Sandbox extends LinearOpMode
                     SandboxIntakeOuttake();
                     break;
                 case HANG:
-                    HangManual();
+                    HangSandbox();
+                    break;
+                case APRIL:
+                    AprilSandbox();
                     break;
                 case SMD_WHEEL_MOTOR_PROFILER:
                     logFile = new File("/sdcard/FIRST/www/SandboxTelemetry.html");
@@ -377,7 +397,101 @@ public class Aura_Sandbox extends LinearOpMode
         return;
     }
 
-    public void HangManual() {
+    public void AprilSandbox() {
+
+        targetFound = false;
+        desiredTag  = null;
+
+        List<AprilTagDetection> currentDetections = aprilTag.getDetections();
+        for (AprilTagDetection detection : currentDetections) {
+            // Look to see if we have size info on this tag.
+            if (detection.metadata != null) {
+                //  Check to see if we want to track towards this tag.
+                if ((DESIRED_TAG_ID < 0) || (detection.id == DESIRED_TAG_ID)) {
+                    // Yes, we want to use this tag.
+                    targetFound = true;
+                    desiredTag = detection;
+                    break;  // don't look any further.
+                } else {
+                    // This tag is in the library, but we do not want to track it right now.
+                    telemetry.addData("Skipping", "Tag ID %d is not desired", detection.id);
+                }
+            } else {
+                // This tag is NOT in the library, so we don't have enough information to track to it.
+                telemetry.addData("Unknown", "Tag ID %d is not in TagLibrary", detection.id);
+            }
+        }
+
+        if (targetFound) {
+            telemetry.addData("Found", "ID %d (%s)", desiredTag.id, desiredTag.metadata.fieldPosition);
+            telemetry.addData("Range", "%5.1f inches", desiredTag.ftcPose.range);
+            telemetry.addData("Bearing", "%3.0f degrees", desiredTag.ftcPose.bearing);
+            telemetry.addData("Yaw", "%3.0f degrees", desiredTag.ftcPose.yaw);
+        }
+    }
+
+    private void initAprilTag() {
+        // Create the AprilTag processor by using a builder.
+        aprilTag = new AprilTagProcessor.Builder().build();
+
+        // Adjust Image Decimation to trade-off detection-range for detection-rate.
+        // eg: Some typical detection data using a Logitech C920 WebCam
+        // Decimation = 1 ..  Detect 2" Tag from 10 feet away at 10 Frames per second
+        // Decimation = 2 ..  Detect 2" Tag from 6  feet away at 22 Frames per second
+        // Decimation = 3 ..  Detect 2" Tag from 4  feet away at 30 Frames Per Second
+        // Decimation = 3 ..  Detect 5" Tag from 10 feet away at 30 Frames Per Second
+        // Note: Decimation can be changed on-the-fly to adapt during a match.
+        aprilTag.setDecimation(2);
+
+        // Create the vision portal by using a builder.
+        if (USE_WEBCAM) {
+            visionPortal = new VisionPortal.Builder()
+                    .setCamera(hardwareMap.get(WebcamName.class, "Kemera"))
+                    .addProcessor(aprilTag)
+                    .build();
+        } else {
+            visionPortal = new VisionPortal.Builder()
+                    .setCamera(BuiltinCameraDirection.BACK)
+                    .addProcessor(aprilTag)
+                    .build();
+        }
+    }
+
+    private void setManualExposure(int exposureMS, int gain) {
+        // Wait for the camera to be open, then use the controls
+
+        if (visionPortal == null) {
+            return;
+        }
+
+        // Make sure camera is streaming before we try to set the exposure controls
+        if (visionPortal.getCameraState() != VisionPortal.CameraState.STREAMING) {
+            telemetry.addData("Camera", "Waiting");
+            telemetry.update();
+            while (!isStopRequested() && (visionPortal.getCameraState() != VisionPortal.CameraState.STREAMING)) {
+                sleep(20);
+            }
+            telemetry.addData("Camera", "Ready");
+            telemetry.update();
+        }
+
+        // Set camera controls unless we are stopping.
+        if (!isStopRequested())
+        {
+            ExposureControl exposureControl = visionPortal.getCameraControl(ExposureControl.class);
+            if (exposureControl.getMode() != ExposureControl.Mode.Manual) {
+                exposureControl.setMode(ExposureControl.Mode.Manual);
+                sleep(50);
+            }
+            exposureControl.setExposure((long)exposureMS, TimeUnit.MILLISECONDS);
+            sleep(20);
+            GainControl gainControl = visionPortal.getCameraControl(GainControl.class);
+            gainControl.setGain(gain);
+            sleep(20);
+        }
+    }
+
+    public void HangSandbox() {
         if(gamepad2.x) {
             if (!changingState) {
                 timer_gp2_x.reset();
