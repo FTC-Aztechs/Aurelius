@@ -91,11 +91,11 @@ public class Aura_AutoBlue_Long_Meet4 extends LinearOpMode {
     Vector2d BeforeGatePos1 = new Vector2d(50,2);
     Vector2d BeforeGatePos2 = new Vector2d(50,-14);
     Vector2d BeforeGatePos3 = new Vector2d(50,-19);
-    Vector2d AfterGatePos = new Vector2d(50, 62);
+    Vector2d AfterGatePos = new Vector2d(50, 58);
 
-    Vector2d Yellow1Pos = new Vector2d(22, 90);
-    Vector2d Yellow2Pos = new Vector2d(28, 90);
-    Vector2d Yellow3Pos = new Vector2d(33, 90);
+    Pose2d Yellow1Pos = new Pose2d(22, 90, Math.toRadians(-90));
+    Pose2d Yellow2Pos = new Pose2d(28, 90, Math.toRadians(-90));
+    Pose2d Yellow3Pos = new Pose2d(33, 90, Math.toRadians(-90));
 
     Vector2d ParkPos = new Vector2d(50, 82);
 
@@ -131,7 +131,7 @@ public class Aura_AutoBlue_Long_Meet4 extends LinearOpMode {
     private static FtcDashboard auraBoard;
 
 
-//TODO: imu
+    //TODO: imu
     public class IMUController implements Action {
         @Override
         public boolean run(TelemetryPacket tPkt) {
@@ -387,10 +387,10 @@ public class Aura_AutoBlue_Long_Meet4 extends LinearOpMode {
                 .lineToY(-2)
                 .strafeTo(BeforeGatePos1)
                 .stopAndAdd(rectifyHeadingError)
-                .lineToYSplineHeading(AfterGatePos.y, Math.toRadians(-90))
+                .strafeTo(AfterGatePos)
                 .stopAndAdd(rectifyHeadingError)
-                .strafeTo(Yellow3Pos)
-                .strafeTo(Yellow1Pos)
+                .splineToLinearHeading(Yellow3Pos, Math.toRadians(90))
+                .strafeTo(new Vector2d(Yellow1Pos.component1().x,Yellow1Pos.component1().y))
                 .build();
 
         trajPos2Yellow = BlueLong.actionBuilder(Purple2Pos)
@@ -398,10 +398,10 @@ public class Aura_AutoBlue_Long_Meet4 extends LinearOpMode {
                 .lineToY(-18)
                 .strafeTo(BeforeGatePos2)
                 .stopAndAdd(rectifyHeadingError)
-                .lineToYSplineHeading(AfterGatePos.y, Math.toRadians(-90))
+                .strafeTo(AfterGatePos)
                 .stopAndAdd(rectifyHeadingError)
-                .strafeTo(Yellow3Pos)
-                .strafeTo(Yellow2Pos)
+                .splineToLinearHeading(Yellow3Pos, Math.toRadians(90))
+                .strafeTo(new Vector2d(Yellow2Pos.component1().x,Yellow2Pos.component1().y))
                 .build();
 
         trajPos3Yellow = BlueLong.actionBuilder(Purple3Pos)
@@ -409,23 +409,23 @@ public class Aura_AutoBlue_Long_Meet4 extends LinearOpMode {
                 .lineToY(-21)
                 .strafeTo(BeforeGatePos3)
                 .stopAndAdd(rectifyHeadingError)
-                .lineToYSplineHeading(AfterGatePos.y, Math.toRadians(-90))
+                .strafeTo(AfterGatePos)
                 .stopAndAdd(rectifyHeadingError)
-                .strafeTo(Yellow3Pos)
+                .splineToLinearHeading(Yellow3Pos, Math.toRadians(90))
                 .build();
     }
 
     void buildParkTrajectories()
     {
-        trajPos1ToPark = BlueLong.actionBuilder(new Pose2d(Yellow1Pos.x, Yellow1Pos.y, Math.toRadians(-90)))
+        trajPos1ToPark = BlueLong.actionBuilder(Yellow1Pos)
                 .strafeTo(ParkPos)
                 .build();
 
-        trajPos2ToPark = BlueLong.actionBuilder(new Pose2d(Yellow2Pos.x, Yellow2Pos.y, Math.toRadians(-90)))
+        trajPos2ToPark = BlueLong.actionBuilder(Yellow2Pos)
                 .strafeTo(ParkPos)
                 .build();
 
-        trajPos3ToPark = BlueLong.actionBuilder(new Pose2d(Yellow3Pos.x, Yellow3Pos.y, Math.toRadians(-90)))
+        trajPos3ToPark = BlueLong.actionBuilder(Yellow3Pos)
                 .strafeTo(ParkPos)
                 .build();
     }
@@ -569,8 +569,3 @@ public class Aura_AutoBlue_Long_Meet4 extends LinearOpMode {
     }
 
 }
-
-
-
-
-
