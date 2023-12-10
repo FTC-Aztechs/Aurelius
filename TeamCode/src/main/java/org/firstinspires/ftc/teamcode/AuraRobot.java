@@ -31,7 +31,6 @@ package org.firstinspires.ftc.teamcode;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.Pose2d;
-import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
@@ -39,7 +38,6 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.openftc.easyopencv.OpenCvWebcam;
 
 import java.util.Locale;
 
@@ -74,10 +72,6 @@ public class AuraRobot
     public Aura_DepositController depositFlipper;
 
     public WebcamName Khimera = null;
-    OpenCvWebcam Sauron = null;
-
-    public static BNO055IMU imu = null;
-
 
     // speeds/times
     public static double UpAdjust = 10;
@@ -89,11 +83,6 @@ public class AuraRobot
     public static double SlidePower_Up= 1;
     public static double SlidePower_Down = -0.01;
     public static int BUTTON_TRIGGER_TIMER_MS = 500;
-// webcam data
-    public static WebcamName webcamName       = null;
-    public static final String VUFORIA_KEY =
-            "AZRnab7/////AAABmTUhzFGJLEyEnSXEYWthkjhGRzu8klNOmOa9WEHaryl9AZCo2bZwq/rtvx83YRIgV60/Jy/2aivoXaHNzwi7dEMGoaglSVmdmzPF/zOPyiz27dDJgLVvIROD8ww7lYzL8eweJ+5PqLAavvX3wgrahkOxxOCNeKG9Tl0LkbS5R11ATXL7LLWeUv5FP1aDNgMZvb8P/u96OdOvD6D40Nf01Xf+KnkF5EXwNQKk1r7qd/hiv9h80gvBXMFqMkVgUyogwEnlK2BfmeUhGVm/99BiwwW65LpKSaLVPpW/6xqz9SyPgZ/L/vshbWgSkTB/KoERiV8MsW79RPUuQS6NTOLY32I/kukmsis3MFst5LP/d3gx";
-
 
     //dimensions for vuforia recognition
     public static final float mmPerInch        = 25.4f;
@@ -101,7 +90,6 @@ public class AuraRobot
     public static final float halfField        = 72 * mmPerInch;
     public static final float halfTile         = 12 * mmPerInch;
     public static final float oneAndHalfTile   = 36 * mmPerInch;
-
 
     public static double motorTicks  = 537.7;
     public static double numRotations = 20;
@@ -125,30 +113,15 @@ public class AuraRobot
     public static double HangExtend = 0.3;
     public static double HangIdle = 0;
     public static double FunkyIdle = 0.9;
-
     public static double FunkyUp = 0.57;
 
+    public static double APRILTAG_TIMEOUT = 5;
 
    //------------------------------------------------------------
-    //Roadrunner poses
-        //Blue 1
-       public static AuraPose2d blue_start_pose = new AuraPose2d(12, 62, Math.toRadians(0));
-        public static AuraPose2d blue_pos1_purple = new AuraPose2d(12, 32, Math.toRadians(0));
-        public static AuraPose2d blue_pos2_purple = new AuraPose2d(12, 32, Math.toRadians(0));
-        public static AuraPose2d blue_pos3_purple = new AuraPose2d(12, 32, Math.toRadians(0));
-        public static AuraPose2d blue_middle_purple = new AuraPose2d(12,36,Math.toRadians(0));
-        public static AuraPose2d blue_board = new AuraPose2d(51, 36, Math.toRadians(-90));
-        public static AuraPose2d blue_pos1_yellow = new AuraPose2d(51,36,Math.toRadians(-90));
-        public static AuraPose2d blue_pos2_yellow = new AuraPose2d(51,36,Math.toRadians(-90));
-        public static AuraPose2d blue_pos3_yellow = new AuraPose2d(51,36,Math.toRadians(-90));
-        public static AuraPose2d blue_park_pos = new AuraPose2d(51, 60, Math.toRadians(-90));
-
 
     /* local OpMode members. */
     public  HardwareMap hwMap           =  null;
     private ElapsedTime period  = new ElapsedTime();
-//    MecanumDrive AuraMecanumDrive = new MecanumDrive(hwMap,blue_start_pose.pose2d());
-    //public static MvrkPIDController control = new MvrkPIDController(11, 0, 0.25, 3600);
 
     /* Constructor */
     public AuraRobot(){

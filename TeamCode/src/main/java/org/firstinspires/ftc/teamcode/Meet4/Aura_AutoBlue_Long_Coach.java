@@ -30,6 +30,7 @@
 package org.firstinspires.ftc.teamcode.Meet4;
 
 import static com.qualcomm.robotcore.util.ElapsedTime.Resolution.MILLISECONDS;
+import static org.firstinspires.ftc.teamcode.AuraRobot.APRILTAG_TIMEOUT;
 import static org.firstinspires.ftc.teamcode.AuraRobot.AuraMotors.INTAKE;
 import static org.firstinspires.ftc.teamcode.Aura_DepositController.DepositState.Down;
 import static org.firstinspires.ftc.teamcode.Aura_DepositController.DepositState.Open;
@@ -92,20 +93,25 @@ public class Aura_AutoBlue_Long_Coach extends LinearOpMode {
     Pose2d Purple2Pos = new Pose2d(36, -14, Math.toRadians(90));
     Pose2d Purple3Pos = new Pose2d(28, -19, Math.toRadians(90));
 
-    Vector2d BeforeGatePos1 = new Vector2d(50,2);
-    Vector2d BeforeGatePos2 = new Vector2d(50,-14);
-    Vector2d BeforeGatePos3 = new Vector2d(50,-19);
-    Vector2d AfterGatePos = new Vector2d(45,58);
-
     Pose2d Yellow1Pos = new Pose2d(15, 88, Math.toRadians(-90));
     Pose2d Yellow2Pos = new Pose2d(20, 87.25, Math.toRadians(-90));
     Pose2d Yellow3Pos = new Pose2d(30, 87.25, Math.toRadians(-90));
 
-    Pose2d CalculatedPoseFromAprilTag = new Pose2d(0,0,0);
+    Vector2d BeforeGatePos1 = new Vector2d(50,2);
+    Vector2d BeforeGatePos2 = new Vector2d(50,-14);
+    Vector2d BeforeGatePos3 = new Vector2d(50,-19);
+    double BeforeGateHeading = 90;
+
+    Vector2d AfterGatePos   = new Vector2d(45,58);
+    double AfterGateHeading = 90;
+
+    // Set these manually from the Robot once it is at AfterGatePos.
+    double RangeCalibrated   = 0.0;
+    double YawCalibrated     = 0.0;
+    double BearingCalibrated = 0.0;
     boolean bProceedToYellow = false;
 
     Vector2d ParkPos = new Vector2d(42, 82);
-
 
     public static double purpleOffset1 = 1.0;
     public static double purpleOffset2 = 1.0;
@@ -184,25 +190,19 @@ public class Aura_AutoBlue_Long_Coach extends LinearOpMode {
 
     public Action rectifyHeadingError = new IMUController();
 
-    public class AprilTagController implements Action {
+    public class backwallAprilTagController implements Action {
         @Override
         public boolean run(TelemetryPacket tPkt) {
-            if(updatePosfromBackwallAprilTag(PurpleDropOffPos)) {
-                BlueLong.pose = CalculatedPoseFromAprilTag;
+            if(updatePosfromBackwallAprilTag()) {
                 bProceedToYellow = true;
             } else {
-                sleep(5000);
-                if(updatePosfromBackwallAprilTag(PurpleDropOffPos)) {
-                    BlueLong.pose = CalculatedPoseFromAprilTag;
-                    bProceedToYellow = true;
-                    return false;
-                }
+                bProceedToYellow = false;
             }
             return false;
         }
     }
 
-    public Action updatePosUsingAprilTags = new AprilTagController();
+    public Action updateAfterGatePos = new backwallAprilTagController();
 
     private static final double LEFT_SPIKEMARK_BOUNDARY_X = 250;
     private static final double RIGHT_SPIKEMARK_BOUNDARY_X = 260;
@@ -345,7 +345,7 @@ public class Aura_AutoBlue_Long_Coach extends LinearOpMode {
                     // Go to position 2
                     Actions.runBlocking( new SequentialAction(
                             dropOffPurpleAtPos1,
-                            updatePosUsingAprilTags
+                            updateAfterGatePos
                     ));
                     if(bProceedToYellow)
                         Actions.runBlocking( new SequentialAction( dropOffYellowAtPos1 ));
@@ -356,7 +356,7 @@ public class Aura_AutoBlue_Long_Coach extends LinearOpMode {
                     // Go to position 2
                     Actions.runBlocking( new SequentialAction(
                                 dropOffPurpleAtPos2,
-                                updatePosUsingAprilTags
+                            updateAfterGatePos
                             ));
                     if(bProceedToYellow)
                         Actions.runBlocking( new SequentialAction( dropOffYellowAtPos2 ));
@@ -368,7 +368,7 @@ public class Aura_AutoBlue_Long_Coach extends LinearOpMode {
                     // Go to position 2
                     Actions.runBlocking( new SequentialAction(
                             dropOffPurpleAtPos3,
-                            updatePosUsingAprilTags
+                            updateAfterGatePos
                     ));
                     if(bProceedToYellow)
                         Actions.runBlocking( new SequentialAction( dropOffYellowAtPos3 ));
@@ -377,38 +377,6 @@ public class Aura_AutoBlue_Long_Coach extends LinearOpMode {
                     break;
             }
         }
-    }
-
-    boolean updatePosfromBackwallAprilTag(int iPos)
-    {
-        initAprilTag(); // initializing the april tag processor
-        setManualExposure(6, 250); // accounting for motion blur
-        targetFound = false;
-        desiredTag  = null;
-
-        List<org.firstinspires.ftc.vision.apriltag.AprilTagDetection> currentDetections = aprilTag.getDetections();
-        for (org.firstinspires.ftc.vision.apriltag.AprilTagDetection detection : currentDetections) {
-            // Look to see if we have size info on this tag.
-            if (detection.metadata != null) {
-                //  Check to see if we want to track towards this tag.
-                if ((DESIRED_TAG_ID < 0) || (detection.id == DESIRED_TAG_ID)) {
-                    targetFound = true;
-                    desiredTag = detection;
-                    break;
-                } else {
-                    telemetry.addData("Skipping", "Tag ID %d is not desired", detection.id);
-                }
-            } else {
-                telemetry.addData("Unknown", "Tag ID %d is not in TagLibrary", detection.id);
-            }
-        }
-        if(targetFound) {
-            telemetry.addData("Found", "ID %d (%s)", desiredTag.id, desiredTag.metadata.fieldPosition);
-            telemetry.addData("Range",  "%5.1f inches", desiredTag.ftcPose.range);
-            telemetry.addData("Bearing","%3.0f degrees", desiredTag.ftcPose.bearing);
-            telemetry.addData("Yaw","%3.0f degrees", desiredTag.ftcPose.yaw);
-        }
-        return true;
     }
 
     void buildPurpleTrajectories()
@@ -558,6 +526,55 @@ public class Aura_AutoBlue_Long_Coach extends LinearOpMode {
         }   // end for() loop
 
     }   // end method telemetryTfod()
+
+    boolean updatePosfromBackwallAprilTag()
+    {
+        initAprilTag(); // initializing the april tag processor
+        setManualExposure(6, 250); // accounting for motion blur
+        targetFound = false;
+        desiredTag  = null;
+
+        ElapsedTime AprilTagTimer = new ElapsedTime();
+        AprilTagTimer.reset();
+        while(!targetFound && AprilTagTimer.seconds() < APRILTAG_TIMEOUT) {
+            List<org.firstinspires.ftc.vision.apriltag.AprilTagDetection> currentDetections = aprilTag.getDetections();
+            for (org.firstinspires.ftc.vision.apriltag.AprilTagDetection detection : currentDetections) {
+                // Look to see if we have size info on this tag.
+                if (detection.metadata != null) {
+                    //  Check to see if we want to track towards this tag.
+                    if ((DESIRED_TAG_ID < 0) || (detection.id == DESIRED_TAG_ID)) {
+                        targetFound = true;
+                        desiredTag = detection;
+                        break;
+                    } else {
+                        telemetry.addData("Skipping", "Tag ID %d is not desired", detection.id);
+                    }
+                } else {
+                    telemetry.addData("Unknown", "Tag ID %d is not in TagLibrary", detection.id);
+                }
+            }
+        }
+        if(targetFound) {
+            telemetry.addData("Found", "ID %d (%s)", desiredTag.id, desiredTag.metadata.fieldPosition);
+            telemetry.addData("Range",  "%5.1f inches", desiredTag.ftcPose.range);
+            telemetry.addData("Bearing","%3.0f degrees", desiredTag.ftcPose.bearing);
+            telemetry.addData("Yaw","%3.0f degrees", desiredTag.ftcPose.yaw);
+
+            double deltaY = (desiredTag.ftcPose.range * Math.cos(desiredTag.ftcPose.bearing) -
+                    RangeCalibrated          * Math.cos(BearingCalibrated));
+
+            double deltaX = (desiredTag.ftcPose.range * Math.sin(desiredTag.ftcPose.bearing)) -
+                    (RangeCalibrated          * Math.sin(BearingCalibrated));
+
+            double deltaHeading = desiredTag.ftcPose.yaw - YawCalibrated;
+
+            BlueLong.pose = new Pose2d(AfterGatePos.x + deltaX, AfterGatePos.y + deltaY, AfterGateHeading + deltaHeading);
+
+            return true;
+        }
+        return false;
+    }
+
 
     private void initAprilTag() {
         // Create the AprilTag processor by using a builder.
