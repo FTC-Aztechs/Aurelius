@@ -44,6 +44,7 @@ import static org.firstinspires.ftc.teamcode.AuraRobot.speedAdjust;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -79,6 +80,7 @@ import java.util.concurrent.TimeUnit;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
+@Config
 @TeleOp(name="Sandbox", group="Linear Opmode")
 public class Aura_Sandbox extends LinearOpMode
 {
@@ -430,6 +432,10 @@ public class Aura_Sandbox extends LinearOpMode
             telemetry.addData("Bearing", "%3.0f degrees", desiredTag.ftcPose.bearing);
             telemetry.addData("Yaw", "%3.0f degrees", desiredTag.ftcPose.yaw);
         }
+
+        //range 40
+        //bearing 17
+        //yaw 0
     }
 
     private void initAprilTag() {

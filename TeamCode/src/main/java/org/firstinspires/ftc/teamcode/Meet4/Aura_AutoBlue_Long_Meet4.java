@@ -97,7 +97,7 @@ public class Aura_AutoBlue_Long_Meet4 extends LinearOpMode {
     Vector2d BeforeGatePos1 = new Vector2d(50,2);
     Vector2d BeforeGatePos2 = new Vector2d(50,-14);
     Vector2d BeforeGatePos3 = new Vector2d(50,-19);
-    Vector2d AfterGateTagPos = new Vector2d(50, 56);
+    Vector2d AfterGateTagPos = new Vector2d(50, 51);
     Vector2d AfterGatePos = new Vector2d(50, 68);
 
     Pose2d Yellow1Pos = new Pose2d(22, 90, Math.toRadians(-90));
@@ -109,9 +109,9 @@ public class Aura_AutoBlue_Long_Meet4 extends LinearOpMode {
     double AfterGateHeading = 90;
 
     // Set these manually from the Robot once it is at AfterGatePos.
-    double RangeCalibrated   = 0.0;
+    double RangeCalibrated   = 40.3;
     double YawCalibrated     = 0.0;
-    double BearingCalibrated = 0.0;
+    double BearingCalibrated = 17;
     boolean bProceedToYellow = false;
 
 
@@ -237,7 +237,7 @@ public class Aura_AutoBlue_Long_Meet4 extends LinearOpMode {
     private VisionPortal visionPortal;
 
     private static final boolean USE_WEBCAM = true;
-    private static final int DESIRED_TAG_ID = 1;     // Choose the tag you want to approach or set to -1 for ANY tag.
+    public static final int DESIRED_TAG_ID = 3;     // Choose the tag you want to approach or set to -1 for ANY tag.
     private AprilTagProcessor aprilTag;              // Used for managing the AprilTag detection process.
     private org.firstinspires.ftc.vision.apriltag.AprilTagDetection desiredTag = null;     // Used to hold the data for a detected AprilTag
     boolean targetFound     = false;    // Set to true when an AprilTag target is detected
@@ -629,9 +629,11 @@ public class Aura_AutoBlue_Long_Meet4 extends LinearOpMode {
                         break;
                     } else {
                         telemetry.addData("Skipping", "Tag ID %d is not desired", detection.id);
+                        telemetry.update();
                     }
                 } else {
                     telemetry.addData("Unknown", "Tag ID %d is not in TagLibrary", detection.id);
+                    telemetry.update();
                 }
             }
         }
@@ -640,19 +642,25 @@ public class Aura_AutoBlue_Long_Meet4 extends LinearOpMode {
             telemetry.addData("Range",  "%5.1f inches", desiredTag.ftcPose.range);
             telemetry.addData("Bearing","%3.0f degrees", desiredTag.ftcPose.bearing);
             telemetry.addData("Yaw","%3.0f degrees", desiredTag.ftcPose.yaw);
-
-            double deltaY = (desiredTag.ftcPose.range * Math.cos(desiredTag.ftcPose.bearing) -
-                    RangeCalibrated          * Math.cos(BearingCalibrated));
+            telemetry.update();
 
             double deltaX = (desiredTag.ftcPose.range * Math.sin(desiredTag.ftcPose.bearing)) -
                     (RangeCalibrated          * Math.sin(BearingCalibrated));
 
+            double deltaY = (desiredTag.ftcPose.range * Math.cos(desiredTag.ftcPose.bearing) -
+                    RangeCalibrated          * Math.cos(BearingCalibrated));
+
             double deltaHeading = desiredTag.ftcPose.yaw - YawCalibrated;
 
-            BlueLong.pose = new Pose2d(AfterGatePos.x + deltaX, AfterGatePos.y + deltaY, AfterGateHeading + deltaHeading);
+            telemetry.addData("Current pos:", "X: %d Y: %d, Heading: %d",BlueLong.pose.position.x, BlueLong.pose.position.y, BlueLong.pose.heading.log() );
+            telemetry.addData("Deltas", "X: %d Y: %d Heading: %d", deltaX, deltaY, deltaHeading);
+            telemetry.update();
 
+            //BlueLong.pose = new Pose2d(BlueLong.pose.position.x + deltaX, BlueLong.pose.position.y + deltaY, BlueLong.pose.heading.log() + deltaHeading);
             return true;
         }
+        telemetry.addData("Not Found", "Desired Tag not found");
+        telemetry.update();
         return false;
     }
 
@@ -672,10 +680,10 @@ public class Aura_AutoBlue_Long_Meet4 extends LinearOpMode {
 
         // Create the vision portal by using a builder.
         if (USE_WEBCAM) {
-            visionPortal = new VisionPortal.Builder()
-                    .setCamera(hardwareMap.get(WebcamName.class, "Eyeball"))
-                    .addProcessor(aprilTag)
-                    .build();
+                visionPortal = new VisionPortal.Builder()
+                        .setCamera(hardwareMap.get(WebcamName.class, "Kemera"))
+                        .addProcessor(aprilTag)
+                        .build();
         } else {
             visionPortal = new VisionPortal.Builder()
                     .setCamera(BuiltinCameraDirection.BACK)
