@@ -103,6 +103,7 @@ public class Aura_Sandbox extends LinearOpMode
     boolean changingWheelSpeed = false;
     boolean targetFound = false;    // Set to true when an AprilTag target is detected
     boolean changingState = false;
+    boolean bKeepGoing = true;
     public static int SANDBOX_MODE = 0;
 
     public static int Smd_profileTime = 5000;
@@ -122,6 +123,36 @@ public class Aura_Sandbox extends LinearOpMode
         APRIL
     }
     public static SandboxMode sandboxMode = SandboxMode.APRIL;
+
+//    public static class CameraStreamProcessor implements VisionProcessor, CameraStreamSource {
+//        private final AtomicReference<Bitmap> lastFrame =
+//                new AtomicReference<>(Bitmap.createBitmap(1, 1, Bitmap.Config.RGB_565));
+//
+//        @Override
+//        public void init(int width, int height, CameraCalibration calibration) {
+//            lastFrame.set(Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565));
+//        }
+//
+//        @Override
+//        public Object processFrame(Mat frame, long captureTimeNanos) {
+//            Bitmap b = Bitmap.createBitmap(frame.width(), frame.height(), Bitmap.Config.RGB_565);
+//            Utils.matToBitmap(frame, b);
+//            lastFrame.set(b);
+//            return null;
+//        }
+//
+//        @Override
+//        public void onDrawFrame(Canvas canvas, int onscreenWidth, int onscreenHeight,
+//                                float scaleBmpPxToCanvasPx, float scaleCanvasDensity,
+//                                Object userContext) {
+//            // do nothing
+//        }
+//
+//        @Override
+//        public void getFrameBitmap(Continuation<? extends Consumer<Bitmap>> continuation) {
+//            continuation.dispatch(bitmapConsumer -> bitmapConsumer.accept(lastFrame.get()));
+//        }
+//    }
 
 //    MvrkVuforiaPoseEstimator vuforiaPoseEstimator = new MvrkVuforiaPoseEstimator(hardwareMap);
 
@@ -149,6 +180,8 @@ public class Aura_Sandbox extends LinearOpMode
             setManualExposure(6,250);
         }
 
+
+
         waitForStart();
         //getUserInput();
 
@@ -157,7 +190,7 @@ public class Aura_Sandbox extends LinearOpMode
         runtime.reset();
 
         // run until the end of the match (driver presses STOP)
-        while (!isStopRequested()) {
+        while (!isStopRequested() && bKeepGoing) {
             switch(sandboxMode) {
                 case SMD_INTAKE_OUTTAKE:
                     SandboxIntakeOuttake();
@@ -431,7 +464,12 @@ public class Aura_Sandbox extends LinearOpMode
             telemetry.addData("Range", "%5.1f inches", desiredTag.ftcPose.range);
             telemetry.addData("Bearing", "%3.0f degrees", desiredTag.ftcPose.bearing);
             telemetry.addData("Yaw", "%3.0f degrees", desiredTag.ftcPose.yaw);
+            bKeepGoing = false;
         }
+        else {
+            telemetry.addData("Target:", "Not Found!");
+        }
+        telemetry.update();
 
         //range 40
         //bearing 17
