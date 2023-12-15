@@ -439,12 +439,14 @@ public class Aura_Sandbox extends LinearOpMode
         targetFound = false;
         desiredTag  = null;
 
+        int desiredTagID = CAMERA_SIDE ? 3 : 4;
+
         List<AprilTagDetection> currentDetections = aprilTag.getDetections();
         for (AprilTagDetection detection : currentDetections) {
             // Look to see if we have size info on this tag.
             if (detection.metadata != null) {
                 //  Check to see if we want to track towards this tag.
-                if ((DESIRED_TAG_ID < 0) || (detection.id == DESIRED_TAG_ID)) {
+                if ((DESIRED_TAG_ID < 0) || (detection.id == desiredTagID)) {
                     // Yes, we want to use this tag.
                     targetFound = true;
                     desiredTag = detection;

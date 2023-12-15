@@ -100,9 +100,13 @@ public class Aura_AutoBlue_Long_Meet4 extends LinearOpMode {
     Vector2d AfterGateTagPos = new Vector2d(50, 51.25);
     Vector2d AfterGatePos = new Vector2d(50, 68);
 
-    Pose2d Yellow1Pos = new Pose2d(22, 90, Math.toRadians(-90));
-    Pose2d Yellow2Pos = new Pose2d(28, 90, Math.toRadians(-90));
-    Pose2d Yellow3Pos = new Pose2d(33, 90, Math.toRadians(-90));
+    Pose2d Yellow1Pos = new Pose2d(22, 89, Math.toRadians(-90));
+    Pose2d Yellow2Pos = new Pose2d(28, 89, Math.toRadians(-90));
+    Pose2d Yellow3Pos = new Pose2d(33, 89, Math.toRadians(-90));
+//    Pose2d Yellow1Pos = new Pose2d(22, 90, Math.toRadians(-90));
+//    Pose2d Yellow2Pos = new Pose2d(28, 90, Math.toRadians(-90));
+//    Pose2d Yellow3Pos = new Pose2d(33, 90, Math.toRadians(-90));
+
 
     Vector2d ParkPos = new Vector2d(50, 82);
 
@@ -426,8 +430,8 @@ public class Aura_AutoBlue_Long_Meet4 extends LinearOpMode {
                 .stopAndAdd(rectifyHeadingError)
                 .strafeTo(AfterGateTagPos)
                 .stopAndAdd(updateAfterGatePos)
-                .strafeTo(AfterGatePos)
-                .splineToLinearHeading(Yellow3Pos, Math.toRadians(90))
+                .splineToLinearHeading(new Pose2d(ParkPos.x, ParkPos.y, Math.toRadians(-90)), Math.toRadians(90))
+                .stopAndAdd(rectifyHeadingError)
                 .strafeTo(new Vector2d(Yellow1Pos.component1().x,Yellow1Pos.component1().y))
                 .build();
 
@@ -438,8 +442,8 @@ public class Aura_AutoBlue_Long_Meet4 extends LinearOpMode {
                 .stopAndAdd(rectifyHeadingError)
                 .strafeTo(AfterGateTagPos)
                 .stopAndAdd(updateAfterGatePos)
-                .strafeTo(AfterGatePos)
-                .splineToLinearHeading(Yellow3Pos, Math.toRadians(90))
+                .splineToLinearHeading(new Pose2d(ParkPos.x, ParkPos.y, Math.toRadians(-90)), Math.toRadians(90))
+                .stopAndAdd(rectifyHeadingError)
                 .strafeTo(new Vector2d(Yellow2Pos.component1().x,Yellow2Pos.component1().y))
                 .build();
 
@@ -450,8 +454,9 @@ public class Aura_AutoBlue_Long_Meet4 extends LinearOpMode {
                 .stopAndAdd(rectifyHeadingError)
                 .strafeTo(AfterGateTagPos)
                 .stopAndAdd(updateAfterGatePos)
-                .strafeTo(AfterGatePos)
-                .splineToLinearHeading(Yellow3Pos, Math.toRadians(90))
+                .splineToLinearHeading(new Pose2d(ParkPos.x, ParkPos.y, Math.toRadians(-90)), Math.toRadians(90))
+                .stopAndAdd(rectifyHeadingError)
+                .strafeTo(new Vector2d(Yellow3Pos.component1().x,Yellow3Pos.component1().y))
                 .build();
     }
 
@@ -655,7 +660,7 @@ public class Aura_AutoBlue_Long_Meet4 extends LinearOpMode {
 
             double currX = BlueLong.pose.position.x;
             double currY = BlueLong.pose.position.y;
-            telemetry.addData("Current pos:", "X: %5.1f Y: %5.1f Heading: %5.1f degrees", BlueLong.pose.position.x, BlueLong.pose.position.x, Math.toDegrees(BlueLong.pose.heading.log()));
+            telemetry.addData("Current pos:", "X: %5.1f Y: %5.1f Heading: %5.1f degrees", BlueLong.pose.position.x, BlueLong.pose.position.y, Math.toDegrees(BlueLong.pose.heading.log()));
             telemetry.addData("Deltas", "X: %5.1f Y: %5.1f Heading: %5.1f degrees", deltaX, deltaY, deltaHeading);
             telemetry.update();
 
