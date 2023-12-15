@@ -656,7 +656,7 @@ public class Aura_AutoBlue_Long_Meet4 extends LinearOpMode {
                     (desiredTag.ftcPose.range * Math.sin(Math.toRadians(desiredTag.ftcPose.bearing)));
 
 
-            double deltaHeading = desiredTag.ftcPose.yaw - YawCalibrated;
+            double deltaHeading = YawCalibrated - desiredTag.ftcPose.yaw;
 
             double currX = BlueLong.pose.position.x;
             double currY = BlueLong.pose.position.y;
