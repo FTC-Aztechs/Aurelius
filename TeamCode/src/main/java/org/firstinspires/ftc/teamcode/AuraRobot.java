@@ -92,7 +92,7 @@ public class AuraRobot
     public static final float oneAndHalfTile   = 36 * mmPerInch;
 
     public static double motorTicks  = 537.7;
-    public static double numRotations = 20;
+    public static double numRotations = 25;
 
     //claw variables
     public static double Launcher_Set_Pos = 0;
@@ -110,8 +110,8 @@ public class AuraRobot
     public static int HighJunction_Auto = 15250;
     public static int UpperLimit     = 18000;
 
-    public static double HangExtend = 0.3;
-    public static double HangIdle = 0;
+    public static double HangExtend = 0.4;
+    public static double HangIdle = 0; //0
     public static double FunkyIdle = 0.9;
     public static double FunkyUp = 0.57;
 

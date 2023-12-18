@@ -27,7 +27,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.firstinspires.ftc.teamcode.Meet3;
+package org.firstinspires.ftc.teamcode.Meet5;
 
 import static com.qualcomm.robotcore.util.ElapsedTime.Resolution.MILLISECONDS;
 import static org.firstinspires.ftc.teamcode.AuraRobot.AuraMotors.INTAKE;
@@ -45,7 +45,6 @@ import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -53,6 +52,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.teamcode.AprilTagDetectionPipeline;
+import org.firstinspires.ftc.teamcode.AuraHeadingEstimator;
 import org.firstinspires.ftc.teamcode.AuraRobot;
 import org.firstinspires.ftc.teamcode.roadrunnerbasics.MecanumDrive;
 import org.firstinspires.ftc.vision.VisionPortal;
@@ -76,37 +76,77 @@ import java.util.List;
  */
 
 @Config
-@Autonomous(name="Red_Short3", group="Linear OpMode")
-@Disabled
+@Autonomous(name="Blue_Short", group="Linear OpMode")
 
-
-public class Aura_AutoRed_Short_Meet3 extends LinearOpMode {
+public class Aura_AutoBlue_Short_Meet5 extends LinearOpMode {
 
     //**** Roadrunner Pose2ds ****
 
-    Pose2d StartPos = new Pose2d(0,0,0);
+    Pose2d StartPos = new Pose2d(12,61.5,Math.toRadians(-90));
 
-    Pose2d Purple1Pos = new Pose2d(28, 2, Math.toRadians(90));
-    Pose2d Purple2Pos = new Pose2d(36, -12, Math.toRadians(90));
-    Pose2d Purple3Pos = new Pose2d(28, -19, Math.toRadians(90));
+    Pose2d Purple1Pos = new Pose2d(31, 34.5 , Math.toRadians(-180)); //27,19,-90
+    Pose2d Purple2Pos = new Pose2d(24, 24.5 , Math.toRadians(-180));  //37,12,-90
+    Pose2d Purple3Pos = new Pose2d(12, 34.5, Math.toRadians(-180));  //27,0,-90
 
-    Pose2d Yellow3Pos = new Pose2d(20, -37, Math.toRadians(90));
-    Pose2d Yellow2Pos = new Pose2d(28, -37, Math.toRadians(90));
-    Pose2d Yellow1Pos = new Pose2d(33,-37, Math.toRadians(90));
+    Pose2d Yellow1Pos = new Pose2d(49, 34.5, Math.toRadians(-180));  //27,37,-90
+    Pose2d Yellow2Pos = new Pose2d(49, 35.5,Math.toRadians(-180));   //26,37,-90
+    Pose2d Yellow3Pos = new Pose2d(49,28.5 ,Math.toRadians(-180));    //33,37,-90
 
-    Vector2d ParkPos = new Vector2d(7, -37);
+    Vector2d ParkPos = new Vector2d(49, 54.5);  //7, 37
+
+    //Roadrunner field-centric coordinates quick guide brought to you by Lavanya
+
+    //y+ robot drives from centerfield towards the blue side
+    //y- robot drives from centerfield towards the red side
+    //x- robot drives from centerfield towards stacks
+    //x+ robot drives from centerfield towards backdrops
+
+    //0° robot from centerfield faces backdrop
+    //90° robot from centerfield faces blue
+    //180° robot from centerfield faces stacks
+    //-90° robot from centerfield faces red
+    //tangent parameter in splines = changing angle changes the shape of the path
+
+    //setTangent() = changes the direction in which the robot initially starts to drive
+    //90 = to the left
+    //180 = to the back
+    //-90 = to the right
+    //0 = forward
+
+    //************
 
 
     private static final double LEFT_SPIKEMARK_BOUNDARY_X = 250;
     private static final double RIGHT_SPIKEMARK_BOUNDARY_X = 260;
 
-    public static double SplineAngle = 90;
     public static int PurpleDropOffPos = 0;
 
     AuraRobot Aurelius = new AuraRobot();
-    MecanumDrive RedShort;
+    MecanumDrive BlueShort;
+    public AuraHeadingEstimator myHeadingEstimator;
+
 
     private static FtcDashboard auraBoard;
+
+    //TODO: imu
+    public class IMUController implements Action {
+        @Override
+        public boolean run(TelemetryPacket tPkt) {
+
+            double oldHeading = BlueShort.pose.heading.log();
+            telemetry.addData("Old heading", Math.toDegrees(oldHeading));
+            double yaw = myHeadingEstimator.getYaw();
+            telemetry.addData("IMU Heading correction: ", Math.toDegrees(yaw - oldHeading));
+            telemetry.addData("Corrected heading:", Math.toDegrees(yaw));
+            telemetry.update();
+
+            BlueShort.pose = new Pose2d(BlueShort.pose.position.x, BlueShort.pose.position.y, yaw);
+
+            return false;
+        }
+    }
+
+    public Action rectifyHeadingError = new IMUController();
 
     //TODO: declare April Tag stuffi
     OpenCvWebcam Sauron = null;
@@ -143,11 +183,12 @@ public class Aura_AutoRed_Short_Meet3 extends LinearOpMode {
      */
     // TFOD_MODEL_ASSET points to a model file stored in the project Asset location,
     // this is only used for Android Studio when using models in Assets.
-    private static final String TFOD_MODEL_ASSET = "myRedpy.tflite";
+    private static final String TFOD_MODEL_ASSET = "myBloopy.tflite";
 
     // TFOD_MODEL_FILE points to a model file stored onboard the Robot Controller's storage,
     // this is used when uploading models directly to the RC using the model upload interface.
 //    private static final String TFOD_MODEL_FILE = "C:\\Sashank\\FTC CenterStage\\Aurelius\\Aurelius\\TeamCode\\src\\main\\java\\org\\firstinspires\\ftc\\teamcode\\myBloopy.tflite";
+
     // Define the labels recognized in the model for TFOD (must be in training order!)
     private static final String[] LABELS = {
             "Pixel",
@@ -164,19 +205,19 @@ public class Aura_AutoRed_Short_Meet3 extends LinearOpMode {
 
     // TODO: define trajectory variables here
     // Purple Trajectories
-    private Action trajPos3Purple;
-    private Action trajPos2Purple;
     private Action trajPos1Purple;
+    private Action trajPos2Purple;
+    private Action trajPos3Purple;
 
     // Yellow Trajectories
-    private Action trajPos3Yellow;
-    private Action trajPos2Yellow;
     private Action trajPos1Yellow;
+    private Action trajPos2Yellow;
+    private Action trajPos3Yellow;
 
     // Park Trajectories
-    private Action trajPos3ToPark;
-    private Action trajPos2ToPark;
     private Action trajPos1ToPark;
+    private Action trajPos2ToPark;
+    private Action trajPos3ToPark;
 
     private ElapsedTime runtime = new ElapsedTime();
 
@@ -195,7 +236,8 @@ public class Aura_AutoRed_Short_Meet3 extends LinearOpMode {
         //   Option 3: Ditch the VisionProcessor and use EasyOpenCV directly
 
         Aurelius.init(hardwareMap);
-        RedShort = new MecanumDrive(Aurelius.hwMap, new Pose2d(0,0,Math.toRadians(0)));
+        BlueShort = new MecanumDrive(Aurelius.hwMap, new Pose2d(0,0,0));
+        myHeadingEstimator = new AuraHeadingEstimator(Aurelius.hwMap);
         ElapsedTime trajectoryTimer = new ElapsedTime(MILLISECONDS);
 
         auraBoard = FtcDashboard.getInstance();
@@ -239,25 +281,25 @@ public class Aura_AutoRed_Short_Meet3 extends LinearOpMode {
             switch (PurpleDropOffPos) {
                 case 1:
                     Actions.runBlocking(
-                            new SequentialAction(
-                                    trajPos1Purple,
-                                    new Action() {
-                                        @Override
-                                        public boolean run(TelemetryPacket tPkt) {
-                                            dropOffPurplePixel();
-                                            return false;
-                                        }
-                                    },
-                                    trajPos1Yellow,
-                                    new Action() {
-                                        @Override
-                                        public boolean run(TelemetryPacket tPkt) {
-                                            dropOffYellowPixel();
-                                            return false;
-                                        }
-                                    }
-                                    , trajPos1ToPark
-                            ));
+                        new SequentialAction(
+                            trajPos1Purple,
+                            new Action() {
+                                @Override
+                                public boolean run(TelemetryPacket tPkt) {
+                                    dropOffPurplePixel();
+                                    return false;
+                                }
+                            },
+                            trajPos1Yellow,
+                            new Action() {
+                                @Override
+                                public boolean run(TelemetryPacket tPkt) {
+                                    dropOffYellowPixel();
+                                    return false;
+                                }
+                            }
+                            ,trajPos1ToPark
+                        ));
                     break;
                 case 2:
                     // Go to position 2
@@ -283,80 +325,80 @@ public class Aura_AutoRed_Short_Meet3 extends LinearOpMode {
                             ));
                     break;
                 case 3:
-                default:
+                 default:
                     // Go to position 3
-                    Actions.runBlocking(
-                            new SequentialAction(
-                                    trajPos3Purple,
-                                    new Action() {
-                                        @Override
-                                        public boolean run(TelemetryPacket tPkt) {
-                                            dropOffPurplePixel();
-                                            return false;
-                                        }
-                                    },
-                                    trajPos3Yellow,
-                                    new Action() {
-                                        @Override
-                                        public boolean run(TelemetryPacket tPkt) {
-                                            dropOffYellowPixel();
-                                            return false;
-                                        }
-                                    },
-                                    trajPos3ToPark
-                            ));
-                    break;
+                     Actions.runBlocking(
+                             new SequentialAction(
+                                     trajPos3Purple,
+                                     new Action() {
+                                         @Override
+                                         public boolean run(TelemetryPacket tPkt) {
+                                             dropOffPurplePixel();
+                                             return false;
+                                         }
+                                     },
+                                     trajPos3Yellow,
+                                     new Action() {
+                                         @Override
+                                         public boolean run(TelemetryPacket tPkt) {
+                                             dropOffYellowPixel();
+                                             return false;
+                                         }
+                                     },
+                                     trajPos3ToPark
+                             ));
+                break;
             }
         }
     }
 
     void buildPurpleTrajectories()
     {
-        trajPos1Purple = RedShort.actionBuilder(StartPos)
-                .setTangent(Math.toRadians(0))
-                .splineToLinearHeading(Purple1Pos, Math.toRadians(30))
+        trajPos1Purple = BlueShort.actionBuilder(StartPos)
+                .splineToLinearHeading(Purple1Pos, Math.toRadians(-90))
                 .build();
 
-        trajPos2Purple = RedShort.actionBuilder(StartPos)
-                .setTangent(Math.toRadians(-70))
-                .splineToLinearHeading(Purple2Pos, Math.toRadians(0))
+        trajPos2Purple = BlueShort.actionBuilder(StartPos)
+                .splineToLinearHeading(Purple2Pos, Math.toRadians(-90))
                 .build();
 
-        trajPos3Purple = RedShort.actionBuilder(StartPos)
-                .setTangent(Math.toRadians(-70))
-                .splineToLinearHeading(Purple3Pos, Math.toRadians(0))
+        trajPos3Purple = BlueShort.actionBuilder(StartPos)
+                .splineToLinearHeading(Purple3Pos, Math.toRadians(-90))
                 .build();
     }
 
     void buildYellowTrajectories()
     {
-        trajPos1Yellow = RedShort.actionBuilder(Purple1Pos)
+        trajPos1Yellow = BlueShort.actionBuilder(Purple1Pos)
+                .stopAndAdd(rectifyHeadingError)
                 .setReversed(true)
-                .splineToLinearHeading(Yellow1Pos, Math.toRadians(-90))
+                .splineToLinearHeading(Yellow1Pos, Math.toRadians(90))
                 .build();
 
-        trajPos2Yellow = RedShort.actionBuilder(Purple2Pos)
+        trajPos2Yellow = BlueShort.actionBuilder(Purple2Pos)
+                .stopAndAdd(rectifyHeadingError)
                 .setReversed(true)
-                .splineToLinearHeading(Yellow2Pos, Math.toRadians(-90))
+                .splineToLinearHeading(Yellow2Pos, Math.toRadians(90))
                 .build();
 
-        trajPos3Yellow = RedShort.actionBuilder(Purple3Pos)
+        trajPos3Yellow = BlueShort.actionBuilder(Purple3Pos)
+                .stopAndAdd(rectifyHeadingError)
                 .setReversed(true)
-                .splineToLinearHeading(Yellow3Pos, Math.toRadians(-90))
+                .splineToLinearHeading(Yellow3Pos, Math.toRadians(90))
                 .build();
     }
 
     void buildParkTrajectories()
     {
-        trajPos1ToPark = RedShort.actionBuilder(Yellow1Pos)
+        trajPos1ToPark = BlueShort.actionBuilder(Yellow1Pos)
                 .strafeTo(ParkPos)
                 .build();
 
-        trajPos2ToPark = RedShort.actionBuilder(Yellow2Pos)
+        trajPos2ToPark = BlueShort.actionBuilder(Yellow2Pos)
                 .strafeTo(ParkPos)
                 .build();
 
-        trajPos3ToPark = RedShort.actionBuilder(Yellow3Pos)
+        trajPos3ToPark = BlueShort.actionBuilder(Yellow3Pos)
                 .strafeTo(ParkPos)
                 .build();
     }
@@ -364,8 +406,8 @@ public class Aura_AutoRed_Short_Meet3 extends LinearOpMode {
     void dropOffPurplePixel()
     {
         runtime.reset();
-        while(runtime.seconds() < 1.2) {
-            Aurelius.setPower(INTAKE, -0.2);
+        while(runtime.seconds() < 0.8) {
+            Aurelius.setPower(INTAKE, -0.175);
         }
         Aurelius.setPower(INTAKE, 0);
     }
@@ -420,20 +462,20 @@ public class Aura_AutoRed_Short_Meet3 extends LinearOpMode {
         return result;
     }
 
-    //TODO: April Tag detection function - might need updating
+//TODO: April Tag detection function - might need updating
 //TODO: TFOD functions here
     //TFOD ConceptTensorFlowObjectDetectionEasy functions
     private void initTfod() {
 
         // Create the TensorFlow processor the easy way.
         tfod = new TfodProcessor.Builder()
-                .setModelAssetName(TFOD_MODEL_ASSET)
-                .setModelLabels(LABELS)
-                .setIsModelTensorFlow2(true)
-                .setIsModelQuantized(true)
-                .setModelInputSize(300)
-                .setModelAspectRatio(16.0 / 9.0)
-                .build();
+        .setModelAssetName(TFOD_MODEL_ASSET)
+        .setModelLabels(LABELS)
+        .setIsModelTensorFlow2(true)
+        .setIsModelQuantized(true)
+        .setModelInputSize(300)
+        .setModelAspectRatio(16.0 / 9.0)
+        .build();
 
         // Create the vision portal the easy way.
         VisionPortal.Builder builder = new VisionPortal.Builder();
@@ -441,7 +483,7 @@ public class Aura_AutoRed_Short_Meet3 extends LinearOpMode {
         // Set the camera (webcam vs. built-in RC phone camera).
         builder.setCamera(hardwareMap.get(WebcamName.class, "Kemera"));
 
-
+        
         // Set and enable the processor.
         builder.addProcessor(tfod);
 
@@ -489,7 +531,7 @@ public class Aura_AutoRed_Short_Meet3 extends LinearOpMode {
         else
             PurpleDropOffPos = 3;
 
-//        //TODO REmove this override
+//        //TODO Remove this override
 //        PurpleDropOffPos = 1;
 
         telemetry.addData("Detected Spike Mark X = ", x);
@@ -501,7 +543,6 @@ public class Aura_AutoRed_Short_Meet3 extends LinearOpMode {
     }
 
 }
-
 
 
 

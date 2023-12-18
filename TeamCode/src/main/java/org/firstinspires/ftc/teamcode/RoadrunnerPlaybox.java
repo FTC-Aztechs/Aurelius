@@ -159,17 +159,17 @@ private static int iTeleCt = 1;
     void buildTestTrajectory()
     {
         squareTraj = Playbox.actionBuilder(new Pose2d(StartposX,StartposY,Math.toRadians(StartposHeading)))
-                .lineToX(Distance + StartposX)
+                .strafeTo(new Vector2d(Distance + StartposX, 0 + StartposY))
                 .strafeTo(new Vector2d(Distance + StartposX,Distance + StartposY))
                 .setReversed(true)
-                .lineToX(0 + StartposX)
+                .strafeTo(new Vector2d(0 + StartposX, Distance + StartposY))
                 .setReversed(false)
                 .strafeTo(new Vector2d(0 + StartposX,0 + StartposY))
                 .build();
 
         splineTraj = Playbox.actionBuilder(new Pose2d(StartposX,StartposY,Math.toRadians(StartposHeading)))
                 .splineToLinearHeading(new Pose2d(Distance + StartposX,Distance + StartposY, Math.toRadians(90 + StartposHeading)),Math.toRadians(90 + StartposHeading))
-                .splineToLinearHeading(new Pose2d(0,0, Math.toRadians(0 + StartposHeading)),Math.toRadians(90 + StartposHeading))
+                .splineToLinearHeading(new Pose2d(0 + StartposX,0 + StartposY, Math.toRadians(0 + StartposHeading)),Math.toRadians(90 + StartposHeading))
                 .build();
     }
 

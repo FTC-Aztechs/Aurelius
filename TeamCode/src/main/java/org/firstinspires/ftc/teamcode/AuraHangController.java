@@ -82,7 +82,7 @@ public class AuraHangController {
                 funky.setPosition(FunkyIdle);
                 currState = AuraHangController.HangState.Idle;
                 break;
-        }
+            }
 
         return;
     }

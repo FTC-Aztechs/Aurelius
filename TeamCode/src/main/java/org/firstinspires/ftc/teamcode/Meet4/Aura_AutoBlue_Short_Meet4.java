@@ -52,6 +52,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.teamcode.AprilTagDetectionPipeline;
+import org.firstinspires.ftc.teamcode.AuraHeadingEstimator;
 import org.firstinspires.ftc.teamcode.AuraRobot;
 import org.firstinspires.ftc.teamcode.roadrunnerbasics.MecanumDrive;
 import org.firstinspires.ftc.vision.VisionPortal;
@@ -75,7 +76,7 @@ import java.util.List;
  */
 
 @Config
-@Autonomous(name="Blue_Short", group="Linear OpMode")
+@Autonomous(name="Blue_Short4", group="Linear OpMode")
 
 public class Aura_AutoBlue_Short_Meet4 extends LinearOpMode {
 
@@ -87,9 +88,9 @@ public class Aura_AutoBlue_Short_Meet4 extends LinearOpMode {
     Pose2d Purple2Pos = new Pose2d(37, 12, Math.toRadians(-90));
     Pose2d Purple3Pos = new Pose2d(27, 0, Math.toRadians(-90));
 
-    Pose2d Yellow1Pos = new Pose2d(20, 38, Math.toRadians(-90));
-    Pose2d Yellow2Pos = new Pose2d(28, 38,Math.toRadians(-90));
-    Pose2d Yellow3Pos = new Pose2d(33,38,Math.toRadians(-90));
+    Pose2d Yellow1Pos = new Pose2d(20, 37, Math.toRadians(-90));
+    Pose2d Yellow2Pos = new Pose2d(26, 37,Math.toRadians(-90));
+    Pose2d Yellow3Pos = new Pose2d(33,37,Math.toRadians(-90));
 
     Vector2d ParkPos = new Vector2d(7, 37);
 
@@ -117,8 +118,30 @@ public class Aura_AutoBlue_Short_Meet4 extends LinearOpMode {
 
     AuraRobot Aurelius = new AuraRobot();
     MecanumDrive BlueShort;
+    public AuraHeadingEstimator myHeadingEstimator;
+
 
     private static FtcDashboard auraBoard;
+
+    //TODO: imu
+    public class IMUController implements Action {
+        @Override
+        public boolean run(TelemetryPacket tPkt) {
+
+            double oldHeading = BlueShort.pose.heading.log();
+            telemetry.addData("Old heading", Math.toDegrees(oldHeading));
+            double yaw = myHeadingEstimator.getYaw();
+            telemetry.addData("IMU Heading correction: ", Math.toDegrees(yaw - oldHeading));
+            telemetry.addData("Corrected heading:", Math.toDegrees(yaw));
+            telemetry.update();
+
+            BlueShort.pose = new Pose2d(BlueShort.pose.position.x, BlueShort.pose.position.y, yaw);
+
+            return false;
+        }
+    }
+
+    public Action rectifyHeadingError = new IMUController();
 
     //TODO: declare April Tag stuffi
     OpenCvWebcam Sauron = null;
@@ -209,6 +232,7 @@ public class Aura_AutoBlue_Short_Meet4 extends LinearOpMode {
 
         Aurelius.init(hardwareMap);
         BlueShort = new MecanumDrive(Aurelius.hwMap, new Pose2d(0,0,0));
+        myHeadingEstimator = new AuraHeadingEstimator(Aurelius.hwMap);
         ElapsedTime trajectoryTimer = new ElapsedTime(MILLISECONDS);
 
         auraBoard = FtcDashboard.getInstance();
@@ -326,31 +350,34 @@ public class Aura_AutoBlue_Short_Meet4 extends LinearOpMode {
     void buildPurpleTrajectories()
     {
         trajPos1Purple = BlueShort.actionBuilder(StartPos)
-                .splineToLinearHeading(Purple1Pos, Math.toRadians(0))
+                .splineToLinearHeading(Purple1Pos, Math.toRadians(-90))
                 .build();
 
         trajPos2Purple = BlueShort.actionBuilder(StartPos)
-                .splineToLinearHeading(Purple2Pos, Math.toRadians(0))
+                .splineToLinearHeading(Purple2Pos, Math.toRadians(-90))
                 .build();
 
         trajPos3Purple = BlueShort.actionBuilder(StartPos)
-                .splineToLinearHeading(Purple3Pos, Math.toRadians(0))
+                .splineToLinearHeading(Purple3Pos, Math.toRadians(-90))
                 .build();
     }
 
     void buildYellowTrajectories()
     {
         trajPos1Yellow = BlueShort.actionBuilder(Purple1Pos)
+                .stopAndAdd(rectifyHeadingError)
                 .setReversed(true)
                 .splineToLinearHeading(Yellow1Pos, Math.toRadians(90))
                 .build();
 
         trajPos2Yellow = BlueShort.actionBuilder(Purple2Pos)
+                .stopAndAdd(rectifyHeadingError)
                 .setReversed(true)
                 .splineToLinearHeading(Yellow2Pos, Math.toRadians(90))
                 .build();
 
         trajPos3Yellow = BlueShort.actionBuilder(Purple3Pos)
+                .stopAndAdd(rectifyHeadingError)
                 .setReversed(true)
                 .splineToLinearHeading(Yellow3Pos, Math.toRadians(90))
                 .build();
@@ -375,7 +402,7 @@ public class Aura_AutoBlue_Short_Meet4 extends LinearOpMode {
     {
         runtime.reset();
         while(runtime.seconds() < 0.8) {
-            Aurelius.setPower(INTAKE, -0.2);
+            Aurelius.setPower(INTAKE, -0.175);
         }
         Aurelius.setPower(INTAKE, 0);
     }
@@ -499,7 +526,7 @@ public class Aura_AutoBlue_Short_Meet4 extends LinearOpMode {
         else
             PurpleDropOffPos = 3;
 
-//        //TODO REmove this override
+//        //TODO Remove this override
 //        PurpleDropOffPos = 1;
 
         telemetry.addData("Detected Spike Mark X = ", x);

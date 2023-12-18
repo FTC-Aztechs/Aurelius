@@ -82,7 +82,7 @@ import java.util.concurrent.TimeUnit;
  */
 
 @Config
-@Autonomous(name="Red_Long", group="Linear OpMode")
+@Autonomous(name="Red_Long4", group="Linear OpMode")
 
 public class Aura_AutoRed_Long_Meet4 extends LinearOpMode {
 
@@ -90,19 +90,19 @@ public class Aura_AutoRed_Long_Meet4 extends LinearOpMode {
 
     Pose2d StartPos = new Pose2d(0,0,0);
 
+    Pose2d Purple3Pos = new Pose2d(28, -2, Math.toRadians(-90));
+    Pose2d Purple2Pos = new Pose2d(36, 14, Math.toRadians(-90));
     Pose2d Purple1Pos = new Pose2d(28, 19, Math.toRadians(-90));
-    Pose2d Purple2Pos = new Pose2d(36, 12, Math.toRadians(-90));
-    Pose2d Purple3Pos = new Pose2d(28, 0, Math.toRadians(-90));
 
-    Vector2d BeforeGatePos3 = new Vector2d(50,4);
-    Vector2d BeforeGatePos2 = new Vector2d(50,16);
-    Vector2d BeforeGatePos1 = new Vector2d(50,23);
+    Vector2d BeforeGatePos3 = new Vector2d(50,-2);
+    Vector2d BeforeGatePos2 = new Vector2d(50,14);
+    Vector2d BeforeGatePos1 = new Vector2d(50,19);
     Vector2d AfterGateTagPos = new Vector2d(50, -51.25);
     Vector2d AfterGatePos = new Vector2d(50, 68);
 
-    Pose2d Yellow3Pos = new Pose2d(14, -89, Math.toRadians(90));
-    Pose2d Yellow2Pos = new Pose2d(20, -89, Math.toRadians(90));
-    Pose2d Yellow1Pos = new Pose2d(30, -89, Math.toRadians(90));
+    Pose2d Yellow3Pos = new Pose2d(22,  -87.5, Math.toRadians(90));
+    Pose2d Yellow2Pos = new Pose2d(28,  -87.5, Math.toRadians(90));
+    Pose2d Yellow1Pos = new Pose2d(33,  -87.5, Math.toRadians(90));
 //    Pose2d Yellow1Pos = new Pose2d(22, 90, Math.toRadians(-90));
 //    Pose2d Yellow2Pos = new Pose2d(28, 90, Math.toRadians(-90));
 //    Pose2d Yellow3Pos = new Pose2d(33, 90, Math.toRadians(-90));
@@ -113,9 +113,9 @@ public class Aura_AutoRed_Long_Meet4 extends LinearOpMode {
     double AfterGateHeading = 90;
 
     // Set these manually from the Robot once it is at AfterGatePos.
-    double RangeCalibrated   = 40.9;
+    double RangeCalibrated   = 41;
     double YawCalibrated     = 0.0;
-    double BearingCalibrated = -17;
+    double BearingCalibrated = -16;
     boolean bProceedToYellow = false;
 
 
@@ -141,7 +141,7 @@ public class Aura_AutoRed_Long_Meet4 extends LinearOpMode {
 
     public static int PurpleDropOffPos = 0;
     public static double SplineAngle = 0;
-    public static double TangentAngle = -70;
+    public static double TangentAngle = 0;
 
     AuraRobot Aurelius = new AuraRobot();
     MecanumDrive RedLong;
@@ -169,7 +169,7 @@ public class Aura_AutoRed_Long_Meet4 extends LinearOpMode {
         }
     }
 
-    public Action rectifyHeadingError = new Aura_AutoRed_Long_Meet4.IMUController();
+    public Action rectifyHeadingError = new IMUController();
 
     public class backwallAprilTagController implements Action {
         @Override
@@ -414,7 +414,7 @@ public class Aura_AutoRed_Long_Meet4 extends LinearOpMode {
                 .build();
 
         trajPos3Purple = RedLong.actionBuilder(StartPos)
-                .splineToLinearHeading(Purple3Pos, Math.toRadians(0))
+                .splineToLinearHeading(Purple3Pos, Math.toRadians(-90))
                 .build();
     }
 
@@ -422,36 +422,36 @@ public class Aura_AutoRed_Long_Meet4 extends LinearOpMode {
     {
         trajPos1Yellow = RedLong.actionBuilder(Purple1Pos)
                 .setReversed(false)
-                .lineToY(23)
+                .lineToY(21)
                 .strafeTo(BeforeGatePos1)
                 .stopAndAdd(rectifyHeadingError)
                 .strafeTo(AfterGateTagPos)
                 .stopAndAdd(updateAfterGatePos)
-                .splineToLinearHeading(new Pose2d(ParkPos.x, ParkPos.y, Math.toRadians(-90)), Math.toRadians(90))
+                .splineToLinearHeading(new Pose2d(ParkPos.x, ParkPos.y, Math.toRadians(90)), Math.toRadians(-90))
                 .stopAndAdd(rectifyHeadingError)
                 .strafeTo(new Vector2d(Yellow1Pos.component1().x,Yellow1Pos.component1().y))
                 .build();
 
         trajPos2Yellow = RedLong.actionBuilder(Purple2Pos)
                 .setReversed(false)
-                .lineToY(16)
+                .lineToY(18)
                 .strafeTo(BeforeGatePos2)
                 .stopAndAdd(rectifyHeadingError)
                 .strafeTo(AfterGateTagPos)
                 .stopAndAdd(updateAfterGatePos)
-                .splineToLinearHeading(new Pose2d(ParkPos.x, ParkPos.y, Math.toRadians(-90)), Math.toRadians(90))
+                .splineToLinearHeading(new Pose2d(ParkPos.x, ParkPos.y, Math.toRadians(90)), Math.toRadians(-90))
                 .stopAndAdd(rectifyHeadingError)
                 .strafeTo(new Vector2d(Yellow2Pos.component1().x,Yellow2Pos.component1().y))
                 .build();
 
         trajPos3Yellow = RedLong.actionBuilder(Purple3Pos)
                 .setReversed(false)
-                .lineToY(4)
+                .lineToY(2)
                 .strafeTo(BeforeGatePos3)
                 .stopAndAdd(rectifyHeadingError)
                 .strafeTo(AfterGateTagPos)
                 .stopAndAdd(updateAfterGatePos)
-                .splineToLinearHeading(new Pose2d(ParkPos.x, ParkPos.y, Math.toRadians(-90)), Math.toRadians(90))
+                .splineToLinearHeading(new Pose2d(ParkPos.x, ParkPos.y, Math.toRadians(90)), Math.toRadians(-90))
                 .stopAndAdd(rectifyHeadingError)
                 .strafeTo(new Vector2d(Yellow3Pos.component1().x,Yellow3Pos.component1().y))
                 .build();
@@ -475,7 +475,7 @@ public class Aura_AutoRed_Long_Meet4 extends LinearOpMode {
     {
         runtime.reset();
         while(runtime.seconds() < 0.8) {
-            Aurelius.setPower(INTAKE, -0.2);
+            Aurelius.setPower(INTAKE, -0.175);
         }
         Aurelius.setPower(INTAKE, 0);
     }
@@ -517,6 +517,7 @@ public class Aura_AutoRed_Long_Meet4 extends LinearOpMode {
     //TODO: add any motors/servos that initialized later
     void initMotorsAndServos(boolean run_to_position)
     {
+
     }
 
     private double getBatteryVoltage() {
@@ -646,11 +647,11 @@ public class Aura_AutoRed_Long_Meet4 extends LinearOpMode {
             telemetry.addData("Yaw","%3.0f degrees", desiredTag.ftcPose.yaw);
             telemetry.update();
 
-            double deltaX = (RangeCalibrated          * Math.cos(Math.toRadians(BearingCalibrated))) -
-                            (desiredTag.ftcPose.range * Math.cos(Math.toRadians(desiredTag.ftcPose.bearing)));
+            double deltaX = (RangeCalibrated          * Math.sin(Math.toRadians(BearingCalibrated))) -
+                            (desiredTag.ftcPose.range * Math.sin(Math.toRadians(desiredTag.ftcPose.bearing)));
 
-            double deltaY = (RangeCalibrated          * Math.sin(Math.toRadians(BearingCalibrated))) -
-                    (desiredTag.ftcPose.range * Math.sin(Math.toRadians(desiredTag.ftcPose.bearing)));
+            double deltaY = (RangeCalibrated          * Math.cos(Math.toRadians(BearingCalibrated))) -
+                            (desiredTag.ftcPose.range * Math.cos(Math.toRadians(desiredTag.ftcPose.bearing)));
 
 
             double deltaHeading = desiredTag.ftcPose.yaw - YawCalibrated;
@@ -661,7 +662,7 @@ public class Aura_AutoRed_Long_Meet4 extends LinearOpMode {
             telemetry.addData("Deltas", "X: %5.1f Y: %5.1f Heading: %5.1f degrees", deltaX, deltaY, deltaHeading);
             telemetry.update();
 
-            RedLong.pose = new Pose2d(AfterGateTagPos.x + deltaX, AfterGateTagPos.y + deltaY,Math.toRadians(90) + Math.toRadians(deltaHeading));
+            RedLong.pose = new Pose2d(AfterGateTagPos.x + deltaX, AfterGateTagPos.y - deltaY,Math.toRadians(-90) - Math.toRadians(deltaHeading));
             telemetry.addData("Updated pos:", "X: %5.1f Y: %5.1f Heading %5.1f degrees", RedLong.pose.position.x, RedLong.pose.position.y, Math.toDegrees(RedLong.pose.heading.log()));
             telemetry.update();
             return true;

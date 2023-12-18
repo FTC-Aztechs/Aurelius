@@ -27,7 +27,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.firstinspires.ftc.teamcode.Meet3;
+package org.firstinspires.ftc.teamcode.Meet5;
 
 import static com.qualcomm.robotcore.util.ElapsedTime.Resolution.MILLISECONDS;
 import static org.firstinspires.ftc.teamcode.AuraRobot.AuraMotors.INTAKE;
@@ -45,7 +45,6 @@ import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -53,6 +52,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.teamcode.AprilTagDetectionPipeline;
+import org.firstinspires.ftc.teamcode.AuraHeadingEstimator;
 import org.firstinspires.ftc.teamcode.AuraRobot;
 import org.firstinspires.ftc.teamcode.roadrunnerbasics.MecanumDrive;
 import org.firstinspires.ftc.vision.VisionPortal;
@@ -76,11 +76,12 @@ import java.util.List;
  */
 
 @Config
-@Autonomous(name="Red_Short3", group="Linear OpMode")
-@Disabled
+@Autonomous(name="Red_Short", group="Linear OpMode")
 
+public class Aura_AutoRed_Short_Meet5 extends LinearOpMode {
 
-public class Aura_AutoRed_Short_Meet3 extends LinearOpMode {
+    //Todo:switch to field coordinates, x and heading inverse of Red Short
+
 
     //**** Roadrunner Pose2ds ****
 
@@ -105,8 +106,30 @@ public class Aura_AutoRed_Short_Meet3 extends LinearOpMode {
 
     AuraRobot Aurelius = new AuraRobot();
     MecanumDrive RedShort;
+    public AuraHeadingEstimator myHeadingEstimator;
+
 
     private static FtcDashboard auraBoard;
+
+    //TODO: imu
+    public class IMUController implements Action {
+        @Override
+        public boolean run(TelemetryPacket tPkt) {
+
+            double oldHeading =RedShort.pose.heading.log();
+            telemetry.addData("Old heading", Math.toDegrees(oldHeading));
+            double yaw = myHeadingEstimator.getYaw();
+            telemetry.addData("IMU Heading correction: ", Math.toDegrees(yaw - oldHeading));
+            telemetry.addData("Corrected heading:", Math.toDegrees(yaw));
+            telemetry.update();
+
+           RedShort.pose = new Pose2d(RedShort.pose.position.x,RedShort.pose.position.y, yaw);
+
+            return false;
+        }
+    }
+
+    public Action rectifyHeadingError = new IMUController();
 
     //TODO: declare April Tag stuffi
     OpenCvWebcam Sauron = null;
@@ -196,6 +219,7 @@ public class Aura_AutoRed_Short_Meet3 extends LinearOpMode {
 
         Aurelius.init(hardwareMap);
         RedShort = new MecanumDrive(Aurelius.hwMap, new Pose2d(0,0,Math.toRadians(0)));
+        myHeadingEstimator = new AuraHeadingEstimator(Aurelius.hwMap);
         ElapsedTime trajectoryTimer = new ElapsedTime(MILLISECONDS);
 
         auraBoard = FtcDashboard.getInstance();
@@ -331,16 +355,19 @@ public class Aura_AutoRed_Short_Meet3 extends LinearOpMode {
     void buildYellowTrajectories()
     {
         trajPos1Yellow = RedShort.actionBuilder(Purple1Pos)
+                .stopAndAdd(rectifyHeadingError)
                 .setReversed(true)
                 .splineToLinearHeading(Yellow1Pos, Math.toRadians(-90))
                 .build();
 
         trajPos2Yellow = RedShort.actionBuilder(Purple2Pos)
+                .stopAndAdd(rectifyHeadingError)
                 .setReversed(true)
                 .splineToLinearHeading(Yellow2Pos, Math.toRadians(-90))
                 .build();
 
         trajPos3Yellow = RedShort.actionBuilder(Purple3Pos)
+                .stopAndAdd(rectifyHeadingError)
                 .setReversed(true)
                 .splineToLinearHeading(Yellow3Pos, Math.toRadians(-90))
                 .build();
@@ -365,7 +392,7 @@ public class Aura_AutoRed_Short_Meet3 extends LinearOpMode {
     {
         runtime.reset();
         while(runtime.seconds() < 1.2) {
-            Aurelius.setPower(INTAKE, -0.2);
+            Aurelius.setPower(INTAKE, -0.175);
         }
         Aurelius.setPower(INTAKE, 0);
     }

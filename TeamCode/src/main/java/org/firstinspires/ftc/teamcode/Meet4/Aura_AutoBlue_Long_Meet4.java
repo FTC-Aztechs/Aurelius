@@ -82,7 +82,7 @@ import java.util.concurrent.TimeUnit;
  */
 
 @Config
-@Autonomous(name="Blue_Long", group="Linear OpMode")
+@Autonomous(name="Blue_Long4", group="Linear OpMode")
 
 public class Aura_AutoBlue_Long_Meet4 extends LinearOpMode {
 
@@ -100,9 +100,9 @@ public class Aura_AutoBlue_Long_Meet4 extends LinearOpMode {
     Vector2d AfterGateTagPos = new Vector2d(50, 51.25);
     Vector2d AfterGatePos = new Vector2d(50, 68);
 
-    Pose2d Yellow1Pos = new Pose2d(22, 89, Math.toRadians(-90));
-    Pose2d Yellow2Pos = new Pose2d(28, 89, Math.toRadians(-90));
-    Pose2d Yellow3Pos = new Pose2d(33, 89, Math.toRadians(-90));
+    Pose2d Yellow1Pos = new Pose2d(22, 87.5, Math.toRadians(-90));
+    Pose2d Yellow2Pos = new Pose2d(28, 87.5, Math.toRadians(-90));
+    Pose2d Yellow3Pos = new Pose2d(33, 87.5, Math.toRadians(-90));
 //    Pose2d Yellow1Pos = new Pose2d(22, 90, Math.toRadians(-90));
 //    Pose2d Yellow2Pos = new Pose2d(28, 90, Math.toRadians(-90));
 //    Pose2d Yellow3Pos = new Pose2d(33, 90, Math.toRadians(-90));
@@ -113,7 +113,7 @@ public class Aura_AutoBlue_Long_Meet4 extends LinearOpMode {
     double AfterGateHeading = 90;
 
     // Set these manually from the Robot once it is at AfterGatePos.
-    double RangeCalibrated   = 40.3;
+    double RangeCalibrated   = 40;
     double YawCalibrated     = 0.0;
     double BearingCalibrated = 17;
     boolean bProceedToYellow = false;
@@ -478,7 +478,7 @@ public class Aura_AutoBlue_Long_Meet4 extends LinearOpMode {
     {
         runtime.reset();
         while(runtime.seconds() < 0.8) {
-            Aurelius.setPower(INTAKE, -0.2);
+            Aurelius.setPower(INTAKE, -0.17);
         }
         Aurelius.setPower(INTAKE, 0);
     }
@@ -649,11 +649,12 @@ public class Aura_AutoBlue_Long_Meet4 extends LinearOpMode {
             telemetry.addData("Yaw","%3.0f degrees", desiredTag.ftcPose.yaw);
             telemetry.update();
 
-            double deltaX = (RangeCalibrated          * Math.cos(Math.toRadians(BearingCalibrated))) -
+            double deltaX = (RangeCalibrated          * Math.sin(Math.toRadians(BearingCalibrated))) -
+                    (desiredTag.ftcPose.range * Math.sin(Math.toRadians(desiredTag.ftcPose.bearing)));
+
+            double deltaY = (RangeCalibrated          * Math.cos(Math.toRadians(BearingCalibrated))) -
                             (desiredTag.ftcPose.range * Math.cos(Math.toRadians(desiredTag.ftcPose.bearing)));
 
-            double deltaY = (RangeCalibrated          * Math.sin(Math.toRadians(BearingCalibrated))) -
-                    (desiredTag.ftcPose.range * Math.sin(Math.toRadians(desiredTag.ftcPose.bearing)));
 
 
             double deltaHeading = YawCalibrated - desiredTag.ftcPose.yaw;

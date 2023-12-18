@@ -45,7 +45,7 @@ public class AuraIntakeController {
 
         switch (targetState) {
             case OUT:
-                intakeMotor.setPower(speed);
+                intakeMotor.setPower(speed * 0.8);
                 currState = intakeState.OUT;
                 break;
             case IN:
