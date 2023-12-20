@@ -94,31 +94,26 @@ public class Aura_AutoBlue_Long_Meet5 extends LinearOpMode {
     //to find heading: add -90 degrees to field centric start pos heading
 
 
-    //starting position     Pose2d StartPos = new Pose2d(-36,61.5,Math.toRadians(-90));
+    Pose2d StartPos = new Pose2d(-36,61.5,Math.toRadians(-90);//0,0,0
 
-    Pose2d StartPos = new Pose2d(0,0,0);
+    Pose2d Purple1Pos = new Pose2d(-34, 33.5, Math.toRadians(0));//28,2,90
+    Pose2d Purple2Pos = new Pose2d(-59, 25.5, Math.toRadians(0));//36,-14,90
+    Pose2d Purple3Pos = new Pose2d(-55, 33.5, Math.toRadians(0));//28,-19,90
 
-    Pose2d Purple1Pos = new Pose2d(28, 2, Math.toRadians(90));//28,2,90
-    Pose2d Purple2Pos = new Pose2d(36, -14, Math.toRadians(90));//36,-14,90
-    Pose2d Purple3Pos = new Pose2d(28, -19, Math.toRadians(90));//28,-19,90
+    Vector2d BeforeGatePos1 = new Vector2d(-34,11.5);//50,2
+    Vector2d BeforeGatePos2 = new Vector2d(-50, 11.5);//50,-14
+    Vector2d BeforeGatePos3 = new Vector2d(-55, 11.5);//50,-19
+    Vector2d AfterGateTagPos = new Vector2d(15.25, 11.5);//50,51.25
+    Vector2d AfterGatePos = new Vector2d(32, 11.5);//50,68
 
-    Vector2d BeforeGatePos1 = new Vector2d(50,2);//50,2
-    Vector2d BeforeGatePos2 = new Vector2d(50,-14);//50,-14
-    Vector2d BeforeGatePos3 = new Vector2d(50,-19);//50,-19
-    Vector2d AfterGateTagPos = new Vector2d(50, 51.25);//50,51.25
-    Vector2d AfterGatePos = new Vector2d(50, 68);//50,68
-
-    Pose2d Yellow1Pos = new Pose2d(22, 87.5, Math.toRadians(-90));//22,87.5,-90
-    Pose2d Yellow2Pos = new Pose2d(28, 87.5, Math.toRadians(-90));//22,87.5,-90
-    Pose2d Yellow3Pos = new Pose2d(33, 87.5, Math.toRadians(-90));//22,87.5, -90
-//    Pose2d Yellow1Pos = new Pose2d(22, 90, Math.toRadians(-90));
-//    Pose2d Yellow2Pos = new Pose2d(28, 90, Math.toRadians(-90));
-//    Pose2d Yellow3Pos = new Pose2d(33, 90, Math.toRadians(-90));
+    Pose2d Yellow1Pos = new Pose2d(51.5, 39.5, Math.toRadians(-180));//22,87.5,-90
+    Pose2d Yellow2Pos = new Pose2d(51.5, 39.5, Math.toRadians(-180));//22,87.5,-90
+    Pose2d Yellow3Pos = new Pose2d(51.5, 39.5, Math.toRadians(-180));//22,87.5, -90
 
 
-    Vector2d ParkPos = new Vector2d(50, 82);
+    Vector2d ParkPos = new Vector2d(46, 11.5);//50, 82
 
-    double AfterGateHeading = 90;
+    double AfterGateHeading = -180;//90
 
     // Set these manually from the Robot once it is at AfterGatePos.
     double RangeCalibrated   = 40;
