@@ -90,29 +90,26 @@ public class Aura_AutoRed_Long_Meet5 extends LinearOpMode {
 
     //Todo:switch to field coordinates, x and heading inverse of Red Long
 
-    Pose2d StartPos = new Pose2d(0,0,0);
+    Pose2d StartPos = new Pose2d(-36, -61.5, Math.toRadians(90));//0,0,0
 
-    Pose2d Purple3Pos = new Pose2d(28, -2, Math.toRadians(-90));
-    Pose2d Purple2Pos = new Pose2d(36, 14, Math.toRadians(-90));
-    Pose2d Purple1Pos = new Pose2d(28, 19, Math.toRadians(-90));
+    Pose2d Purple3Pos = new Pose2d(-34, -33.5, Math.toRadians(0));//28,-2,-90
+    Pose2d Purple2Pos = new Pose2d(-50, -25.5, Math.toRadians(0));//36,14,-90
+    Pose2d Purple1Pos = new Pose2d(-55, -33.5, Math.toRadians(0));//28,19,-90
 
-    Vector2d BeforeGatePos3 = new Vector2d(50,-2);
-    Vector2d BeforeGatePos2 = new Vector2d(50,14);
-    Vector2d BeforeGatePos1 = new Vector2d(50,19);
-    Vector2d AfterGateTagPos = new Vector2d(50, -51.25);
-    Vector2d AfterGatePos = new Vector2d(50, 68);
+    Vector2d BeforeGatePos3 = new Vector2d(-34, -11.5);//50,-2
+    Vector2d BeforeGatePos2 = new Vector2d(-50, -11.5);//50,14
+    Vector2d BeforeGatePos1 = new Vector2d(-55, -11.5);//50,19
+    Vector2d AfterGateTagPos = new Vector2d(15.25, -11.5);//50, -51.5
+    Vector2d AfterGatePos = new Vector2d(32, -11.5);//50, 68
 
-    Pose2d Yellow3Pos = new Pose2d(22,  -87.5, Math.toRadians(90));
-    Pose2d Yellow2Pos = new Pose2d(28,  -87.5, Math.toRadians(90));
-    Pose2d Yellow1Pos = new Pose2d(33,  -87.5, Math.toRadians(90));
-//    Pose2d Yellow1Pos = new Pose2d(22, 90, Math.toRadians(-90));
-//    Pose2d Yellow2Pos = new Pose2d(28, 90, Math.toRadians(-90));
-//    Pose2d Yellow3Pos = new Pose2d(33, 90, Math.toRadians(-90));
+    Pose2d Yellow3Pos = new Pose2d(51.5,  -39.5, Math.toRadians(-180));//22,-87.5,90
+    Pose2d Yellow2Pos = new Pose2d(51.5,  -33.5, Math.toRadians(-180));//28,-87.5,90
+    Pose2d Yellow1Pos = new Pose2d(51.5,  -28.5, Math.toRadians(-180));//28,-87.5,90
 
 
-    Vector2d ParkPos = new Vector2d(50, -82);
+    Vector2d ParkPos = new Vector2d(46, -11.5);//50,-82
 
-    double AfterGateHeading = 90;
+    double AfterGateHeading = -180;//90
 
     // Set these manually from the Robot once it is at AfterGatePos.
     double RangeCalibrated   = 41;
@@ -121,14 +118,19 @@ public class Aura_AutoRed_Long_Meet5 extends LinearOpMode {
     boolean bProceedToYellow = false;
 
 
-    //Roadrunner quick guide brought to you by Lavanya
+   //Roadrunner field-centric coordinates quick guide brought to you by Lavanya
 
-    //y+ robot drives toward backdroo
-    //y- robot drives away from backdrop
-    //x- robot drives closer to starting wall
-    //x+ robot drives toward the center of the field
+    //y+ robot drives from centerfield towards the blue side
+    //y- robot drives from centerfield towards the red side
+    //x- robot drives from centerfield towards stacks
+    //x+ robot drives from centerfield towards backdrops
 
+    //0° robot from centerfield faces backdrop
+    //90° robot from centerfield faces blue
+    //180° robot from centerfield faces stacks
+    //-90° robot from centerfield faces red
     //tangent parameter in splines = changing angle changes the shape of the path
+
     //setTangent() = changes the direction in which the robot initially starts to drive
     //90 = to the left
     //180 = to the back
