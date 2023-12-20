@@ -107,8 +107,8 @@ public class Aura_AutoBlue_Long_Meet5 extends LinearOpMode {
     Vector2d AfterGatePos = new Vector2d(32, 11.5);//50,68
 
     Pose2d Yellow1Pos = new Pose2d(51.5, 39.5, Math.toRadians(-180));//22,87.5,-90
-    Pose2d Yellow2Pos = new Pose2d(51.5, 39.5, Math.toRadians(-180));//22,87.5,-90
-    Pose2d Yellow3Pos = new Pose2d(51.5, 39.5, Math.toRadians(-180));//22,87.5, -90
+    Pose2d Yellow2Pos = new Pose2d(51.5, 33.5, Math.toRadians(-180));//22,87.5,-90
+    Pose2d Yellow3Pos = new Pose2d(51.5, 28.5, Math.toRadians(-180));//22,87.5, -90
 
 
     Vector2d ParkPos = new Vector2d(46, 11.5);//50, 82
