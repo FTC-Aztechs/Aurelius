@@ -82,7 +82,7 @@ public class Aura_AutoBlue_Short_Meet5 extends LinearOpMode {
 
     //**** Roadrunner Pose2ds ****
 
-    Pose2d StartPos = new Pose2d(12,61.5,Math.toRadians(-90));
+    Pose2d StartPos = new Pose2d(12,61.5,Math.toRadians(-90));//0,0,0
 
     Pose2d Purple1Pos = new Pose2d(31, 34.5 , Math.toRadians(-180)); //27,19,-90
     Pose2d Purple2Pos = new Pose2d(24, 24.5 , Math.toRadians(-180));  //37,12,-90
