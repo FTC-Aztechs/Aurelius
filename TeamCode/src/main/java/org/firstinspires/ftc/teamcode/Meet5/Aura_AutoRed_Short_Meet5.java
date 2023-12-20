@@ -85,17 +85,40 @@ public class Aura_AutoRed_Short_Meet5 extends LinearOpMode {
 
     //**** Roadrunner Pose2ds ****
 
-    Pose2d StartPos = new Pose2d(0,0,0);
+    Pose2d StartPos = new Pose2d(12,-61.5,Math.toRadians(90);//0,0,0
 
-    Pose2d Purple1Pos = new Pose2d(28, 2, Math.toRadians(90));
-    Pose2d Purple2Pos = new Pose2d(36, -12, Math.toRadians(90));
-    Pose2d Purple3Pos = new Pose2d(28, -19, Math.toRadians(90));
+    Pose2d Purple1Pos = new Pose2d(31, -34.5, Math.toRadians(180));//28,2,90
+    Pose2d Purple2Pos = new Pose2d(24, -24.5, Math.toRadians(180));//36,-12,90
+    Pose2d Purple3Pos = new Pose2d(12, -34.5, Math.toRadians(180));//28,-19,90
 
-    Pose2d Yellow3Pos = new Pose2d(20, -37, Math.toRadians(90));
-    Pose2d Yellow2Pos = new Pose2d(28, -37, Math.toRadians(90));
-    Pose2d Yellow1Pos = new Pose2d(33,-37, Math.toRadians(90));
+    Pose2d Yellow3Pos = new Pose2d(49, -34.5, Math.toRadians(180));//20,-37,90
+    Pose2d Yellow2Pos = new Pose2d(49, -35.5, Math.toRadians(180));//28,-37,90
+    Pose2d Yellow1Pos = new Pose2d(49,-28.5, Math.toRadians(180));//33,-37,90
 
-    Vector2d ParkPos = new Vector2d(7, -37);
+    Vector2d ParkPos = new Vector2d(49, -54.5);//7,-37
+
+    
+
+    //Roadrunner field-centric coordinates quick guide brought to you by Lavanya
+
+    //y+ robot drives from centerfield towards the blue side
+    //y- robot drives from centerfield towards the red side
+    //x- robot drives from centerfield towards stacks
+    //x+ robot drives from centerfield towards backdrops
+
+    //0° robot from centerfield faces backdrop
+    //90° robot from centerfield faces blue
+    //180° robot from centerfield faces stacks
+    //-90° robot from centerfield faces red
+    //tangent parameter in splines = changing angle changes the shape of the path
+
+    //setTangent() = changes the direction in which the robot initially starts to drive
+    //90 = to the left
+    //180 = to the back
+    //-90 = to the right
+    //0 = forward
+
+    //************
 
 
     private static final double LEFT_SPIKEMARK_BOUNDARY_X = 250;
