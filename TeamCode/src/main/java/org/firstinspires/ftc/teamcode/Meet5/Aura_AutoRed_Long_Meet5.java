@@ -102,12 +102,12 @@ public class Aura_AutoRed_Long_Meet5 extends LinearOpMode {
     Vector2d AfterGateTagPos = new Vector2d(15.25, -11.5);//50, -51.5
     Vector2d AfterGatePos = new Vector2d(32, -11.5);//50, 68
 
-    Pose2d Yellow3Pos = new Pose2d(51.5,  -39.5, Math.toRadians(-180));//22,-87.5,90
-    Pose2d Yellow2Pos = new Pose2d(51.5,  -33.5, Math.toRadians(-180));//28,-87.5,90
-    Pose2d Yellow1Pos = new Pose2d(51.5,  -28.5, Math.toRadians(-180));//28,-87.5,90
+    Pose2d Yellow3Pos = new Pose2d(51.5,  -39.5, Math.toRadians(180));//22,-87.5,90
+    Pose2d Yellow2Pos = new Pose2d(51.5,  -33.5, Math.toRadians(180));//28,-87.5,90
+    Pose2d Yellow1Pos = new Pose2d(51.5,  -28.5, Math.toRadians(180));//28,-87.5,90
 
 
-    Vector2d ParkPos = new Vector2d(46, -11.5);//50,-82
+    Vector2d ParkPos = new Vector2d(51.5, -11.5);//50,-82
 
     double AfterGateHeading = -180;//90
 
@@ -284,8 +284,8 @@ public class Aura_AutoRed_Long_Meet5 extends LinearOpMode {
         //   Option 3: Ditch the VisionProcessor and use EasyOpenCV directly
 
         Aurelius.init(hardwareMap);
-        RedLong = new MecanumDrive(Aurelius.hwMap, new Pose2d(0,0,0));
-        myHeadingEstimator = new AuraHeadingEstimator(Aurelius.hwMap);
+        RedLong = new MecanumDrive(Aurelius.hwMap, StartPos);
+        myHeadingEstimator = new AuraHeadingEstimator(Aurelius.hwMap, StartPos);
         ElapsedTime trajectoryTimer = new ElapsedTime(MILLISECONDS);
 
         auraBoard = FtcDashboard.getInstance();
@@ -426,36 +426,36 @@ public class Aura_AutoRed_Long_Meet5 extends LinearOpMode {
     {
         trajPos1Yellow = RedLong.actionBuilder(Purple1Pos)
                 .setReversed(false)
-                .lineToY(21)
+                .lineToX(-57)
                 .strafeTo(BeforeGatePos1)
                 .stopAndAdd(rectifyHeadingError)
                 .strafeTo(AfterGateTagPos)
                 .stopAndAdd(updateAfterGatePos)
-                .splineToLinearHeading(new Pose2d(ParkPos.x, ParkPos.y, Math.toRadians(90)), Math.toRadians(-90))
+                .splineToLinearHeading(new Pose2d(ParkPos.x, ParkPos.y, Math.toRadians(180)), Math.toRadians(-90))
                 .stopAndAdd(rectifyHeadingError)
                 .strafeTo(new Vector2d(Yellow1Pos.component1().x,Yellow1Pos.component1().y))
                 .build();
 
         trajPos2Yellow = RedLong.actionBuilder(Purple2Pos)
                 .setReversed(false)
-                .lineToY(18)
+                .lineToX(-54)
                 .strafeTo(BeforeGatePos2)
                 .stopAndAdd(rectifyHeadingError)
                 .strafeTo(AfterGateTagPos)
                 .stopAndAdd(updateAfterGatePos)
-                .splineToLinearHeading(new Pose2d(ParkPos.x, ParkPos.y, Math.toRadians(90)), Math.toRadians(-90))
+                .splineToLinearHeading(new Pose2d(ParkPos.x, ParkPos.y, Math.toRadians(180)), Math.toRadians(-90))
                 .stopAndAdd(rectifyHeadingError)
                 .strafeTo(new Vector2d(Yellow2Pos.component1().x,Yellow2Pos.component1().y))
                 .build();
 
         trajPos3Yellow = RedLong.actionBuilder(Purple3Pos)
                 .setReversed(false)
-                .lineToY(2)
+                .lineToX(-38)
                 .strafeTo(BeforeGatePos3)
                 .stopAndAdd(rectifyHeadingError)
                 .strafeTo(AfterGateTagPos)
                 .stopAndAdd(updateAfterGatePos)
-                .splineToLinearHeading(new Pose2d(ParkPos.x, ParkPos.y, Math.toRadians(90)), Math.toRadians(-90))
+                .splineToLinearHeading(new Pose2d(ParkPos.x, ParkPos.y, Math.toRadians(180)), Math.toRadians(-90))
                 .stopAndAdd(rectifyHeadingError)
                 .strafeTo(new Vector2d(Yellow3Pos.component1().x,Yellow3Pos.component1().y))
                 .build();

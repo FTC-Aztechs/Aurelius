@@ -216,7 +216,7 @@ public class Aura_AutoRed_Short_Meet4 extends LinearOpMode {
 
         Aurelius.init(hardwareMap);
         RedShort = new MecanumDrive(Aurelius.hwMap, new Pose2d(0,0,Math.toRadians(0)));
-        myHeadingEstimator = new AuraHeadingEstimator(Aurelius.hwMap);
+        myHeadingEstimator = new AuraHeadingEstimator(Aurelius.hwMap, StartPos);
         ElapsedTime trajectoryTimer = new ElapsedTime(MILLISECONDS);
 
         auraBoard = FtcDashboard.getInstance();

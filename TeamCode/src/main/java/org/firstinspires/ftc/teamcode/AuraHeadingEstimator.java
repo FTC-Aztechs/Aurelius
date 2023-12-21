@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.acmerobotics.roadrunner.Pose2d;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
@@ -14,8 +15,9 @@ public class AuraHeadingEstimator {
     private IMU.Parameters myIMUParameters;
     private Telemetry telemetry;
     private IMU myIMU;
+    private double heading;
 
-    public AuraHeadingEstimator(HardwareMap hwMap) {
+    public AuraHeadingEstimator(HardwareMap hwMap, Pose2d startPos) {
         myIMU = hwMap.get(IMU.class, "imu");
         myIMUParameters = new IMU.Parameters(
                 new RevHubOrientationOnRobot(
@@ -23,6 +25,7 @@ public class AuraHeadingEstimator {
                         RevHubOrientationOnRobot.UsbFacingDirection.UP)
         );
         myIMU.initialize(myIMUParameters);
+        heading = startPos.heading.log();
     }
 
     public void resetYaw()
@@ -37,6 +40,7 @@ public class AuraHeadingEstimator {
     public double getYaw() {
         // Yaw value should INCREASE as the robot is rotated Counter Clockwise. (Rotation about Z) <br>
         YawPitchRollAngles angles = myIMU.getRobotYawPitchRollAngles();
-        return angles.getYaw(AngleUnit.RADIANS);
+        double Angle = angles.getYaw(AngleUnit.RADIANS) + heading;
+        return Angle;
     }
 }

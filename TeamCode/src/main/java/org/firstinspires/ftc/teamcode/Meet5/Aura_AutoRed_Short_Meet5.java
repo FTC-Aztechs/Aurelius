@@ -85,7 +85,7 @@ public class Aura_AutoRed_Short_Meet5 extends LinearOpMode {
 
     //**** Roadrunner Pose2ds ****
 
-    Pose2d StartPos = new Pose2d(12,-61.5,Math.toRadians(90);//0,0,0
+    Pose2d StartPos = new Pose2d(12,-61.5,Math.toRadians(90));//0,0,0
 
     Pose2d Purple1Pos = new Pose2d(31, -34.5, Math.toRadians(180));//28,2,90
     Pose2d Purple2Pos = new Pose2d(24, -24.5, Math.toRadians(180));//36,-12,90
@@ -241,8 +241,8 @@ public class Aura_AutoRed_Short_Meet5 extends LinearOpMode {
         //   Option 3: Ditch the VisionProcessor and use EasyOpenCV directly
 
         Aurelius.init(hardwareMap);
-        RedShort = new MecanumDrive(Aurelius.hwMap, new Pose2d(0,0,Math.toRadians(0)));
-        myHeadingEstimator = new AuraHeadingEstimator(Aurelius.hwMap);
+        RedShort = new MecanumDrive(Aurelius.hwMap, StartPos);
+        myHeadingEstimator = new AuraHeadingEstimator(Aurelius.hwMap, StartPos);
         ElapsedTime trajectoryTimer = new ElapsedTime(MILLISECONDS);
 
         auraBoard = FtcDashboard.getInstance();
@@ -276,6 +276,7 @@ public class Aura_AutoRed_Short_Meet5 extends LinearOpMode {
         while (!isStarted()) {
             telemetryTfod();
         }
+        myHeadingEstimator.resetYaw();
 
         runtime.reset();
         if (opModeIsActive()) {

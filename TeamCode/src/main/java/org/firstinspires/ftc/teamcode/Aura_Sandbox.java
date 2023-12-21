@@ -172,15 +172,13 @@ public class Aura_Sandbox extends LinearOpMode
         Aurelius.setRunMode(LOWER_RIGHT, RUN_WITHOUT_ENCODER);
 
 
-        telemetry.addData("Right Tracking wheel: ", Aurelius.getCurrentPosition(LOWER_LEFT));
-        telemetry.addData("Left Tracking wheel: ", Aurelius.getCurrentPosition(UPPER_RIGHT));
+        telemetry.addData("Left Tracking wheel: ", Aurelius.getCurrentPosition(LOWER_LEFT));
+        telemetry.addData("Right Tracking wheel: ", Aurelius.getCurrentPosition(UPPER_RIGHT));
         telemetry.addData("Strafe Tracking wheel: ", Aurelius.getCurrentPosition(LOWER_RIGHT));
         initAprilTag();
         if(USE_WEBCAM) {
             setManualExposure(6,250);
         }
-
-
 
         waitForStart();
         //getUserInput();
@@ -220,12 +218,15 @@ public class Aura_Sandbox extends LinearOpMode
                 break;
                 case ENCODER_TESTING:
                 default:
-                    telemetry.addData("Right Tracking wheel: ", Aurelius.getCurrentPosition(LOWER_LEFT));
-                    telemetry.addData("Left Tracking wheel: ", Aurelius.getCurrentPosition(UPPER_RIGHT));
-                    telemetry.addData("Strafe Tracking wheel: ", Aurelius.getCurrentPosition(LOWER_RIGHT));
+//                    telemetry.addData("Right Tracking wheel: ", Aurelius.getCurrentPosition(LOWER_LEFT));
+//                    telemetry.addData("Left Tracking wheel: ", Aurelius.getCurrentPosition(UPPER_RIGHT));
+//                    telemetry.addData("Strafe Tracking wheel: ", Aurelius.getCurrentPosition(LOWER_RIGHT));
                     SandboxManualDrive();
                     break;
             }
+            telemetry.addData("Left Tracking wheel: ", -Aurelius.getCurrentPosition(LOWER_LEFT));
+            telemetry.addData("Right Tracking wheel: ", Aurelius.getCurrentPosition(UPPER_RIGHT));
+            telemetry.addData("Strafe Tracking wheel: ", Aurelius.getCurrentPosition(LOWER_RIGHT));
             telemetry.update();
         }
     }

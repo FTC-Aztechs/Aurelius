@@ -236,8 +236,8 @@ public class Aura_AutoBlue_Short_Meet5 extends LinearOpMode {
         //   Option 3: Ditch the VisionProcessor and use EasyOpenCV directly
 
         Aurelius.init(hardwareMap);
-        BlueShort = new MecanumDrive(Aurelius.hwMap, new Pose2d(0,0,0));
-        myHeadingEstimator = new AuraHeadingEstimator(Aurelius.hwMap);
+        BlueShort = new MecanumDrive(Aurelius.hwMap, StartPos);
+        myHeadingEstimator = new AuraHeadingEstimator(Aurelius.hwMap, StartPos);
         ElapsedTime trajectoryTimer = new ElapsedTime(MILLISECONDS);
 
         auraBoard = FtcDashboard.getInstance();
